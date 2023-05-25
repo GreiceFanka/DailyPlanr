@@ -1,15 +1,14 @@
 package DailyPlanr.controllers;
 
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import DailyPlanr.models.User;
 import DailyPlanr.models.UserRepository;
@@ -19,7 +18,7 @@ import jakarta.validation.Valid;
 public class UserController {
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	private final PasswordEncoder encoder;
 	
 	public UserController(PasswordEncoder encoder) {
@@ -36,28 +35,41 @@ public class UserController {
 	}
 	
 	@PostMapping("/new")
-	public String newUser(@Valid User user) {
+	public String newUser(@Valid User user, RedirectAttributes redirAttrs ) {
 		user.setPassword(encoder.encode(user.getPassword()));
-		userRepository.save(user);
-		return "login";
+		Optional<User> opUser = userRepository.findByLogin(user.getLogin());
+		if(opUser.isEmpty()) {
+			userRepository.save(user);
+			redirAttrs.addFlashAttribute("success", "Everything went just fine.");
+			return "redirect:/login";
+		}else {
+			redirAttrs.addFlashAttribute("error", "User already registered");
+		}
+		return "redirect:/signup";
 	}
 	@GetMapping("/all")
-	public Iterable<User> getAllUsers() {
+	public @ResponseBody Iterable<User> getAllUsers() {
 		return userRepository.findAll();
 	}
 	
 	@PostMapping("/passwordcheck")
-	public ResponseEntity<Boolean> validatePassword (@RequestParam String login, @RequestParam String password) {
+	public String validatePassword (@RequestParam String login, @RequestParam String password, RedirectAttributes redirAttrs) {
 		
 		Optional<User> opUser = userRepository.findByLogin(login);
 		
 		if(opUser.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);	
+			redirAttrs.addFlashAttribute("error", "Login not found.");
+			return "redirect:/login";
 		}
 
 		User user = opUser.get();
 		boolean valid = encoder.matches(password, user.getPassword());
-		HttpStatus status = (valid) ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
-		return ResponseEntity.status(status).body(valid);
+		
+		if(valid) {
+			return "/admin";
+		}else {
+			redirAttrs.addFlashAttribute("error", "Incorrect Password!");
+			 return "redirect:/login";
+		}
 	}
 }
