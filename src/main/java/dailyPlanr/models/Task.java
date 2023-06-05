@@ -14,6 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class Task {
@@ -34,9 +35,14 @@ public class Task {
 	@JoinTable(name= "task_user", joinColumns = {@JoinColumn(name = "task_id")}, inverseJoinColumns = {@JoinColumn(name="user_id")})
 	List<User> users = new ArrayList<>();
 	
+	@ManyToOne
+	@JoinColumn(name = "category_id")
+	private Category categories;
+	
 	public void addUser(User user) {
 		this.users.add(user);
-		user.getTasks().add(this);
+		user.getTasks().add(this);	
+		categories.getTasks().add(this);
 	}
 	
 	public Task() {
@@ -87,4 +93,13 @@ public class Task {
 	public void setUsers(List<User> users) {
 		this.users = users;
 	}
+
+	public Category getCategories() {
+		return categories;
+	}
+
+	public void setCategories(Category categories) {
+		this.categories = categories;
+	}
+	
 }
