@@ -1,6 +1,9 @@
 package dailyPlanr.controllers;
 
 import java.util.Optional;
+
+import javax.inject.Inject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -15,11 +18,15 @@ import dailyPlanr.models.UserRepository;
 import jakarta.validation.Valid;
 
 @Controller
-public class UserController {
+public class UserController{
+
 	@Autowired
 	private UserRepository userRepository;
 
 	private final PasswordEncoder encoder;
+	
+	@Inject
+	private LoggedUser loggedUser;
 	
 	public UserController(PasswordEncoder encoder) {
 		this.encoder = encoder;
@@ -47,7 +54,7 @@ public class UserController {
 		}
 		return "redirect:/signup";
 	}
-	@GetMapping("/all")
+	@GetMapping("/allusers")
 	public @ResponseBody Iterable<User> getAllUsers() {
 		return userRepository.findAll();
 	}
@@ -64,9 +71,12 @@ public class UserController {
 
 		User user = opUser.get();
 		boolean valid = encoder.matches(password, user.getPassword());
-		
+	
 		if(valid) {
-			return "/admin";
+			this.loggedUser.setUserLogged(user);
+			redirAttrs.addFlashAttribute("login", loggedUser.getLoginUser());
+			redirAttrs.addFlashAttribute("user", loggedUser.getUserId());
+			return "redirect:/newtask";
 		}else {
 			redirAttrs.addFlashAttribute("error", "Incorrect Password!");
 			 return "redirect:/login";
