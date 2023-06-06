@@ -67,9 +67,4 @@ public class TaskController {
 		}
 		return "/alltasks";
 	}
-	
-	@GetMapping("/task")
-	public String bringMeTasks() {
-		return "/task";
-	}
 }
