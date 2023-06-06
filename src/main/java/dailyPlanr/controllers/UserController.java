@@ -71,12 +71,9 @@ public class UserController{
 
 		User user = opUser.get();
 		boolean valid = encoder.matches(password, user.getPassword());
-	
 		if(valid) {
-			this.loggedUser.setUserLogged(user);
-			redirAttrs.addFlashAttribute("login", loggedUser.getLoginUser());
-			redirAttrs.addFlashAttribute("user", loggedUser.getUserId());
-			return "redirect:/newtask";
+			this.loggedUser.setUserLogged(user);		
+			return "redirect:/alltasks";
 		}else {
 			redirAttrs.addFlashAttribute("error", "Incorrect Password!");
 			 return "redirect:/login";
