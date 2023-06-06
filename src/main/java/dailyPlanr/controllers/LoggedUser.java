@@ -3,10 +3,12 @@ package dailyPlanr.controllers;
 import javax.inject.Named;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.SessionScope;
 
 import dailyPlanr.models.User;
 
-@Named
+@Named("loggedUser")
+@SessionScope
 @Component
 public class LoggedUser {
 
