@@ -3,24 +3,30 @@
 <head>
 <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="/css/task.css">
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" >
-	<link rel="stylesheet" type="text/css" href="static/css/task.css">
 </head>
 <body>
-<div class="container contact">
-	<div class="row">
-		<div class="col-md-3">
-			<div class="contact-info" style="background-color:#ff9b00;">
-				<h2>Create your tasks</h2>
-			</div>
+	<div class = "container col-md-12">
+			<nav class="navbar navbar-dark bg-dark">
+	  			  <ul class="nav navbar-nav navbar-right">
+                       <li>
+                       		<a href="#" class="dropdown-toggle text-white" data-toggle="dropdown"><span class="glyphicon glyphicon-log-in" th:text="${login}"></span>	
+                       			<span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+ 									<li><a href="#">Logout</a></li>
+                  			</ul>
+                  		</li>
+                 </ul>
+			</nav>
 		</div>
+		<div class="container contact">
+		<div class="col-md-12"></div>	
 		<div class="col-md-9">
 			<div class="contact-form">
 				<form action="/newtask/create/" method="post">
-					<div class="form-group col-sm-10">
-						<h3 th:text = "${login}"></h3>
-					</div>
 					<div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
+					<div class="alert alert-success" role="alert" th:text="${success}" th:if="${success}"></div>
 					<div class="form-group">
 					  <label class="control-label col-sm-2" for="Id"></label>
 					  <input type="text" name="user" id="user" th:if="${user}" th:value="${user}" readonly>
@@ -45,12 +51,10 @@
 						<textarea class="form-control" rows="5" id="description" name="description"></textarea>
 					  </div>
 					</div>
-					<div class="form-group">
-						  <label class="control-label col-sm-2" for="Category">Category</label>
-						  <input type="text" name="categories" id="categories" >
-						  <div class="form-group col-sm-10">          
-					 </div>
-					</div>
+
+					<select class="form-select" aria-label="Default select example" name="categories">
+  						<option th:each="category:${categories}" id="categories" th:value="${category.id}" th:text="${category.name}"></option>
+					</select>
 					<div class="form-group">        
 					  <div class="col-sm-offset-2 col-sm-10">
 						<button type="submit" class="btn btn-default">Submit</button>
@@ -60,10 +64,8 @@
 			</div>
 		</div>
 	</div>
-</div>
-	<script type="text/javascript">
-
-	</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </body>
 
 
