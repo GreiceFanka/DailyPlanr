@@ -32,8 +32,10 @@ public class TaskController {
 	@GetMapping("/newtask")
 	public String tasks(ModelMap model) {
 		boolean session = loggedUser.isLogged();
+		int id = loggedUser.getUserId();
 		if(session) {	
-			List<Category> listCategories = categoryRepository.findAll();
+			List<Category> listCategories = categoryRepository.findCategoryByUser(id);
+			
 			model.addAttribute("login", loggedUser.getLoginUser());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("categories", listCategories);
@@ -64,7 +66,8 @@ public class TaskController {
 			model.addAttribute("login", loggedUser.getLoginUser());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("tasks", allTasks);
+			return "/alltasks";
 		}
-		return "/alltasks";
+		return "redirect:/login";
 	}
 }
