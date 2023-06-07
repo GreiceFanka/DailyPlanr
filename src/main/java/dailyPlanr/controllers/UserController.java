@@ -36,9 +36,15 @@ public class UserController{
 	public String login() {
 		return "login";
 	}
+	
 	@GetMapping("/signup")
 	public String signup() {
 		return "signup";
+	}
+	
+	@GetMapping("/index")
+	public String homePage() {
+		return "/index";
 	}
 	
 	@PostMapping("/new")
@@ -54,6 +60,7 @@ public class UserController{
 		}
 		return "redirect:/signup";
 	}
+	
 	@GetMapping("/allusers")
 	public @ResponseBody Iterable<User> getAllUsers() {
 		return userRepository.findAll();
