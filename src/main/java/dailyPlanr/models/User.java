@@ -25,6 +25,9 @@ public class User {
 	@ManyToMany(mappedBy = "users")
 	List<Task> tasks = new ArrayList<>();
 	
+	@ManyToMany(mappedBy = "users")
+	List<Category> categories = new ArrayList<>();
+	
 	public User() {
 
 	}
@@ -56,4 +59,11 @@ public class User {
 	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
 	}
+	public List<Category> getCategories() {
+		return categories;
+	}
+	public void setCategories(List<Category> categories) {
+		this.categories = categories;
+	}
+
 }
