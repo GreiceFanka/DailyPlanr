@@ -32,6 +32,9 @@ public class Task {
 	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 	private Date data;
 	
+	@Column
+	private String taskStatus = Status.TODO.getDesc();
+	
 	@ManyToMany
 	@JoinTable(name= "task_user", joinColumns = {@JoinColumn(name = "task_id")}, inverseJoinColumns = {@JoinColumn(name="user_id")})
 	List<User> users = new ArrayList<>();
@@ -50,9 +53,10 @@ public class Task {
 
 	}
 	
-	public Task(String title, String description) {
+	public Task(String title, String description, String taskStatus) {
 		this.title = title;
 		this.description = description;
+		this.taskStatus = taskStatus;
 	}
 
 	public int getId() {
@@ -102,5 +106,12 @@ public class Task {
 	public void setCategories(Category categories) {
 		this.categories = categories;
 	}
-	
+
+	public String getTaskStatus() {
+		return taskStatus;
+	}
+
+	public void setTaskStatus(String taskStatus) {
+		this.taskStatus = taskStatus;
+	}
 }
