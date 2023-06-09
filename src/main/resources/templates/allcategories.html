@@ -1,7 +1,35 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
+<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" >
 </head>
 <body>
+	<div class = "container col-md-12">
+			<nav class="navbar navbar-dark bg-dark">
+	  			  <ul class="nav navbar-nav navbar-right">
+                       <li>
+                      		<a href="#" class="dropdown-toggle text-white" data-toggle="dropdown"><span class="glyphicon glyphicon-log-in" th:text="${login}"></span>	
+                       			<span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+ 								<li><a href="#">Logout</a></li>
+                  			</ul>
+                  		</li>
+                 </ul>
+			</nav>
+		</div>
+		
+		<div class="container">
+		<div class="row">
+			<div class="card col-3"  style="margin:30px; padding:10px;" th:each="category:${categories}">
+	  			<div class="card-body">
+				    <p class="card-text" th:text="${category.name}"></p>
+				    <a th:href="@{/edit/category/{id}(id=${category.id})}"><button type="button" class="btn btn-outline-success">Edit</button></a>
+	  			</div>
+	  		</div>
+  		</div>
+</div>
 </body>
 </html>

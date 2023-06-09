@@ -21,18 +21,16 @@
 			</nav>
 		</div>
 		<div class="container">
-		<div class="row" style="padding:30px;">
-			<div class="card col-3" style="margin:30px; padding:10px;" th:each="task:${tasks}">
-	  			<div class="card-body">
-					    <h5 class="card-title" th:text="${task.title}"></h5>
-					    <p class="card-text" th:text="${task.description}"></p>
-					    <button type="button" class="btn btn-outline-success">Edit</button>
-					  <a th:href="@{/delete/task/{id}(id=${task.id})}"><button type="button" class="btn btn-danger">Delete</button></a> 
+		<form th:action="@{/update/category}" method="post">
+				<div class="row" style="padding:30px;">
+					<div th:each="category:${categories}">
+						<label for="name">Name</label>
+						<input id="categories" th:value="${category.name}" name="name">
+						<input  type="hidden" th:value="${category.id}" name="id">
+						<button type="submit" class="btn btn-outline-success">Save</button>
+					</div>
 	  			</div>
-	  		</div>
-  		</div>
+  		</form>
 	</div>
 </body>
-
-
 </html>
