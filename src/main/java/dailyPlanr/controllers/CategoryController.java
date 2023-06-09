@@ -5,16 +5,18 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import dailyPlanr.models.Category;
 import dailyPlanr.models.CategoryRepository;
 import dailyPlanr.models.User;
 import jakarta.validation.Valid;
-@RestController
+@Controller
 public class CategoryController {
 	
 	@Autowired
@@ -42,5 +44,22 @@ public class CategoryController {
 			category.addUsersCategory(user);
 			categoryRepository.save(category);
 			return "salvo";
+	}
+	
+	@GetMapping("/edit/category/{id}")
+		public String editCategory(@PathVariable int id, ModelMap model) {
+			List<Category> categories = categoryRepository.findCategoryById(id);
+			model.addAttribute("login", loggedUser.getLoginUser());
+			model.addAttribute("user", loggedUser.getUserId());
+			model.addAttribute("categories", categories);
+		return "/editcategory";
+	}
+	
+	@PostMapping("/update/category")
+		public String updateCategory(@RequestParam String name,@RequestParam int id, ModelMap model) {
+		categoryRepository.updateCategory(name, id);
+		model.addAttribute("login", loggedUser.getLoginUser());
+		model.addAttribute("user", loggedUser.getUserId());
+		return "redirect:/allcategories";
 	}
 }
