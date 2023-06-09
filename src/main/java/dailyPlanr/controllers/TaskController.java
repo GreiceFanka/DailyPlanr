@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -69,5 +70,11 @@ public class TaskController {
 			return "/alltasks";
 		}
 		return "redirect:/login";
+	}
+	
+	@GetMapping("/delete/task/{id}")
+	public String deleteTask(@PathVariable int id) {
+		taskRepository.deleteById(id);
+		return "redirect:/alltasks";
 	}
 }
