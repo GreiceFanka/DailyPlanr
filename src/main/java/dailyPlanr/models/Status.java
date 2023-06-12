@@ -1,5 +1,8 @@
 package dailyPlanr.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum Status {
 	TODO("To do"),
 	INPROGRESS("In progress"),
@@ -15,4 +18,14 @@ public enum Status {
 	public String getDesc() {
 		return desc;
 	}
+	
+	public static List<String> getAllStatus() {
+        List<String> allStatus = new ArrayList<String>();
+
+        for (Status stat : values())
+            allStatus.add(stat.desc);
+
+        return allStatus;
+    }
+
 }
