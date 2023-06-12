@@ -10,6 +10,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import dailyPlanr.models.Category;
@@ -98,7 +99,7 @@ public class TaskController {
 	}
 	
 	@PostMapping("/update/task")
-	public String updateTask(String data, String title, String description, String taskStatus, int cat_id, int task_id) {
+	public String updateTask(@RequestParam String data,@RequestParam String title,@RequestParam String description,@RequestParam String taskStatus,@RequestParam int cat_id,@RequestParam int task_id) {
 		taskRepository.updateTask(data, title, description, taskStatus, cat_id, task_id);
 		return "redirect:/alltasks";
 	}
