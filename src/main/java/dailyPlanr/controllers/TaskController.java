@@ -14,6 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import dailyPlanr.models.Category;
 import dailyPlanr.models.CategoryRepository;
+import dailyPlanr.models.Status;
 import dailyPlanr.models.Task;
 import dailyPlanr.models.TaskRepository;
 import dailyPlanr.models.User;
@@ -29,6 +30,7 @@ public class TaskController {
 	
 	@Inject
 	private LoggedUser loggedUser;
+	
 	
 	@GetMapping("/newtask")
 	public String tasks(ModelMap model) {
@@ -75,6 +77,29 @@ public class TaskController {
 	@GetMapping("/delete/task/{id}")
 	public String deleteTask(@PathVariable int id) {
 		taskRepository.deleteById(id);
+		return "redirect:/alltasks";
+	}
+	
+	@GetMapping("/edit/task/{id}")
+	public String editTask(@PathVariable int id, ModelMap model, Status status) {
+		int user_id = loggedUser.getUserId();
+		
+		List<Task> tasks = taskRepository.findTaskById(id);
+		List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
+		
+		List<String> allStatus = Status.getAllStatus();
+		
+		model.addAttribute("login", loggedUser.getLoginUser());
+		model.addAttribute("user", loggedUser.getUserId());
+		model.addAttribute("tasks", tasks);
+		model.addAttribute("categories", listCategories);
+		model.addAttribute("status",allStatus);
+		return "/updatetask";
+	}
+	
+	@PostMapping("/update/task")
+	public String updateTask(String data, String title, String description, String taskStatus, int cat_id, int task_id) {
+		taskRepository.updateTask(data, title, description, taskStatus, cat_id, task_id);
 		return "redirect:/alltasks";
 	}
 }
