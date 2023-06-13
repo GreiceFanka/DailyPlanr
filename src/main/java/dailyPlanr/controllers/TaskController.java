@@ -66,14 +66,17 @@ public class TaskController {
 		boolean session = loggedUser.isLogged();
 		int id = loggedUser.getUserId();
 		Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
+		
 		if(session) {
 			model.addAttribute("login", loggedUser.getLoginUser());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("tasks", allTasks);
+			
 			return "/alltasks";
 		}
 		return "redirect:/login";
 	}
+	
 	
 	@GetMapping("/delete/task/{id}")
 	public String deleteTask(@PathVariable int id) {
@@ -87,7 +90,6 @@ public class TaskController {
 		
 		List<Task> tasks = taskRepository.findTaskById(id);
 		List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
-		
 		List<String> allStatus = Status.getAllStatus();
 		
 		model.addAttribute("login", loggedUser.getLoginUser());
@@ -99,8 +101,20 @@ public class TaskController {
 	}
 	
 	@PostMapping("/update/task")
-	public String updateTask(@RequestParam String data,@RequestParam String title,@RequestParam String description,@RequestParam String taskStatus,@RequestParam int cat_id,@RequestParam int task_id) {
-		taskRepository.updateTask(data, title, description, taskStatus, cat_id, task_id);
+	public String updateTask(@RequestParam String data,@RequestParam String title,@RequestParam String description,@RequestParam int task_id) {
+		taskRepository.updateTask(data, title, description, task_id);
+		return "redirect:/alltasks";
+	}
+	
+	@PostMapping("edit/status")
+	public String editTaskStatus(String taskStatus, int id) {
+		taskRepository.editStatus(taskStatus, id);
+		return "redirect:/alltasks";
+	}
+	
+	@PostMapping("edit/category")
+	public String editTaskCategory(int cat_id, int id) {
+		taskRepository.editTaskCategory(cat_id, id);
 		return "redirect:/alltasks";
 	}
 }
