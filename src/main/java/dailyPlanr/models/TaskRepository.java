@@ -16,9 +16,19 @@ public interface TaskRepository extends CrudRepository<Task, Integer>{
 	
 	@Transactional
 	@Modifying
-	@Query(value="UPDATE task SET data = ? , title = ? , description = ? ,task_status = ? , category_id = ? "
+	@Query(value="UPDATE task SET data = ? , title = ? , description = ?  "
 			+ "WHERE id = ? ", nativeQuery = true)
-	public void updateTask(String data, String title, String description, String taskStatus, int cat_id, int task_id);
+	public void updateTask(String data, String title, String description, int task_id);
+	
+	@Transactional
+	@Modifying
+	@Query(value="UPDATE task SET task_status = ? WHERE id = ? ", nativeQuery = true)
+	public void editStatus(String taskStatus, int id);
+	
+	@Transactional
+	@Modifying
+	@Query(value="UPDATE task SET category_id = ? WHERE id = ? ", nativeQuery = true)
+	public void editTaskCategory(int cat_id, int id);
 	
 	public List<Task> findTaskById(int id);
 }
