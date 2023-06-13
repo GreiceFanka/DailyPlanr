@@ -107,13 +107,13 @@ public class TaskController {
 	}
 	
 	@PostMapping("edit/status")
-	public String editTaskStatus(String taskStatus, int id) {
+	public String editTaskStatus(@RequestParam String taskStatus,@RequestParam int id) {
 		taskRepository.editStatus(taskStatus, id);
 		return "redirect:/alltasks";
 	}
 	
 	@PostMapping("edit/category")
-	public String editTaskCategory(int cat_id, int id) {
+	public String editTaskCategory(@RequestParam int cat_id,@RequestParam int id){
 		taskRepository.editTaskCategory(cat_id, id);
 		return "redirect:/alltasks";
 	}
