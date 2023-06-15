@@ -1,5 +1,8 @@
 package dailyPlanr.controllers;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -116,5 +119,18 @@ public class TaskController {
 	public String editTaskCategory(@RequestParam int cat_id,@RequestParam int id){
 		taskRepository.editTaskCategory(cat_id, id);
 		return "redirect:/alltasks";
+	}
+	
+	@GetMapping("/sendReminder")
+	public String sendReminder(ModelMap model) {
+		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.DAY_OF_MONTH, 1);
+		String date = dateFormat.format(calendar.getTime());
+		
+		List<String> userList = taskRepository.findTaskByDate(date);
+		
+		model.addAttribute("userList", userList);
+		return "/teste";
 	}
 }
