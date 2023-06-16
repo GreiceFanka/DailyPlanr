@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.commons.mail.EmailException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -34,6 +35,9 @@ public class TaskController {
 	
 	@Inject
 	private LoggedUser loggedUser;
+	
+	@Inject
+	private Mail mail;
 	
 	
 	@GetMapping("/newtask")
@@ -122,15 +126,14 @@ public class TaskController {
 	}
 	
 	@GetMapping("/sendReminder")
-	public String sendReminder(ModelMap model) {
+	public void sendReminder() throws EmailException {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.DAY_OF_MONTH, 1);
 		String date = dateFormat.format(calendar.getTime());
 		
 		List<String> userList = taskRepository.findTaskByDate(date);
-		
-		model.addAttribute("userList", userList);
-		return "/teste";
+		String passwordMail = mail.getPasswordMail();
+		Task.sendEmail(userList, passwordMail);
 	}
 }
