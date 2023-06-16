@@ -14,7 +14,7 @@ public interface TaskRepository extends CrudRepository<Task, Integer>{
 			+ "where user_id = ? ", nativeQuery = true)
 	public Iterable<Task> findTaskByUser(int id); 
 	
-	@Query(value = "SELECT u.login FROM user u\n"
+	@Query(value = "SELECT DISTINCT u.login FROM user u\n"
 			+ "LEFT JOIN task_user tu ON u.id=tu.user_id\n"
 			+ "LEFT JOIN task t ON t.id=tu.task_id\n"
 			+ "WHERE t.data <= ? AND t.task_status IN ('In progress', 'To do');", nativeQuery = true)
