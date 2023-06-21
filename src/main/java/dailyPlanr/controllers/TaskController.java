@@ -1,8 +1,7 @@
 package dailyPlanr.controllers;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -127,10 +126,9 @@ public class TaskController {
 	
 	@GetMapping("/sendReminder")
 	public void sendReminder() throws EmailException {
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
-		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.DAY_OF_MONTH, 1);
-		String date = dateFormat.format(calendar.getTime());
+		LocalDateTime date = LocalDateTime.now().plusDays(1);
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+		date.format(dateTimeFormatter);
 		
 		List<String> userList = taskRepository.findTaskByDate(date);
 		String passwordMail = mail.getPasswordMail();

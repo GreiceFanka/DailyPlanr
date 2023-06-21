@@ -1,5 +1,6 @@
 package dailyPlanr.models;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,7 +19,7 @@ public interface TaskRepository extends CrudRepository<Task, Integer>{
 			+ "LEFT JOIN task_user tu ON u.id=tu.user_id\n"
 			+ "LEFT JOIN task t ON t.id=tu.task_id\n"
 			+ "WHERE t.data <= ? AND t.task_status IN ('In progress', 'To do');", nativeQuery = true)
-	public List<String> findTaskByDate(String date);
+	public List<String> findTaskByDate(LocalDateTime date);
 	
 	@Transactional
 	@Modifying
