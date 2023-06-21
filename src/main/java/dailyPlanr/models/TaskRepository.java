@@ -18,8 +18,13 @@ public interface TaskRepository extends CrudRepository<Task, Integer>{
 	@Query(value = "SELECT DISTINCT u.login FROM user u\n"
 			+ "LEFT JOIN task_user tu ON u.id=tu.user_id\n"
 			+ "LEFT JOIN task t ON t.id=tu.task_id\n"
-			+ "WHERE t.data <= ? AND t.task_status IN ('In progress', 'To do');", nativeQuery = true)
+			+ "WHERE t.data <= ? AND t.task_status IN ('In progress', 'To do')", nativeQuery = true)
 	public List<String> findTaskByDate(LocalDateTime date);
+	
+	@Query(value="SELECT * FROM task tk "
+			+ "INNER JOIN task_user tku ON tk.id=tku.task_id "
+			+ "WHERE tku.user_id = ? AND tk.data < ?  AND tk.task_status IN ('In progress', 'To do')", nativeQuery = true)
+	public Iterable<Task> findLateTasks(int id, LocalDateTime date);
 	
 	@Transactional
 	@Modifying
