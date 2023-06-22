@@ -68,7 +68,7 @@ public class TaskController {
 
 	@GetMapping("/alltasks")
 	public String getAllTasks(ModelMap model) {
-		String alert;
+		String alert = "null";
 		boolean session = loggedUser.isLogged();
 		int id = loggedUser.getUserId();
 		Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
@@ -83,22 +83,14 @@ public class TaskController {
 
 			if (latedTasks <= -1 && (toDoStatus || inProgressStatus)) {
 				alert = "You have late tasks!";
-				model.addAttribute("alert", alert);
-			} else {
-				alert = "null";
-				model.addAttribute("alert", alert);
 			}
-		}
-		if (!allTasks.iterator().hasNext()) {
-			alert = "null";
-			model.addAttribute("alert", alert);
-		}
+		}	
 
 		if (session) {
 			model.addAttribute("login", loggedUser.getLoginUser());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("tasks", allTasks);
-
+			model.addAttribute("alert", alert);
 			return "/alltasks";
 		}
 		return "redirect:/login";
