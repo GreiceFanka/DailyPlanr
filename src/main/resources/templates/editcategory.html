@@ -25,7 +25,7 @@
 				<div class="row" style="padding:30px;">
 					<div th:each="category:${categories}">
 						<label for="name">Name</label>
-						<input id="categories" th:value="${category.name}" name="name">
+						<input id="categories" th:value="${category.categoryName}" name="categoryName">
 						<input  type="hidden" th:value="${category.id}" name="id">
 						<button type="submit" class="btn btn-outline-success">Save</button>
 					</div>

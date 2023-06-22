@@ -120,7 +120,7 @@
 								<div class="modal-body">
 									<div class="row" style="margin-top: 30px;">
 										<label class="control-label col-4">Current Category: </label>
-										<p th:each="task:${tasks}" th:text="${task.categories.name}"></p>
+										<p th:each="task:${tasks}" th:text="${task.categories.categoryName}"></p>
 										<input th:each="task:${tasks}" type="hidden"
 											th:value="${task.id}" name="id">
 									</div>
@@ -130,7 +130,7 @@
 											class="form-select" aria-label="Default select example"
 											name="cat_id">
 											<option th:each="category:${categories}" th:value="${category.id}"
-												th:text="${category.name}"></option>
+												th:text="${category.categoryName}"></option>
 										</select>
 									</div>
 								</div>

@@ -25,7 +25,7 @@
 		<div class="row">
 			<div class="card col-3"  style="margin:30px; padding:10px;" th:each="category:${categories}">
 	  			<div class="card-body">
-				    <p class="card-text" th:text="${category.name}"></p>
+				    <p class="card-text" th:text="${category.categoryName}"></p>
 				    <a th:href="@{/edit/category/{id}(id=${category.id})}"><button type="button" class="btn btn-outline-success">Edit</button></a>
 	  			</div>
 	  		</div>
