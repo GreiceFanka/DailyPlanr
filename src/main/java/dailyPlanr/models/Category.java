@@ -20,7 +20,7 @@ public class Category {
 	private int id;
 	
 	@Column
-	private String name;
+	private String categoryName;
 	
 	@OneToMany(mappedBy = "categories")
 	private List<Task> tasks;
@@ -38,8 +38,8 @@ public class Category {
 		
 	}
 
-	public Category(String name) {
-		this.name = name;
+	public Category(String categoryName) {
+		this.categoryName = categoryName;
 	}
 
 	public int getId() {
@@ -50,12 +50,12 @@ public class Category {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getCategoryName() {
+		return categoryName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setCategoryName(String categoryName) {
+		this.categoryName = categoryName;
 	}
 
 	public List<Task> getTasks() {
