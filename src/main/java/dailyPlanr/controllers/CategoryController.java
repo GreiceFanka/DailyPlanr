@@ -56,8 +56,8 @@ public class CategoryController {
 	}
 	
 	@PostMapping("/update/category")
-		public String updateCategory(@RequestParam String name,@RequestParam int id, ModelMap model) {
-		categoryRepository.updateCategory(name, id);
+		public String updateCategory(@RequestParam String categoryName,@RequestParam int id, ModelMap model) {
+		categoryRepository.updateCategory(categoryName, id);
 		model.addAttribute("login", loggedUser.getLoginUser());
 		model.addAttribute("user", loggedUser.getUserId());
 		return "redirect:/allcategories";
