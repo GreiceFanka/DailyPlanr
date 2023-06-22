@@ -144,6 +144,13 @@ public class TaskController {
 		taskRepository.editTaskCategory(cat_id, id);
 		return "redirect:/alltasks";
 	}
+	
+	@PostMapping("/add/user")
+	public String addUser(@RequestParam int taskId, @RequestParam int userId, RedirectAttributes redirectAttributes) {
+		taskRepository.insertUserTask(taskId,userId);
+		redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
+		return "redirect:/alltasks";
+	}
 
 	@GetMapping("/sendReminder")
 	public void sendReminder() throws EmailException {
