@@ -81,7 +81,7 @@ public class TaskController {
 			boolean toDoStatus = task.getTaskStatus().equalsIgnoreCase("To do");
 			boolean inProgressStatus = task.getTaskStatus().equalsIgnoreCase("In progress");
 
-			if (latedTasks <= -1 && toDoStatus || inProgressStatus) {
+			if (latedTasks <= -1 && (toDoStatus || inProgressStatus)) {
 				alert = "You have late tasks!";
 				model.addAttribute("alert", alert);
 			} else {
@@ -89,11 +89,16 @@ public class TaskController {
 				model.addAttribute("alert", alert);
 			}
 		}
+		if (!allTasks.iterator().hasNext()) {
+			alert = "null";
+			model.addAttribute("alert", alert);
+		}
 
 		if (session) {
 			model.addAttribute("login", loggedUser.getLoginUser());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("tasks", allTasks);
+
 			return "/alltasks";
 		}
 		return "redirect:/login";
@@ -150,14 +155,14 @@ public class TaskController {
 		String passwordMail = mail.getPasswordMail();
 		Task.sendEmail(userList, passwordMail);
 	}
-	
+
 	@GetMapping("/late/tasks")
 	public String lateTasks(ModelMap model) {
 		int id = loggedUser.getUserId();
 		LocalDateTime date = LocalDateTime.now();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 		date.format(dateTimeFormatter);
-		
+
 		Iterable<Task> lateTasks = taskRepository.findLateTasks(id, date);
 		model.addAttribute("lateTasks", lateTasks);
 		model.addAttribute("login", loggedUser.getLoginUser());
