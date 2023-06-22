@@ -7,7 +7,9 @@ import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -84,6 +86,22 @@ public class UserController{
 		}else {
 			redirAttrs.addFlashAttribute("error", "Incorrect Password!");
 			 return "redirect:/login";
+		}
+	}
+	
+	@GetMapping("/search/user/{task_id}")
+	public String searchUser(@PathVariable int task_id, RedirectAttributes redirAttrs, ModelMap model) {
+		int taskId = task_id;
+		String company = loggedUser.getCompany();
+		
+		if(!company.isEmpty()) {
+		Iterable<User> usersCompany = userRepository.findUserWithSameCompany(company);
+		model.addAttribute("usersCompany", usersCompany);
+		model.addAttribute("taskId", taskId);
+		return "/adduser";
+		}else {
+			redirAttrs.addFlashAttribute("error", "You don't have company.");
+			return "redirect:/alltasks";
 		}
 	}
 }
