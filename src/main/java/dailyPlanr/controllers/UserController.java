@@ -1,6 +1,8 @@
 package dailyPlanr.controllers;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
@@ -50,13 +52,25 @@ public class UserController{
 	}
 	
 	@PostMapping("/new")
-	public String newUser(@Valid User user, RedirectAttributes redirAttrs ) {
+	public String newUser(@Valid User user, RedirectAttributes redirAttrs ){
 		user.setPassword(encoder.encode(user.getPassword()));
+		boolean isEmail = false;
+		String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
+		   Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
+	       Matcher matcher = pattern.matcher(user.getLogin());
+	       
+	       if(matcher.matches()) {
+	    	   isEmail = true;
+	       }
+		
 		Optional<User> opUser = userRepository.findByLogin(user.getLogin());
-		if(opUser.isEmpty()) {
+		
+		if(opUser.isEmpty() && isEmail) {
 			userRepository.save(user);
 			redirAttrs.addFlashAttribute("success", "Everything went just fine.");
 			return "redirect:/login";
+		}else if (!isEmail) {
+			redirAttrs.addFlashAttribute("error", "Invalid email format, please try again.");
 		}else {
 			redirAttrs.addFlashAttribute("error", "User already registered");
 		}
