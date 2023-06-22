@@ -17,25 +17,33 @@ public class LoggedUser {
 	public User getUser() {
 		return user;
 	}
-	
+
 	public void setUserLogged(User user) {
 		this.user = user;
 	}
-	
-	public void logOff(){
+
+	public void logOff() {
 		this.user = null;
 	}
-	
+
 	public boolean isLogged() {
 		return this.user != null;
 	}
-	
+
 	public String getLoginUser() {
 		return this.user.getLogin();
 	}
-	
+
 	public Integer getUserId() {
 		return this.user.getId();
 	}
-	
+
+	public String getName() {
+		return this.user.getName();
+	}
+
+	public String getCompany() {
+		return this.user.getCompany();
+	}
+
 }
