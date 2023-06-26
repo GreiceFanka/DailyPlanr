@@ -31,7 +31,7 @@ public class CategoryController {
 		int id = loggedUser.getUserId();
 		List<Category> categories = categoryRepository.findCategoryByUser(id);
 		if(session) {
-			model.addAttribute("login", loggedUser.getLoginUser());
+			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("categories", categories);
 			return "/allcategories";
@@ -43,13 +43,13 @@ public class CategoryController {
 		public String createCategory(@Valid Category category, @Valid User user) {
 			category.addUsersCategory(user);
 			categoryRepository.save(category);
-			return "salvo";
+			return "redirect:/allcategories";
 	}
 	
 	@GetMapping("/edit/category/{id}")
 		public String editCategory(@PathVariable int id, ModelMap model) {
 			List<Category> categories = categoryRepository.findCategoryById(id);
-			model.addAttribute("login", loggedUser.getLoginUser());
+			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("categories", categories);
 		return "/editcategory";
@@ -58,7 +58,7 @@ public class CategoryController {
 	@PostMapping("/update/category")
 		public String updateCategory(@RequestParam String categoryName,@RequestParam int id, ModelMap model) {
 		categoryRepository.updateCategory(categoryName, id);
-		model.addAttribute("login", loggedUser.getLoginUser());
+		model.addAttribute("name", loggedUser.getName());
 		model.addAttribute("user", loggedUser.getUserId());
 		return "redirect:/allcategories";
 	}
