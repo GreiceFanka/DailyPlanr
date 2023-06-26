@@ -45,7 +45,7 @@ public class TaskController {
 		if (session) {
 			List<Category> listCategories = categoryRepository.findCategoryByUser(id);
 
-			model.addAttribute("login", loggedUser.getLoginUser());
+			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("categories", listCategories);
 			return "/newtask";
@@ -87,7 +87,7 @@ public class TaskController {
 		}	
 
 		if (session) {
-			model.addAttribute("login", loggedUser.getLoginUser());
+			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("tasks", allTasks);
 			model.addAttribute("alert", alert);
@@ -110,7 +110,7 @@ public class TaskController {
 		List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
 		List<String> allStatus = Status.getAllStatus();
 
-		model.addAttribute("login", loggedUser.getLoginUser());
+		model.addAttribute("name", loggedUser.getName());
 		model.addAttribute("user", loggedUser.getUserId());
 		model.addAttribute("tasks", tasks);
 		model.addAttribute("categories", listCategories);
@@ -164,7 +164,7 @@ public class TaskController {
 
 		Iterable<Task> lateTasks = taskRepository.findLateTasks(id, date);
 		model.addAttribute("lateTasks", lateTasks);
-		model.addAttribute("login", loggedUser.getLoginUser());
+		model.addAttribute("name", loggedUser.getName());
 		return "/lateTask";
 	}
 }
