@@ -112,10 +112,17 @@ public class UserController{
 		Iterable<User> usersCompany = userRepository.findUserWithSameCompany(company);
 		model.addAttribute("usersCompany", usersCompany);
 		model.addAttribute("taskId", taskId);
+		model.addAttribute("name", loggedUser.getName());
 		return "/adduser";
 		}else {
 			redirAttrs.addFlashAttribute("error", "You don't have company.");
 			return "redirect:/alltasks";
 		}
+	}
+	
+	@GetMapping("/exit")
+	public String logout() {
+		loggedUser.logOff();
+		return "redirect:/login";
 	}
 }
