@@ -84,7 +84,7 @@ public class TaskController {
 			if (latedTasks <= -1 && (toDoStatus || inProgressStatus)) {
 				alert = "You have late tasks!";
 			}
-		}	
+		}
 
 		if (session) {
 			model.addAttribute("name", loggedUser.getName());
@@ -136,10 +136,10 @@ public class TaskController {
 		taskRepository.editTaskCategory(cat_id, id);
 		return "redirect:/alltasks";
 	}
-	
+
 	@PostMapping("/add/user")
 	public String addUser(@RequestParam int taskId, @RequestParam int userId, RedirectAttributes redirectAttributes) {
-		taskRepository.insertUserTask(taskId,userId);
+		taskRepository.insertUserTask(taskId, userId);
 		redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
 		return "redirect:/alltasks";
 	}
@@ -166,5 +166,45 @@ public class TaskController {
 		model.addAttribute("lateTasks", lateTasks);
 		model.addAttribute("name", loggedUser.getName());
 		return "/lateTask";
+	}
+
+	@GetMapping("/archive")
+	public String tasksInArchive(ModelMap model) {
+		boolean session = loggedUser.isLogged();
+		int id = loggedUser.getUserId();
+		Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
+		List<String> allStatus = Status.getAllStatus();
+		if (session) {
+			model.addAttribute("name", loggedUser.getName());
+			model.addAttribute("tasks", allTasks);
+			model.addAttribute("status", allStatus);
+			return "/archive";
+		}
+		return "redirect:/login";
+	}
+
+	@GetMapping("archive/{id}")
+	public String changeStatus(@PathVariable int id, ModelMap model) {
+		List<Task> tasks = taskRepository.findTaskById(id);
+		List<String> allStatus = Status.getAllStatus();
+		model.addAttribute("name", loggedUser.getName());
+		model.addAttribute("status", allStatus);
+		model.addAttribute("tasks", tasks);
+		return "/changestatus";
+	}
+	
+	@GetMapping("/tasksbycategory")
+	public String showTasksByCategory(ModelMap model) {
+		boolean session = loggedUser.isLogged();
+		int id = loggedUser.getUserId();
+		Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
+		List<Category> categories = categoryRepository.findCategoryByUser(id);
+		if(session) {
+			model.addAttribute("name", loggedUser.getName());
+			model.addAttribute("tasks", allTasks);
+			model.addAttribute("categories", categories);
+			return "/tasksbycategory";
+		}
+		return "redirect:/login";
 	}
 }
