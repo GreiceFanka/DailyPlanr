@@ -23,3 +23,19 @@
   });
 
 })(jQuery);
+
+
+	$(' .dropdown-toggle').dropdown();
+	
+	$("#btn-modal").click(function() {
+		$("#modalStatus").modal();
+	});
+
+	$("#close").click(function() {
+		$("#modalStatus").modal('hide');
+	});
+	
+	$(".close").click(function() {
+		$("#modalStatus").modal('hide');
+	});
+
