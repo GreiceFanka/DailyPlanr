@@ -62,4 +62,11 @@ public class CategoryController {
 		model.addAttribute("user", loggedUser.getUserId());
 		return "redirect:/allcategories";
 	}
+	
+	@GetMapping("/newcategory")
+		public String newCategory(ModelMap model) {
+		model.addAttribute("name", loggedUser.getName());
+		model.addAttribute("user", loggedUser.getUserId());
+		return "/newcategory";
+	}
 }
