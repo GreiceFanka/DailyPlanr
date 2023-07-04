@@ -36,6 +36,9 @@ public class Task {
 
 	@Column
 	private String taskStatus = Status.TODO.getDesc();
+	
+	@Column(nullable = false)
+	private String priority;
 
 	@ManyToMany
 	@JoinTable(name = "task_user", joinColumns = { @JoinColumn(name = "task_id") }, inverseJoinColumns = {
@@ -56,10 +59,11 @@ public class Task {
 
 	}
 
-	public Task(String title, String description, String taskStatus) {
+	public Task(String title, String description, String taskStatus, String priority) {
 		this.title = title;
 		this.description = description;
 		this.taskStatus = taskStatus;
+		this.priority = priority;
 	}
 
 	public int getId() {
@@ -116,6 +120,14 @@ public class Task {
 
 	public void setTaskStatus(String taskStatus) {
 		this.taskStatus = taskStatus;
+	}
+
+	public String getPriority() {
+		return priority;
+	}
+
+	public void setPriority(String priority) {
+		this.priority = priority;
 	}
 
 	public static void sendEmail(List<String> userList, String passwordMail) throws EmailException {
