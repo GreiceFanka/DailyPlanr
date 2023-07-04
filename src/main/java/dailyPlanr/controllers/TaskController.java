@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import dailyPlanr.models.Category;
 import dailyPlanr.models.CategoryRepository;
+import dailyPlanr.models.Priority;
 import dailyPlanr.models.Status;
 import dailyPlanr.models.Task;
 import dailyPlanr.models.TaskRepository;
@@ -44,10 +45,12 @@ public class TaskController {
 		int id = loggedUser.getUserId();
 		if (session) {
 			List<Category> listCategories = categoryRepository.findCategoryByUser(id);
+			List<String> allPriorities = Priority.getAllPriorities();
 
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("categories", listCategories);
+			model.addAttribute("priorities", allPriorities);
 			return "/newtask";
 		}
 		return "redirect:/login";
@@ -109,19 +112,22 @@ public class TaskController {
 		List<Task> tasks = taskRepository.findTaskById(id);
 		List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
 		List<String> allStatus = Status.getAllStatus();
-
+		List<String> allPriorities = Priority.getAllPriorities();
+ 
 		model.addAttribute("name", loggedUser.getName());
 		model.addAttribute("user", loggedUser.getUserId());
 		model.addAttribute("tasks", tasks);
 		model.addAttribute("categories", listCategories);
 		model.addAttribute("status", allStatus);
+		model.addAttribute("priorities", allPriorities);
+	
 		return "/updatetask";
 	}
 
 	@PostMapping("/update/task")
-	public String updateTask(@RequestParam String data, @RequestParam String title, @RequestParam String description,
+	public String updateTask(@RequestParam String data, @RequestParam String title, @RequestParam String description, @RequestParam String priority,
 			@RequestParam int task_id) {
-		taskRepository.updateTask(data, title, description, task_id);
+		taskRepository.updateTask(data, title, description, priority, task_id);
 		return "redirect:/alltasks";
 	}
 
