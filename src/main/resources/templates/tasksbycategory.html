@@ -27,13 +27,25 @@
 					<a href="/alltasks" class="logo" th:text="${name}"></a>
 				</h3>
 				<ul class="list-unstyled components mb-5">
-					<li class="active">
-					<li><a href="/newtask">New task</a></li>
-					<li><a href="/allcategories">All categories</a></li>
-					<li><a href="/tasksbycategory">Tasks by category</a></li>
-					<li><a href="/archive">Archive</a></li>
+					<li class="active"><a href="#homeSubmenu"
+						data-toggle="collapse" aria-expanded="false" class="dropdown">Tasks<i
+							class="bi bi-caret-down-fill"></i></a>
+						<ul class="collapse list-unstyled" id="homeSubmenu">
+							<li><a href="/alltasks">My tasks</a></li>
+							<li><a href="/newtask">New task</a></li>
+							<li><a href="/tasksbycategory">Tasks by category</a></li>
+							<li><a href="/archive">Archive</a></li>
+						</ul></li>
+					<li><a href="#pageSubmenu" data-toggle="collapse"
+						aria-expanded="false" class="dropdown">Categories<i
+							class="bi bi-caret-down-fill"></i></a>
+						<ul class="collapse list-unstyled" id="pageSubmenu">
+							<li><a href="/allcategories">All categories</a></li>
+							<li><a href="/newcategory">New category</a></li>
+						</ul></li>
 					<li><a href="/exit">Logout</a></li>
 				</ul>
+
 
 				<div class="mb-5"></div>
 

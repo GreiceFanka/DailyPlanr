@@ -21,23 +21,38 @@
 			<div class="p-4 pt-5">
 				<h3><a href="/alltasks" class="logo" th:text="${name}"></a></h3>
 				<ul class="list-unstyled components mb-5">
-					<li class="active">
-					<li>
-						<a href="/newtask">New task</a>
-					</li>
-					<li>
-						<a href="/allcategories">All categories</a>
-					</li>
-					<li>
-						<a href="/tasksbycategory">Tasks by category</a>
-					</li>
-					<li>
-						<a href="/archive">Archive</a>
-					</li>
-					<li>
-						<a href="/exit">Logout</a>
-					</li>
-				</ul>
+				<li class="active">
+	            <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown">Tasks<i class="bi bi-caret-down-fill"></i></a>
+	            <ul class="collapse list-unstyled" id="homeSubmenu">
+	             <li>
+                    <a href="/alltasks">My tasks</a>
+                </li>
+                <li>
+                    <a href="/newtask">New task</a>
+                </li>
+                <li>
+                    <a href="/tasksbycategory">Tasks by category</a>
+                </li>
+                <li>
+                    <a href="/archive">Archive</a>
+                </li>
+	            </ul>
+	          </li>
+	          <li>
+              <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown">Categories<i class="bi bi-caret-down-fill"></i></a>
+              <ul class="collapse list-unstyled" id="pageSubmenu">
+                <li>
+                    <a href="/allcategories">All categories</a>
+                </li>
+                <li>
+                    <a href="/newcategory">New category</a>
+                </li>
+              </ul>
+	          </li>
+	          <li>
+              <a href="/exit">Logout</a>
+	          </li>
+	        </ul>
 
 				<div class="mb-5"></div>
 
@@ -54,13 +69,16 @@
 				 <div class="card-header text-white bg-warning mb-2">To do</div>
 				<div class="card" id="tasks"
 					 th:if="${task.taskStatus} == 'To do'" th:each="task:${tasks}">
-					 <span class="badge badge-pill badge-secondary align-self-end mb-2" th:text="${task.categories.categoryName}"></span>
+					  <span th:if="${task.priority} == 'Low'" class="badge badge-pill badge-primary align-self-end mb-2" th:text="${task.priority}"></span>
+					  <span th:if="${task.priority} == 'Medium'" class="badge badge-pill badge-orange align-self-end mb-2" th:text="${task.priority}"></span>
+					  <span th:if="${task.priority} == 'High'" class="badge badge-pill badge-danger align-self-end mb-2" th:text="${task.priority}"></span>
 					<div class="card-body text-center">
 						<h6 class="card-title" th:text="${task.title}"></h6>
 						<p class="card-text" th:text="${task.description}"></p>
 						<p class="card-text"
 							th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></p>
 					</div>
+					 <span class="badge badge-secondary align-self-start mb-2" th:text="${task.categories.categoryName}"></span>
 					<div class="dropdown align-self-end">
 						 <a type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 							 <i class="bi bi-three-dots-vertical">
@@ -79,13 +97,16 @@
 				 <div class="card-header text-white bg-info mb-2">In progress</div>
 				<div class="card" id="tasks"
 					 th:if="${task.taskStatus} == 'In progress'" th:each="task:${tasks}">
-					 <span class="badge badge-pill badge-secondary align-self-end mb-2" th:text="${task.categories.categoryName}"></span>
+					 <span th:if="${task.priority} == 'Low'" class="badge badge-pill badge-primary align-self-end mb-2" th:text="${task.priority}"></span>
+					  <span th:if="${task.priority} == 'Medium'" class="badge badge-pill badge-orange align-self-end mb-2" th:text="${task.priority}"></span>
+					  <span th:if="${task.priority} == 'High'" class="badge badge-pill badge-danger align-self-end mb-2" th:text="${task.priority}"></span>
 					<div class="card-body text-center">
 						<h6 class="card-title" th:text="${task.title}"></h6>
 						<p class="card-text" th:text="${task.description}"></p>
 						<p class="card-text"
 							th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></p>
 					</div>
+					 <span class="badge badge-secondary align-self-start mb-2" th:text="${task.categories.categoryName}"></span>
 					<div class="dropdown align-self-end">
 						 <a type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
 							 <i class="bi bi-three-dots-vertical"></i>
@@ -102,23 +123,26 @@
 				 <div class="card-header text-white bg-success mb-2">Done</div>
 					<div class="card" id="tasks"
 					 th:if="${task.taskStatus} == 'Done'" th:each="task:${tasks}">
-					 <span class="badge badge-pill badge-secondary align-self-end mb-2" th:text="${task.categories.categoryName}"></span>
+					  <span th:if="${task.priority} == 'Low'" class="badge badge-pill badge-primary align-self-end mb-2" th:text="${task.priority}"></span>
+					  <span th:if="${task.priority} == 'Medium'" class="badge badge-pill badge-orange align-self-end mb-2" th:text="${task.priority}"></span>
+					  <span th:if="${task.priority} == 'High'" class="badge badge-pill badge-danger align-self-end mb-2" th:text="${task.priority}"></span>
 						<div class="card-body text-center">
 							<h6 class="card-title" th:text="${task.title}"></h6>
 							<p class="card-text" th:text="${task.description}"></p>
 							<p class="card-text"
 								th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></p>
 						</div>
-						<div class="dropdown align-self-end">
-						 <a type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-							 <i class="bi bi-three-dots-vertical"></i>
-						 </a>
-						  <ul class="dropdown-menu text-center" aria-labelledby="dropdownMenu1">
-						    <li><a th:href="@{/search/user/{task_id}(task_id=${task.id})}"><i class="bi bi-person-plus-fill"></i> Add Person</a></li>
-						    <li><a th:href="@{/edit/task/{id}(id=${task.id})}"><i class="bi bi-pencil-fill"></i>Edit</a></li>
-						    <li><a class="text-danger" th:href="@{/delete/task/{id}(id=${task.id})}"><i class="bi bi-trash-fill"></i>Delete</a></li>
-						  </ul>
-					</div>
+						<span class="badge badge-secondary align-self-start mb-2" th:text="${task.categories.categoryName}"></span>
+							<div class="dropdown align-self-end">
+							 <a type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+								 <i class="bi bi-three-dots-vertical"></i>
+							 </a>
+							  <ul class="dropdown-menu text-center" aria-labelledby="dropdownMenu1">
+							    <li><a th:href="@{/search/user/{task_id}(task_id=${task.id})}"><i class="bi bi-person-plus-fill"></i> Add Person</a></li>
+							    <li><a th:href="@{/edit/task/{id}(id=${task.id})}"><i class="bi bi-pencil-fill"></i>Edit</a></li>
+							    <li><a class="text-danger" th:href="@{/delete/task/{id}(id=${task.id})}"><i class="bi bi-trash-fill"></i>Delete</a></li>
+							  </ul>
+						</div>
 				</div>
 			</div>
 </div>
@@ -150,24 +174,21 @@
 	</div>
 
 </div>
-	</div>
+</div>
 
-
-	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
+	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 	<!--===============================================================================================-->
-	<script src="/vendor/animsition/js/animsition.min.js"></script>
+	<script src="vendor/animsition/js/animsition.min.js"></script>
 	<!--===============================================================================================-->
-	<script src="/vendor/bootstrap/js/popper.js"></script>
-	<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+	<script src="vendor/bootstrap/js/popper.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
 	<!--===============================================================================================-->
-	<script src="/vendor/select2/select2.min.js"></script>
+	<script src="vendor/select2/select2.min.js"></script>
 	<!--===============================================================================================-->
-	<script src="/vendor/daterangepicker/moment.min.js"></script>
-	<script src="/vendor/daterangepicker/daterangepicker.js"></script>
+	<script src="vendor/daterangepicker/moment.min.js"></script>
+	<script src="vendor/daterangepicker/daterangepicker.js"></script>
 	<!--===============================================================================================-->
-	<script src="/vendor/countdowntime/countdowntime.js"></script>
-	<script src="/js/scripts.js"></script>
-
-
+	<script src="vendor/countdowntime/countdowntime.js"></script>
+	<script src="js/scripts.js"></script>
 </body>
 </html>

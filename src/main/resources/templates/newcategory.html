@@ -51,60 +51,41 @@
 
 			</div>
 		</nav>
+
 		<!-- Page Content  -->
 
 		<div id="content" class="p-4 p-md-5 pt-5">
-			<h6 class="text-center">
-				<i class="bi bi-archive-fill"></i>Archive
-			</h6>
-			<div id="kanban" class="card border-light">
-				<div class="row">
-					<div class="card" id="tasks"
-						th:if="${task.taskStatus} == 'Archive'" th:each="task:${tasks}"
-						style="min-width: 20%; max-width: 23%;">
-						<span class="badge badge-pill badge-secondary align-self-end mb-2"
-							th:text="${task.categories.categoryName}"></span>
-						<div class="card-body text-center">
-							<h6 class="card-title" th:text="${task.title}"></h6>
-							<p class="card-text" th:text="${task.description}"></p>
-							<p class="card-text"
-								th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></p>
-						</div>
-						<div class="dropdown align-self-end">
-							<a type="button" data-toggle="dropdown" aria-haspopup="true"
-								aria-expanded="true"> <i class="bi bi-three-dots-vertical">
 
-							</i>
-							</a>
-							<ul class="dropdown-menu text-center"
-								aria-labelledby="dropdownMenu1">
-								<li><a id="btn-modal"
-									th:href="@{archive/{id}(id=${task.id})}">Change status</a></li>
-							</ul>
+			<div class="container">
+				<form th:action="@{/create/categories}" method="post">
+					<input type="hidden" th:value="${user}" name="user"></input>
+					<div class="row" style="padding: 30px;">
+						<div class="">
+							<label for="name">Name: </label> <input id="title"
+								name="categoryName">
+							<button type="submit" class="btn btn-outline-success">Save</button>
 						</div>
 					</div>
-				</div>
+				</form>
 			</div>
+
 		</div>
 	</div>
 
 
-
-	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
+	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 	<!--===============================================================================================-->
-	<script src="/vendor/animsition/js/animsition.min.js"></script>
+	<script src="vendor/animsition/js/animsition.min.js"></script>
 	<!--===============================================================================================-->
-	<script src="/vendor/bootstrap/js/popper.js"></script>
-	<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+	<script src="vendor/bootstrap/js/popper.js"></script>
+	<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
 	<!--===============================================================================================-->
-	<script src="/vendor/select2/select2.min.js"></script>
+	<script src="vendor/select2/select2.min.js"></script>
 	<!--===============================================================================================-->
-	<script src="/vendor/daterangepicker/moment.min.js"></script>
-	<script src="/vendor/daterangepicker/daterangepicker.js"></script>
+	<script src="vendor/daterangepicker/moment.min.js"></script>
+	<script src="vendor/daterangepicker/daterangepicker.js"></script>
 	<!--===============================================================================================-->
-	<script src="/vendor/countdowntime/countdowntime.js"></script>
-	<script src="/js/scripts.js"></script>
-
-
+	<script src="vendor/countdowntime/countdowntime.js"></script>
+	<script src="js/scripts.js"></script>
 </body>
 </html>

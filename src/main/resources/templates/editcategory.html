@@ -8,9 +8,10 @@
 	rel="stylesheet">
 <link rel="stylesheet"
 	href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="/css/task.css">
 <link rel="stylesheet"
 	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link rel="stylesheet" type="text/css" href="/css/task.css">
 </head>
 <body>
 	<div class="wrapper d-flex align-items-stretch">
@@ -25,12 +26,25 @@
 					<a href="/alltasks" class="logo" th:text="${name}"></a>
 				</h3>
 				<ul class="list-unstyled components mb-5">
-					<li class="active">
-					<li><a href="/newtask">New task</a></li>
-					<li><a href="/allcategories">All categories</a></li>
-					<li><a href="#">Tasks by category</a></li>
+					<li class="active"><a href="#homeSubmenu"
+						data-toggle="collapse" aria-expanded="false" class="dropdown">Tasks<i
+							class="bi bi-caret-down-fill"></i></a>
+						<ul class="collapse list-unstyled" id="homeSubmenu">
+							<li><a href="/alltasks">My tasks</a></li>
+							<li><a href="/newtask">New task</a></li>
+							<li><a href="/tasksbycategory">Tasks by category</a></li>
+							<li><a href="/archive">Archive</a></li>
+						</ul></li>
+					<li><a href="#pageSubmenu" data-toggle="collapse"
+						aria-expanded="false" class="dropdown">Categories<i
+							class="bi bi-caret-down-fill"></i></a>
+						<ul class="collapse list-unstyled" id="pageSubmenu">
+							<li><a href="/allcategories">All categories</a></li>
+							<li><a href="/newcategory">New category</a></li>
+						</ul></li>
 					<li><a href="/exit">Logout</a></li>
 				</ul>
+
 
 				<div class="mb-5"></div>
 
@@ -43,9 +57,10 @@
 				<form th:action="@{/update/category}" method="post">
 					<div class="row" style="padding: 30px;">
 						<div th:each="category:${categories}">
-							<label for="name">Name: </label> <input id="categories"
-								th:value="${category.categoryName}" name="categoryName">
-							<input type="hidden" th:value="${category.id}" name="id">
+							<label class="control-label col-sm-2" for="name">Name: </label> <input
+								id="title" th:value="${category.categoryName}"
+								name="categoryName"> <input type="hidden"
+								th:value="${category.id}" name="id">
 							<button type="submit" class="btn btn-outline-success">Save</button>
 						</div>
 					</div>
