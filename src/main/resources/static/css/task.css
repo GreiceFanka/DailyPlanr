@@ -8405,3 +8405,7 @@ a[data-toggle="collapse"] {
    #kanban{
    	background-color:#dbdbdb;
    }
+   .badge-orange{
+   background-color: #eead2d;
+   color:white;
+   }
