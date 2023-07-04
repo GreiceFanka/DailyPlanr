@@ -19,13 +19,10 @@ and designated times.
 -Progress Tracking: Allow users to mark tasks as completed as they go
 that are accomplished, providing an overview of daily progress.
 
--Task Recurrence: Allow users to set recurring daily tasks such as reminders or
-regular activities.
-
 -Organization by categories: Allow users to organize their daily tasks into categories or tags,
 facilitating filtering and specific visualization of groups of tasks.
 
-- Task History: Keep a historical record of completed daily tasks, allowing users to
+-Task History: Keep a historical record of completed daily tasks, allowing users to
 users review work done earlier.
 
 Requisitos:
@@ -47,11 +44,9 @@ e dos horários designados.
 -Acompanhamento do progresso: Permitir que os usuários marquem as tarefas como concluídas à medida
 que são realizadas, fornecendo uma visão geral do progresso diário.
 
--Recorrência de tarefas: Permitir que os usuários definam tarefas diárias recorrentes, como lembretes ou
-atividades regulares.
 
 -Organização por categorias: Permitir que os usuários organizem suas tarefas diárias em categorias ou tags,
 facilitando a filtragem e a visualização específica de grupos de tarefas.
 
-- Histórico de tarefas: Manter um registro histórico das tarefas diárias concluídas, permitindo que os
+-Histórico de tarefas: Manter um registro histórico das tarefas diárias concluídas, permitindo que os
 usuários revisem o trabalho realizado anteriormente.
