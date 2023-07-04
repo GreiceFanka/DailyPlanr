@@ -28,9 +28,9 @@ public interface TaskRepository extends CrudRepository<Task, Integer>{
 	
 	@Transactional
 	@Modifying
-	@Query(value="UPDATE Task SET data = ? , title = ? , description = ?  "
+	@Query(value="UPDATE Task SET data = ? , title = ? , description = ? , priority = ? "
 			+ "WHERE id = ? ", nativeQuery = true)
-	public void updateTask(String data, String title, String description, int task_id);
+	public void updateTask(String data, String title, String description, String priority, int task_id);
 	
 	@Transactional
 	@Modifying
