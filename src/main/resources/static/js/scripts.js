@@ -25,7 +25,7 @@
 })(jQuery);
 
 
-	$(' .dropdown-toggle').dropdown();
+	$('.dropdown-toggle').dropdown();
 	
 	$("#btn-modal").click(function() {
 		$("#modalStatus").modal();
@@ -38,4 +38,3 @@
 	$(".close").click(function() {
 		$("#modalStatus").modal('hide');
 	});
-
