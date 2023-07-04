@@ -62,7 +62,7 @@
 					<div class="card col-3" style="margin: 30px; padding: 10px;"
 						th:each="task:${lateTasks}">
 						<div class="card-body">
-							<h5 class="card-title" th:text="${task.title}"></h5>
+							<h6 class="card-title" th:text="${task.title}"></h6>
 							<p class="card-text" th:text="${task.description}"></p>
 							<p class="card-text"
 								th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></p>
