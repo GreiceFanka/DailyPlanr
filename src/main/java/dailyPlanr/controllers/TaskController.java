@@ -218,4 +218,22 @@ public class TaskController {
 		}
 		return "redirect:/login";
 	}
+	
+	@GetMapping("/taskhistory")
+	public String taskHistory(ModelMap model) {
+		model.addAttribute("name", loggedUser.getName());
+		return "/taskhistory";
+	}
+	
+	@PostMapping("/taskhistory")
+	public String getTaskHistory(@RequestParam LocalDate initialDate,@RequestParam LocalDate finalDate, ModelMap model) {
+		int id = loggedUser.getUserId();
+		Iterable<Task> completedTasks =	taskRepository.findCompletedTasks(id, initialDate, finalDate);
+		boolean haveTasks = true;
+			model.addAttribute("name", loggedUser.getName());
+			model.addAttribute("completedTasks", completedTasks);
+			model.addAttribute("haveTasks", haveTasks);
+			
+			return"/taskhistory";
+	}
 }
