@@ -27,6 +27,11 @@ public interface TaskRepository extends CrudRepository<Task, Integer>{
 			+ "WHERE tku.user_id = ? AND tk.data < ?  AND tk.taskStatus IN ('In progress', 'To do')", nativeQuery = true)
 	public Iterable<Task> findLateTasks(int id, LocalDateTime date);
 	
+	@Query(value="SELECT * FROM Task tk "
+			+ "INNER JOIN task_user tku ON tk.id=tku.task_id "
+			+ "WHERE tku.user_id = ? AND tk.updatedStatus BETWEEN ? AND ? AND tk.taskStatus IN ('Done','Archive')", nativeQuery = true)
+	public Iterable<Task> findCompletedTasks(int id, LocalDate initialDate, LocalDate finalDate);
+	
 	@Transactional
 	@Modifying
 	@Query(value="UPDATE Task SET data = ? , title = ? , description = ? , priority = ? "
