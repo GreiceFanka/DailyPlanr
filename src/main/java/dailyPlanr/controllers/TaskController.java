@@ -1,5 +1,6 @@
 package dailyPlanr.controllers;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -133,7 +134,11 @@ public class TaskController {
 
 	@PostMapping("edit/status")
 	public String editTaskStatus(@RequestParam String taskStatus, @RequestParam int id) {
-		taskRepository.editStatus(taskStatus, id);
+		LocalDate updatedStatus = LocalDate.now();
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		updatedStatus.format(dateTimeFormatter);
+		
+		taskRepository.editStatus(taskStatus,updatedStatus, id);
 		return "redirect:/alltasks";
 	}
 
