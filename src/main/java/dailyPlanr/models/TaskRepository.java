@@ -1,5 +1,6 @@
 package dailyPlanr.models;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,8 +35,8 @@ public interface TaskRepository extends CrudRepository<Task, Integer>{
 	
 	@Transactional
 	@Modifying
-	@Query(value="UPDATE Task SET taskStatus = ? WHERE id = ? ", nativeQuery = true)
-	public void editStatus(String taskStatus, int id);
+	@Query(value="UPDATE Task SET taskStatus = ?, updatedStatus = ? WHERE id = ? ", nativeQuery = true)
+	public void editStatus(String taskStatus, LocalDate updatedStatus, int id);
 	
 	@Transactional
 	@Modifying
