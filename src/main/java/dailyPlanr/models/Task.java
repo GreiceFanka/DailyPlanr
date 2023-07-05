@@ -1,5 +1,6 @@
 package dailyPlanr.models;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,9 @@ public class Task {
 
 	@Column
 	private String taskStatus = Status.TODO.getDesc();
+	
+	@DateTimeFormat(pattern = "dd-MM-yyyy")
+	private LocalDate updatedStatus = LocalDate.now();
 	
 	@Column(nullable = false)
 	private String priority;
@@ -120,6 +124,14 @@ public class Task {
 
 	public void setTaskStatus(String taskStatus) {
 		this.taskStatus = taskStatus;
+	}
+
+	public LocalDate getUpdatedStatus() {
+		return updatedStatus;
+	}
+
+	public void setUpdatedStatus(LocalDate updatedStatus) {
+		this.updatedStatus = updatedStatus;
 	}
 
 	public String getPriority() {
