@@ -54,7 +54,7 @@
 
 		<!-- Page Content  -->
 
-		<div id="content" class="p-4 p-md-5 pt-5">
+		<div id="content" class="p-4 p-md-5 pt-5 text-right">
 		<form action="/taskhistory" method="post">
 			<div class="form-group">
 				<div class="row">
@@ -66,14 +66,14 @@
 						<div class="col-sm-2">
 							<input type="date" id="date" name="finalDate">
 						</div>
-						<div class="col-sm-offset-2 col-sm-2">
+						<div class="btn-md col-sm-2">
 						<button type="submit" id="submit" class="btn btn-primary">Search</button>
 					</div>
 				</div>
 			</div>
 		</form>
 		<div>
-			<table class="table table-striped" th:if="${haveTasks}">
+			<table class="table table-striped" th:if="${completedTasks}">
 				  <thead>
 				    <tr>
 				      <th scope="col">#</th>
@@ -94,6 +94,9 @@
 				    <tr>
 				  </tbody>
 			</table>
+		</div>
+		<div th:if="not ${haveTasks}" class="text-center">
+			<img  th:src="@{/images/icons/noresults.png}" style="width:40%;"/>
 		</div>
 	</div>
 	</div>
