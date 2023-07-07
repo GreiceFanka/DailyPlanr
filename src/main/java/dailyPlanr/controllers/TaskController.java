@@ -43,8 +43,9 @@ public class TaskController {
 	@GetMapping("/newtask")
 	public String tasks(ModelMap model) {
 		boolean session = loggedUser.isLogged();
-		int id = loggedUser.getUserId();
+
 		if (session) {
+			int id = loggedUser.getUserId();
 			List<Category> listCategories = categoryRepository.findCategoryByUser(id);
 			List<String> allPriorities = Priority.getAllPriorities();
 
@@ -74,28 +75,28 @@ public class TaskController {
 	public String getAllTasks(ModelMap model) {
 		String alert = "null";
 		boolean session = loggedUser.isLogged();
-		int id = loggedUser.getUserId();
-		Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
-		LocalDateTime now = LocalDateTime.now();
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-		now.format(dateTimeFormatter);
-
-		for (Task task : allTasks) {
-			int latedTasks = task.getData().compareTo(now);
-			boolean toDoStatus = task.getTaskStatus().equalsIgnoreCase("To do");
-			boolean inProgressStatus = task.getTaskStatus().equalsIgnoreCase("In progress");
-
-			if (latedTasks <= -1 && (toDoStatus || inProgressStatus)) {
-				alert = "You have late tasks!";
-			}
-		}
-
 		if (session) {
-			model.addAttribute("name", loggedUser.getName());
-			model.addAttribute("user", loggedUser.getUserId());
-			model.addAttribute("tasks", allTasks);
-			model.addAttribute("alert", alert);
-			return "/alltasks";
+			int id = loggedUser.getUserId();
+			Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
+			LocalDateTime now = LocalDateTime.now();
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+			now.format(dateTimeFormatter);
+	
+			for (Task task : allTasks) {
+				int latedTasks = task.getData().compareTo(now);
+				boolean toDoStatus = task.getTaskStatus().equalsIgnoreCase("To do");
+				boolean inProgressStatus = task.getTaskStatus().equalsIgnoreCase("In progress");
+	
+				if (latedTasks <= -1 && (toDoStatus || inProgressStatus)) {
+					alert = "You have late tasks!";
+				}
+			}
+	
+				model.addAttribute("name", loggedUser.getName());
+				model.addAttribute("user", loggedUser.getUserId());
+				model.addAttribute("tasks", allTasks);
+				model.addAttribute("alert", alert);
+				return "/alltasks";
 		}
 		return "redirect:/login";
 	}
@@ -221,19 +222,28 @@ public class TaskController {
 	
 	@GetMapping("/taskhistory")
 	public String taskHistory(ModelMap model) {
+		boolean haveTasks = true;
 		model.addAttribute("name", loggedUser.getName());
+		model.addAttribute("haveTasks", haveTasks);
 		return "/taskhistory";
 	}
 	
 	@PostMapping("/taskhistory")
-	public String getTaskHistory(@RequestParam LocalDate initialDate,@RequestParam LocalDate finalDate, ModelMap model) {
+	public String getTaskHistory(LocalDate initialDate, LocalDate finalDate, ModelMap model) {
 		int id = loggedUser.getUserId();
-		Iterable<Task> completedTasks =	taskRepository.findCompletedTasks(id, initialDate, finalDate);
-		boolean haveTasks = true;
-			model.addAttribute("name", loggedUser.getName());
-			model.addAttribute("completedTasks", completedTasks);
+		boolean haveTasks = false;
+		
+		if(finalDate != null && initialDate != null) {
+			Iterable<Task> completedTasks =	taskRepository.findCompletedTasks(id, initialDate, finalDate);
+			if(completedTasks.iterator().hasNext()) {
+				haveTasks = true;
+				model.addAttribute("completedTasks", completedTasks);
+				model.addAttribute("haveTasks", haveTasks);
+			}
+		}else {
 			model.addAttribute("haveTasks", haveTasks);
-			
-			return"/taskhistory";
+		}
+		model.addAttribute("name", loggedUser.getName());
+		return"/taskhistory";
 	}
 }
