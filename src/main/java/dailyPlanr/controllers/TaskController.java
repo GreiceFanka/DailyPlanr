@@ -229,7 +229,7 @@ public class TaskController {
 	}
 	
 	@PostMapping("/taskhistory")
-	public String getTaskHistory(LocalDate initialDate, LocalDate finalDate, ModelMap model) {
+	public String getTaskHistory(@Valid LocalDate initialDate,@Valid LocalDate finalDate, ModelMap model) {
 		int id = loggedUser.getUserId();
 		boolean haveTasks = false;
 		
