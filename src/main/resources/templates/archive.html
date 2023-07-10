@@ -59,9 +59,8 @@
 			</h6>
 			<div id="kanban" class="card border-light">
 				<div class="row">
-					<div class="card" id="tasks"
-						th:if="${task.taskStatus} == 'Archive'" th:each="task:${tasks}"
-						style="min-width: 20%; max-width: 23%;">
+					<div class="card" id="tasks" th:each="task:${tasks.content}"
+						style="min-width: 20%; max-width: 20%;">
 						<span class="badge badge-pill badge-secondary align-self-end mb-2"
 							th:text="${task.categories.categoryName}"></span>
 						<div class="card-body text-center">
@@ -84,7 +83,16 @@
 						</div>
 					</div>
 				</div>
+				<div class="pagination-div">
+				    <div class="row col-sm justify-content-center">
+						<div th:if="${totalPages > 0}" class="" style="margin:3px;" th:each="pageNumber : ${pageNumbers}">
+							<a th:href="@{/archive(size=${pageSize}, page=${pageNumber})}"
+							 th:text="('-'+ ${pageNumber} + '-')"></a>
+						</div>
+					</div>
+				</div>
 			</div>
+	
 		</div>
 	</div>
 
