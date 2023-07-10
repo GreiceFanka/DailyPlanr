@@ -1,7 +1,5 @@
 package dailyPlanr.models;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,20 +7,14 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface TaskRepository extends PagingAndSortingRepository<Task, Integer>, CrudRepository<Task, Integer>{
+public interface TaskRepository extends CrudRepository<Task, Integer>{
 	
 	@Query(value= "select * from Task tk\n"
 			+ "inner join task_user tku ON tk.id=tku.task_id\n"
 			+ "where user_id = ? ", nativeQuery = true)
 	public Iterable<Task> findTaskByUser(int id); 
-	
-	@Query(value="select * from Task tk\n"
-			+ "	inner join task_user tku ON tk.id=tku.task_id\n"
-			+ "	where user_id = ? AND taskStatus IN ('Archive')",nativeQuery = true)
-	public Page<Task> findTaskByUserAndStatus(int id, Pageable pageable);
 	
 	@Query(value = "SELECT DISTINCT u.login FROM User u\n"
 			+ "LEFT JOIN task_user tu ON u.id=tu.user_id\n"

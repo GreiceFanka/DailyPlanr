@@ -4,11 +4,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 
 import org.apache.commons.mail.EmailException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -91,9 +95,9 @@ public class TaskController {
 					alert = "You have late tasks!";
 				}
 			}
-	
+				
 				model.addAttribute("name", loggedUser.getName());
-				model.addAttribute("user", loggedUser.getUserId());
+				model.addAttribute("user", loggedUser.getUserId());				
 				model.addAttribute("tasks", allTasks);
 				model.addAttribute("alert", alert);
 				return "/alltasks";
@@ -181,15 +185,32 @@ public class TaskController {
 	}
 
 	@GetMapping("/archive")
-	public String tasksInArchive(ModelMap model) {
+	public String tasksInArchive(ModelMap model, @RequestParam(value="page",defaultValue = "1") int page, @RequestParam(value="size", defaultValue = "4") int size) {
 		boolean session = loggedUser.isLogged();
-		int id = loggedUser.getUserId();
-		Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
+		final int id = loggedUser.getUserId();
+		int currentPage = page;
+        int pageSize = size;
+		Page<Task> allTasks = taskRepository.findTaskByUserAndStatus(id,(PageRequest.of(currentPage -1, pageSize)));
+		
+		int totalPages = allTasks.getTotalPages();
+		
+		if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                .boxed()
+                .collect(Collectors.toList());
+            model.addAttribute("pageNumbers", pageNumbers);
+        }
+		
 		List<String> allStatus = Status.getAllStatus();
+	
 		if (session) {
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("tasks", allTasks);
 			model.addAttribute("status", allStatus);
+			model.addAttribute("pageSize", pageSize);
+			model.addAttribute("currentPage", currentPage);
+			model.addAttribute("totalPages", allTasks.getTotalPages());
+			model.addAttribute("totalItems", allTasks.getTotalElements());
 			return "/archive";
 		}
 		return "redirect:/login";
