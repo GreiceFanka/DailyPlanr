@@ -3818,11 +3818,13 @@ input[type="button"].btn-block {
   padding: 0.75rem 1.25rem;
   margin-bottom: 0;
   background-color: rgba(0, 0, 0, 0.03);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125); }
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    display: flex;
+  flex-direction: column;}
   .card-header:first-child {
     border-radius: calc(0.25rem - 1px) calc(0.25rem - 1px) 0 0; }
   .card-header + .list-group .list-group-item:first-child {
-    border-top: 0; }
+    border-top: 0;}
 
 .card-footer {
   padding: 0.75rem 1.25rem;
@@ -8337,6 +8339,7 @@ a[data-toggle="collapse"] {
   .card{
     margin-left:3%;
     margin-right:2%;
+    flex: 1;
     }
   .card.border-info{
     margin-right:2%;
@@ -8344,6 +8347,7 @@ a[data-toggle="collapse"] {
    #tasks{
    	margin: 30px; 
    	padding: 10px;
+   	
    }
    #tasks button{
    	margin-top:5%;
@@ -8403,9 +8407,24 @@ a[data-toggle="collapse"] {
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
    }
    #kanban{
+   	flex: 1;
    	background-color:#dbdbdb;
    }
+   #tasks, #kanban{
+    transition: 400ms;
+   }
+   
+   #tasks.highlight {
+  	background-color: #22222211;
+	}
+
+	#tasks.over {
+  	background-color: rgba(0, 128, 0, 0.2);
+	}
    .badge-orange{
    background-color: #eead2d;
    color:white;
    }
+   .card.dragging {
+  	opacity: 0.3;
+	}
