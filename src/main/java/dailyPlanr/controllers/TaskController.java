@@ -185,9 +185,9 @@ public class TaskController {
 	}
 
 	@GetMapping("/archive")
-	public String tasksInArchive(ModelMap model, @RequestParam(value="page",defaultValue = "1") int page, @RequestParam(value="size", defaultValue = "4") int size) {
+	public String tasksInArchive(ModelMap model, @RequestParam(value="page",defaultValue = "1") int page, @RequestParam(value="size", defaultValue = "8") int size) {
 		boolean session = loggedUser.isLogged();
-		final int id = loggedUser.getUserId();
+		int id = loggedUser.getUserId();
 		int currentPage = page;
         int pageSize = size;
 		Page<Task> allTasks = taskRepository.findTaskByUserAndStatus(id,(PageRequest.of(currentPage -1, pageSize)));
