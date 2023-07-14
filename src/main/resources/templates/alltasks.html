@@ -59,7 +59,7 @@
 				<div class="alert alert-danger" role="alert" th:text="${error}"
 					th:if="${error}"></div>
 
-				<div class="card border-light" id="kanban"
+				<div class="card border-light" id="kanban" data-id="To do"
 					style="min-width: 25%; max-width: 25%;">
 					<div class="card-header text-white bg-warning mb-2">To do</div>
 					<div class="card" id="tasks" draggable="true" th:if="${task.taskStatus} == 'To do'"
@@ -74,6 +74,7 @@
 							class="badge badge-pill badge-danger align-self-end mb-2"
 							th:text="${task.priority}"></span>
 						<div class="card-body text-center">
+							<input type="hidden" id="task_id" th:value="${task.id}" name="task_id">
 							<h6 class="card-title" th:text="${task.title}"></h6>
 							<p class="card-text" th:text="${task.description}"></p>
 							<p class="card-text"
@@ -101,7 +102,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="card border-light" id="kanban"
+				<div class="card border-light" id="kanban" data-id="In progress"
 					style="min-width: 25%; max-width: 25%;">
 					<div class="card-header text-white bg-info mb-2">In progress</div>
 					<div class="card" id="tasks" draggable="true"
@@ -117,6 +118,7 @@
 							class="badge badge-pill badge-danger align-self-end mb-2"
 							th:text="${task.priority}"></span>
 						<div class="card-body text-center">
+							<input type="hidden" id="task_id" th:value="${task.id}" name="task_id">
 							<h6 class="card-title" th:text="${task.title}"></h6>
 							<p class="card-text" th:text="${task.description}"></p>
 							<p class="card-text"
@@ -142,7 +144,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="card border-light" id="kanban"
+				<div class="card border-light" id="kanban" data-id="Done"
 					style="min-width: 25%; max-width: 25%;">
 					<div class="card-header text-white bg-success mb-2">Done</div>
 					<div class="card" id="tasks" draggable="true" th:if="${task.taskStatus} == 'Done'"
@@ -157,6 +159,7 @@
 							class="badge badge-pill badge-danger align-self-end mb-2"
 							th:text="${task.priority}"></span>
 						<div class="card-body text-center">
+							<input type="hidden" id="task_id" th:value="${task.id}" name="task_id">
 							<h6 class="card-title" th:text="${task.title}"></h6>
 							<p class="card-text" th:text="${task.description}"></p>
 							<p class="card-text"
