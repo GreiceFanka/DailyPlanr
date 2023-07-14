@@ -55,6 +55,13 @@
 	function dragEnd() {
 		lists.forEach(list => list.classList.remove('highlight'));
   		this.classList.remove('dragging');
+  		const el = this.querySelector("#task_id");
+		const task_id = el.getAttribute("value");
+		const id = parseInt(task_id,10);
+		const status = this.querySelector("#task_id");
+		const taskStatus = $(status).parent().parent().parent().data('id');
+	
+		saveData(id,taskStatus);
 	}
 	
 	lists.forEach( list => {
@@ -74,4 +81,20 @@
 	function drop() {
 		this.classList.remove('over');
 	 }
+	
+	function saveData(id,taskStatus){
+		var formData = new FormData();
+		formData.append('id',id);
+		formData.append('taskStatus',taskStatus);
+		
+        fetch('/edit/status', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if(!response.ok)
+                throw new Error("não foi possível trocar o status");
+
+            return response.text();
+        })
+	}
 	
