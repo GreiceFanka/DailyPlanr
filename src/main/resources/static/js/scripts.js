@@ -98,3 +98,8 @@ function saveData(id, taskStatus) {
 	})
 }
 
+setTimeout(() => {
+	$(".alert").fadeOut("slow", function(){
+	$(this).alert('close');
+	});				
+}, 5000);
