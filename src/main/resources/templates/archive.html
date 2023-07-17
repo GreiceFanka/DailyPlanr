@@ -60,7 +60,7 @@
 			</h6>
 			<div id="kanban" class="card border-light">
 				<div class="row">
-					<div class="card" id="tasks" th:each="task:${tasks.content}"
+					<div class="card border-light" id="tasks" th:each="task:${tasks.content}"
 						style="min-width: 20%; max-width: 20%;">
 						<span class="badge badge-pill badge-secondary align-self-end mb-2"
 							th:text="${task.categories.categoryName}"></span>
