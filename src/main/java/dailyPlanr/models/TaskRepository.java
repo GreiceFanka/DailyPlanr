@@ -40,6 +40,11 @@ public interface TaskRepository extends PagingAndSortingRepository<Task, Integer
 			+ "WHERE tku.user_id = ? AND tk.updatedStatus BETWEEN ? AND ? AND tk.taskStatus IN ('Done','Archive')", nativeQuery = true)
 	public Iterable<Task> findCompletedTasks(int id, LocalDate initialDate, LocalDate finalDate);
 	
+	@Query(value="select * from Task tk\n "
+			+ "inner join task_user tku ON tk.id=tku.task_id\n "
+			+ "where user_id = ? AND taskStatus IN ('In progress', 'To do') AND category_id = ? ", nativeQuery = true)
+	public List<Task> findTaskByUserAndCategory(int id, Integer category);
+	
 	@Transactional
 	@Modifying
 	@Query(value="UPDATE Task SET data = ? , title = ? , description = ? , priority = ? "
