@@ -55,7 +55,7 @@
 		<!-- Page Content  -->
 
 		<div id="content" class="p-4 p-md-5 pt-5 text-right">
-		<form action="/taskhistory" method="post">
+		<form action="/taskhistory" method="GET">
 			<div class="form-group">
 				<div class="row">
 					<label class="control-label col-sm-1" for="data">Initial Date:</label>
@@ -95,7 +95,7 @@
 				  </tbody>
 			</table>
 		</div>
-		<div th:if="not ${haveTasks}" class="text-center">
+		<div th:if="${tasksEmpty}" class="text-center">
 			<img  th:src="@{/images/icons/noresults.png}" style="width:40%;"/>
 		</div>
 	</div>
