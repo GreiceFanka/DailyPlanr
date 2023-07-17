@@ -99,8 +99,10 @@
 	<script src="js/main.js"></script>
 	<script type="text/javascript">
 		setTimeout(() => {
-			$(".alert").alert('close')
-		}, 3000);
+			$(".alert").fadeOut("slow", function(){
+				$(this).alert('close');
+			});				
+		    }, 5000);
 	</script>
 </body>
 </html>
