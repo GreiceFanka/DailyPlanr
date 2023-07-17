@@ -227,14 +227,19 @@ public class TaskController {
 	}
 	
 	@GetMapping("/tasksbycategory")
-	public String showTasksByCategory(ModelMap model) {
+	public String showTasksByCategory(@Valid Integer category,ModelMap model) {
 		boolean session = loggedUser.isLogged();
 		int id = loggedUser.getUserId();
-		Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
-		List<Category> categories = categoryRepository.findCategoryByUser(id);
 		if(session) {
+			if(category != null) {
+				List<Task> tasks = taskRepository.findTaskByUserAndCategory(id,category);
+				List<Category> categories = categoryRepository.findCategoryByUser(id);
+				model.addAttribute("name", loggedUser.getName());
+				model.addAttribute("tasks", tasks);
+				model.addAttribute("categories", categories);
+			}
+			List<Category> categories = categoryRepository.findCategoryByUser(id);
 			model.addAttribute("name", loggedUser.getName());
-			model.addAttribute("tasks", allTasks);
 			model.addAttribute("categories", categories);
 			return "/tasksbycategory";
 		}
