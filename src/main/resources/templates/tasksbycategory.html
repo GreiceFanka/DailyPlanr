@@ -56,15 +56,26 @@
 		<!-- Page Content  -->
 
 		<div id="content" class="p-4 p-md-5 pt-5">
-			<div class="row">
-				<div class="card border-light" id="kanban"
-					style="min-width: 25%; max-width: 25%;margin-top:3%;"
-					th:each="category:${categories}">
-					<div class="card-header text-white text-center mb-3 bi bi-tag-fill"
-						th:text="${category.categoryName}"></div>
-					<div class="card" id="tasks" th:each="task:${tasks}"
-						th:if="${category.categoryName} == ${task.categories.categoryName}">
-						<span class="badge badge-pill badge-secondary align-self-end mb-2"
+			<form action="/tasksbycategory" method="GET">
+				<div class="row">
+					<div class="form-group col-sm-12">
+						<label class="control-label" for="description">Filter By
+							Category:</label> <select class="form-select"
+							aria-label="Default select example" name="category">
+							<option th:each="category:${categories}" id="categories"
+								th:value="${category.id}" th:text="${category.categoryName}"></option>
+						</select>
+						<button type="submit" id="submit" class="btn btn-primary"
+							style="margin-left: 2%;">Filter</button>
+					</div>
+				</div>
+			</form>
+			<div class="card border-light" id="kanban"
+				style="min-width: 25%; max-width: 25%; margin-top: 3%;">
+				<div class="row">
+					<div class="card border-light" id="tasks" th:each="task:${tasks}">
+						<span
+							class="badge badge-pill badge-secondary align-self-start mb-2"
 							th:text="${task.categories.categoryName}"></span>
 						<div class="card-body text-center">
 							<h6 class="card-title" th:text="${task.title}"></h6>
@@ -72,6 +83,12 @@
 							<p class="card-text"
 								th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></p>
 						</div>
+						<span th:if="${task.taskStatus} == 'To do'"
+							class="badge badge-pill text-white align-self-end mb-2"
+							th:text="${task.taskStatus}" id="do"></span> <span
+							th:if="${task.taskStatus} == 'In progress'"
+							class="badge badge-pill text-white align-self-end mb-2"
+							th:text="${task.taskStatus}" id="progress"></span>
 						<div class="dropdown align-self-end">
 							<a type="button" data-toggle="dropdown" aria-haspopup="true"
 								aria-expanded="true"> <i class="bi bi-three-dots-vertical">
