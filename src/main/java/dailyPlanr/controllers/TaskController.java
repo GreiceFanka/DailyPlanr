@@ -247,28 +247,20 @@ public class TaskController {
 	}
 	
 	@GetMapping("/taskhistory")
-	public String taskHistory(ModelMap model) {
-		boolean haveTasks = true;
-		model.addAttribute("name", loggedUser.getName());
-		model.addAttribute("haveTasks", haveTasks);
-		return "/taskhistory";
-	}
-	
-	@PostMapping("/taskhistory")
 	public String getTaskHistory(@Valid LocalDate initialDate,@Valid LocalDate finalDate, ModelMap model) {
 		int id = loggedUser.getUserId();
-		boolean haveTasks = false;
+		boolean tasksEmpty = false;
 		
 		if(finalDate != null && initialDate != null) {
 			Iterable<Task> completedTasks =	taskRepository.findCompletedTasks(id, initialDate, finalDate);
 			if(completedTasks.iterator().hasNext()) {
-				haveTasks = true;
 				model.addAttribute("completedTasks", completedTasks);
-				model.addAttribute("haveTasks", haveTasks);
+			}else {
+				tasksEmpty = true;
+				model.addAttribute("tasksEmpty", tasksEmpty);
 			}
-		}else {
-			model.addAttribute("haveTasks", haveTasks);
 		}
+		model.addAttribute("tasksEmpty", tasksEmpty);
 		model.addAttribute("name", loggedUser.getName());
 		return"/taskhistory";
 	}
