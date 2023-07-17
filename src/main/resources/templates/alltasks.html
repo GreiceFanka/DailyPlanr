@@ -56,13 +56,10 @@
 
  	<div id="content" class="p-4 p-md-5 pt-5">
 			<div class="row">
-				<div class="alert alert-danger" role="alert" th:text="${error}"
-					th:if="${error}"></div>
-
-				<div class="card border-light" id="kanban" data-id="To do"
+				<div class="card border-light rounded-bottom" id="kanban" data-id="To do"
 					style="min-width: 25%; max-width: 25%;">
-					<div class="card-header text-white bg-warning mb-2">To do</div>
-					<div class="card" id="tasks" draggable="true" th:if="${task.taskStatus} == 'To do'"
+					<div class="card-header text-white font-weight-bold rounded-top mb-2" id="do">To do</div>
+					<div class="card border-light" id="tasks" draggable="true" th:if="${task.taskStatus} == 'To do'"
 						th:each="task:${tasks}">
 						<span th:if="${task.priority} == 'Low'"
 							class="badge badge-pill badge-primary align-self-end mb-2"
@@ -80,7 +77,7 @@
 							<p class="card-text"
 								th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></p>
 						</div>
-						<span class="badge badge-secondary align-self-start mb-2"
+						<span class="badge badge-pill badge-secondary align-self-start mb-2"
 							th:text="${task.categories.categoryName}"></span>
 						<div class="dropdown align-self-end">
 							<a type="button" data-toggle="dropdown" aria-haspopup="true"
@@ -102,10 +99,10 @@
 						</div>
 					</div>
 				</div>
-				<div class="card border-light" id="kanban" data-id="In progress"
+				<div class="card border-light rounded-bottom" id="kanban" data-id="In progress"
 					style="min-width: 25%; max-width: 25%;">
-					<div class="card-header text-white bg-info mb-2">In progress</div>
-					<div class="card" id="tasks" draggable="true"
+					<div class="card-header text-white font-weight-bold rounded-top mb-2" id="progress">In progress</div>
+					<div class="card border-light" id="tasks" draggable="true"
 						th:if="${task.taskStatus} == 'In progress'"
 						th:each="task:${tasks}">
 						<span th:if="${task.priority} == 'Low'"
@@ -124,7 +121,7 @@
 							<p class="card-text"
 								th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></p>
 						</div>
-						<span class="badge badge-secondary align-self-start mb-2"
+						<span class="badge badge-pill badge-secondary align-self-start mb-2"
 							th:text="${task.categories.categoryName}"></span>
 						<div class="dropdown align-self-end">
 							<a type="button" data-toggle="dropdown" aria-haspopup="true"
@@ -144,10 +141,10 @@
 						</div>
 					</div>
 				</div>
-				<div class="card border-light" id="kanban" data-id="Done"
+				<div class="card border-light rounded-bottom" id="kanban" data-id="Done"
 					style="min-width: 25%; max-width: 25%;">
-					<div class="card-header text-white bg-success mb-2">Done</div>
-					<div class="card" id="tasks" draggable="true" th:if="${task.taskStatus} == 'Done'"
+					<div class="card-header text-white font-weight-bold rounded-top mb-2" id="done">Done</div>
+					<div class="card border-light" id="tasks" draggable="true" th:if="${task.taskStatus} == 'Done'"
 						th:each="task:${tasks}">
 						<span th:if="${task.priority} == 'Low'"
 							class="badge badge-pill badge-primary align-self-end mb-2"
@@ -165,7 +162,7 @@
 							<p class="card-text"
 								th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></p>
 						</div>
-						<span class="badge badge-secondary align-self-start mb-2"
+						<span class="badge badge-pill badge-secondary align-self-start mb-2"
 							th:text="${task.categories.categoryName}"></span>
 						<div class="dropdown align-self-end">
 							<a type="button" data-toggle="dropdown" aria-haspopup="true"
