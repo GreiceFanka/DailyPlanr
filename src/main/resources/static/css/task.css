@@ -8339,7 +8339,7 @@ a[data-toggle="collapse"] {
   .card{
     margin-left:3%;
     margin-right:2%;
-    flex: 1;
+    
     }
   .card.border-info{
     margin-right:2%;
@@ -8408,7 +8408,8 @@ a[data-toggle="collapse"] {
    }
    #kanban{
    	flex: 1;
-   	background-color:#dbdbdb;
+   	background-color:#f3f4f0;
+
    }
    #tasks, #kanban{
     transition: 400ms;
@@ -8427,5 +8428,17 @@ a[data-toggle="collapse"] {
    }
    .card.dragging {
   	opacity: 0.3;
+	}
+	#do{
+	background-color:#f38f00;
+	border-bottom-color: #f38f00;
+	}
+	#progress{
+	background-color: #9400d3;
+	border-bottom-color:#9400d3;
+	}
+	#done{
+	background-color: #2ec27e;
+	border-bottom-color:#2ec27e;
 	}
 	
