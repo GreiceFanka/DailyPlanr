@@ -5,8 +5,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.mail.EmailException;
-import org.apache.commons.mail.SimpleEmail;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.Column;
@@ -142,29 +140,4 @@ public class Task {
 		this.priority = priority;
 	}
 
-	public static void sendEmail(List<String> userList, String passwordMail) throws EmailException {
-		try {
-			for (String user : userList) {
-				SimpleEmail email = new SimpleEmail();
-
-				email.setHostName("smtp.zoho.eu");
-				email.setSmtpPort(465);
-				email.setFrom("dailyplanr@zohomail.eu", "DailyPlanr");
-
-				email.addTo(user);
-				email.setSubject("DailyPlanr task reminder");
-				email.setMsg("Dear user,\n" + "\n"
-						+ "This is just a reminder mail that you have incompleted tasks that are late or will be late soon. Please login in DailyPlanr app and check your tasks list.\n"
-						+ "\n" + "Greetings from DailyPlanr team!");
-
-				email.setSSL(true);
-				email.setAuthentication("dailyplanr@zohomail.eu", passwordMail);
-				System.out.println("Sending...");
-				email.send();
-				System.out.println("Email sent!");
-			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
 }
