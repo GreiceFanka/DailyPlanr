@@ -9,7 +9,6 @@ import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 
-import org.apache.commons.mail.EmailException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -40,9 +39,6 @@ public class TaskController {
 
 	@Inject
 	private LoggedUser loggedUser;
-
-	@Inject
-	private Mail mail;
 
 	@GetMapping("/newtask")
 	public String tasks(ModelMap model) {
@@ -158,17 +154,6 @@ public class TaskController {
 		taskRepository.insertUserTask(taskId, userId);
 		redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
 		return "redirect:/alltasks";
-	}
-
-	@GetMapping("/sendReminder")
-	public void sendReminder() throws EmailException {
-		LocalDateTime date = LocalDateTime.now().plusDays(1);
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-		date.format(dateTimeFormatter);
-
-		List<String> userList = taskRepository.findTaskByDate(date);
-		String passwordMail = mail.getPasswordMail();
-		Task.sendEmail(userList, passwordMail);
 	}
 
 	@GetMapping("/late/tasks")
