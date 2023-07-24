@@ -1,0 +1,570 @@
+
+/*--- Google Fonts ---*/
+@import url("https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700");
+
+/*=======================================================
+			BODY:
+========================================================*/
+
+body {
+	font-family: 'Poppins', sans-serif;
+	font-size: 14px;
+	line-height: 1.8;
+	letter-spacing: 0.07em;
+	color: #5c5c5c;
+}
+
+/*=======================================================
+			COLORS (Only Visible In Scss File):
+========================================================*/
+
+$primary-color: #ad67ea;
+$secondary-color: #8aecec;
+$white: #fff;
+$black: #000;
+$light-grey: #f5f5f7;
+
+/*=======================================================
+			TYPOGRAPHY:
+========================================================*/
+
+h1 {
+	font-size: 3.5rem;
+	font-weight: 700;
+}
+
+h2 {
+	font-size: 2.5rem;
+	font-weight: 700;
+	color: $black;
+}
+
+h3 {
+	font-weight: 300;
+}
+
+h4 {
+	font-weight: 700;
+	color: $black;
+}
+
+h5 {
+	font-weight: 700;
+	color: $black;
+}
+
+h6 {
+	font-size: 1.3rem;
+	font-weight: 700;
+	color: $black;
+}
+
+.lnr {
+	font-size: 3rem;
+	color: $primary-color;
+}
+
+/*=======================================================
+			BUTTONS:
+========================================================*/
+
+.btn-transparent {
+	background: transparent;
+	font-size: 12px;
+	padding: 15px 25px;
+	color: $white;
+	border: 1px solid $white;
+	border-radius: 100px;
+	transition: all .2s ease-in-out;
+}
+
+.btn-transparent:hover,
+.btn-transparent:focus,
+.btn-transparent:active {
+	background: $primary-color;
+	color: $white;
+	border: 1px solid $white;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+	transform: translateY(-3px);
+}
+
+.btn-white {
+	background: $white;
+	font-size: 12px;
+	padding: 15px 25px;
+	color: $black;
+	border: 1px solid $white;
+	border-radius: 100px;
+	transition: all .2s ease-in-out;
+}
+
+.btn-white:hover,
+.btn-white:focus,
+.btn-white:active {
+	background: $primary-color;
+	color: $white;
+	border: 1px solid $white;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+	transform: translateY(-3px);
+}
+
+.btn-primary {
+	background: $primary-color;
+	font-size: 12px;
+	padding: 15px 25px;
+	color: $white;
+	border: 1px solid $white;
+	border-radius: 100px;
+	transition: all .2s ease-in-out;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+	background: $secondary-color;
+	color: $white;
+	border: 1px solid $white;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+	transform: translateY(-3px);
+}
+
+/*=======================================================
+			NAVIGATION:
+========================================================*/
+
+.core-nav {
+	.brand {
+		top: 10px;
+
+		img {
+			width: 120px;
+		}
+	}
+
+	.menu li a {
+		font-weight: 500;
+		transition: all .2s ease-in-out;
+	}
+
+	.menu li.active > a {
+		color: $secondary-color;
+		text-decoration: line-through;
+	}
+
+	.menu li.active > a,
+	.menu li a:hover,
+	.menu li a:focus,
+	.menu li a:active {
+		text-decoration: line-through;
+		color: $secondary-color;
+	}
+}
+
+nav.scrolled {
+	.menu li a {
+		font-weight: 500;
+		transition: all .2s ease-in-out;
+	}
+
+	.menu li.active > a {
+		color: $secondary-color;
+		text-decoration: line-through;
+	}
+
+	.menu li.active > a,
+	.menu li a:hover,
+	.menu li a:focus,
+	.menu li a:active {
+		text-decoration: line-through;
+		color: $secondary-color;
+	}
+}
+
+/*=======================================================
+			TOP SLIDER:
+========================================================*/
+
+.slider-area {
+	height: 100vh;
+	color: $white;
+	text-align: center;
+	position: relative;
+
+	.single-slide {
+		background-position: center center;
+		background-repeat: no-repeat;
+		background-size: cover;
+		max-height: 100vh;
+		height: 100vh;
+
+		.btn {
+			margin-bottom: 15px;
+		}
+	}
+
+	.single-slide:before {
+		content: "";
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		background: rgba(173, 103, 234, 0.66);
+	}
+
+	.slide-bg-1 {
+		background-image: url("https://via.placeholder.com/1920x1080");
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+	}
+
+	.slide-bg-2 {
+		background-image: url("https://via.placeholder.com/1920x1080");
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+	}
+
+	.tabel {
+		display: table;
+		width: 100%;
+
+		.tabel-cell {
+			display: table-cell;
+			height: 40em;
+			vertical-align: middle;
+
+			.slider-content {
+				padding: 0 40px;
+
+				h1 {
+					margin: 20px 0;
+				}
+
+				.btn-white {
+					margin-left: 20px;
+				}
+			}
+		}
+	}
+
+	.owl-dots {
+		bottom: 2.5%;
+		right: 50%;
+		position: relative;
+
+		div.owl-dot {
+			background-color: transparent;
+			border: 2px solid $primary-color;
+			border-radius: 100px;
+			bottom: -25px;
+			display: inline-block;
+			height: 12px;
+			left: 50%;
+			margin-right: 10px;
+			position: relative;
+			-webkit-transition: all 0.3s ease 0s;
+			transition: all 0.3s ease 0s;
+			width: 12px;
+		}
+
+		div.owl-dot.active {
+			background-color: $secondary-color;
+		}
+	}
+}
+
+.slider-area:after {
+	content: "";
+	position: absolute;
+	bottom: -1%;
+	left: 0;
+	z-index: 1;
+	width: 100%;
+	height: 100px;
+	background: transparent;
+	background-size: 100% 100%;
+	background-image: url(../img/bottom-wave.png);
+}
+
+
+/*=======================================================
+			CALL TO ACTION:
+========================================================*/
+
+#call-to-action {
+	background: url('https://via.placeholder.com/1920x1080');
+	background-position: center;
+	background-size: cover;
+	background-attachment: fixed;
+	position: relative;
+	padding: 100px 0;
+	text-align: center;
+	color: $white;
+
+	.btn {
+		margin-top: 40px;
+	}
+}
+
+#call-to-action:after {
+	content: "";
+	position: absolute;
+	bottom: -8%;
+	left: 0;
+	z-index: 1;
+	width: 100%;
+	height: 100px;
+	background: transparent;
+	background-size: 100% 100%;
+	background-image: url(../img/bottom-wave.png);
+}
+
+/*=======================================================
+			CONTACT:
+========================================================*/
+
+#contact {
+	padding: 40px 0 80px 0;
+	background: $light-grey;
+
+	.svg-wave {
+		width: 100%;
+		position: relative;
+		bottom: 60px;
+
+		svg {
+			background: $white;
+			width: 100%;
+			height: auto;
+
+			path {
+				fill: $light-grey;
+			}
+		}
+	}
+
+	h2 {
+		text-align: center;
+		margin-bottom: 80px;
+	}
+
+	h2:after {
+		top: -23px;
+		content: "";
+		position: relative;
+		left: 50%;
+		bottom: 0;
+		width: 250px;
+		height: 4px;
+		display: block;
+		background-color: $primary-color;
+		-webkit-transform: translateX(-50%);
+		transform: translateX(-50%);
+		border-radius: 100px;
+	}
+
+	h4 {
+		margin-bottom: 35px;
+	}
+
+	.email-link {
+		color: $primary-color;
+		display: block;
+		margin-bottom: 15px;
+		transition: all .2s ease-in-out;
+	}
+
+	.email-link:hover,
+	.email-link:focus,
+	.email-link:active {
+		color: $secondary-color;
+		text-decoration: line-through;
+	}
+
+	.social-media {
+		list-style: none;
+		padding: 0;
+
+		li {
+			display: inline-block;
+			transition: all .2s ease-in-out;
+			margin: 0 10px;
+
+			a {
+				font-size: 18px;
+				line-height: 2.8;
+				color: $primary-color;
+			}
+		}
+
+	}
+
+	textarea {
+		border-radius: 5px;
+		border: 1.5px solid $primary-color;
+	}
+
+	textarea:focus {
+		outline: 0;
+		box-shadow: none;
+		border: 1.5px solid $secondary-color;
+	}
+
+	.row {
+		.col {
+			.form-control {
+				border-radius: 100px;
+				margin-bottom: 20px;
+				border: 1.5px solid $primary-color;
+			}
+
+			.form-control:focus {
+				outline: 0;
+				box-shadow: none;
+				border: 1.5px solid $secondary-color;
+			}
+		}
+	}
+
+}
+
+/*=======================================================
+			FOOTER:
+========================================================*/
+
+footer {
+	padding: 25px 0;
+
+	p {
+		margin: 0;
+	}
+
+	a {
+		color: $primary-color;
+		transition: all .2s ease-in-out;
+	}
+
+	a:hover,
+	a:focus,
+	a:active {
+		color: $secondary-color;
+		text-decoration: line-through;
+	}
+}
+
+/*=======================================================
+			MEDIA QUERIES: 
+========================================================*/
+
+@media (max-width: 1199px) {
+	#about {
+		.container {
+			.about-content {
+				padding-top: 40px;
+			}
+		}
+	}
+}
+
+@media (max-width: 992px) {
+	.core-nav .brand {
+		top: 5px;
+	}
+}
+
+@media (max-width: 798px) {
+	#home {
+		.main-slider {
+			h1 {
+				font-size: 3rem;
+			}
+		}
+	}
+}
+
+/*=======================================================
+			PRELOADER: 
+========================================================*/
+
+.preloader-holder {
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	background: url(../img/preview.jpg);
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+	z-index: 100000;
+}
+
+#loader {
+	animation: loader 5s linear infinite;
+	position: absolute;
+	top: calc(50% - 20px);
+	left: calc(50% - 20px);
+}
+
+@keyframes loader {
+	0% {
+		left: -100px
+	}
+
+	100% {
+		left: 110%;
+	}
+}
+
+#box {
+	width: 50px;
+	height: 50px;
+	background: #fff;
+	animation: animate .5s linear infinite;
+	position: absolute;
+	top: 0;
+	left: 0;
+	border-radius: 3px;
+}
+
+@keyframes animate {
+	17% {
+		border-bottom-right-radius: 3px;
+	}
+
+	25% {
+		transform: translateY(9px) rotate(22.5deg);
+	}
+
+	50% {
+		transform: translateY(18px) scale(1, .9) rotate(45deg);
+		border-bottom-right-radius: 40px;
+	}
+
+	75% {
+		transform: translateY(9px) rotate(67.5deg);
+	}
+
+	100% {
+		transform: translateY(0) rotate(90deg);
+	}
+}
+
+#shadow {
+	width: 50px;
+	height: 5px;
+	background: #000;
+	opacity: 0.1;
+	position: absolute;
+	top: 59px;
+	left: 0;
+	border-radius: 50%;
+	animation: shadow .5s linear infinite;
+}
+
+@keyframes shadow {
+	50% {
+		transform: scale(1.2, 1);
+	}
+}
