@@ -101,8 +101,8 @@ public class TaskController {
 		return "redirect:/login";
 	}
 
-	@GetMapping("/delete/task/{id}")
-	public String deleteTask(@PathVariable int id) {
+	@PostMapping("/delete/task")
+	public String deleteTask(@RequestParam int id) {
 		taskRepository.deleteById(id);
 		return "redirect:/alltasks";
 	}
