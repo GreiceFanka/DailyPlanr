@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
+import org.apache.commons.mail.EmailException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -31,6 +32,9 @@ public class UserController{
 	
 	@Inject
 	private LoggedUser loggedUser;
+	
+	@Inject
+	private Mail mail;
 	
 	public UserController(PasswordEncoder encoder) {
 		this.encoder = encoder;
@@ -124,5 +128,18 @@ public class UserController{
 	public String logout() {
 		loggedUser.logOff();
 		return "redirect:/login";
+	}
+	
+	@PostMapping("/sendcontact")
+	public String sendContact(@RequestParam String userEmail,@RequestParam String subject ,@RequestParam String message, RedirectAttributes redirAttrs) throws EmailException {
+		String passwordEmail = mail.getPasswordMail();
+		try {
+			Mail.sendContactEmail(userEmail, subject, message, passwordEmail);
+			redirAttrs.addFlashAttribute("success", "Email sent with success!");
+		} catch (Exception e) {
+			String error = e.getMessage();
+			redirAttrs.addFlashAttribute("error", error);
+		}
+		return "redirect:/index";
 	}
 }
