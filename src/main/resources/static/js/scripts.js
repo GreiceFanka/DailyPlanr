@@ -103,3 +103,29 @@ setTimeout(() => {
 	$(this).alert('close');
 	});				
 }, 5000);
+
+const cardsDeleteModal = document.querySelectorAll('#tasks');
+
+cardsDeleteModal.forEach(card => {
+	card.addEventListener('click', click);
+});
+
+function click(){
+	const element = this.querySelector("#task_id");
+	const element_id = element.getAttribute("value");
+	const id = parseInt(element_id,10);
+	$(".text-danger").click(function() {	
+	const taskInput = document.querySelector("#tid")
+	taskInput.setAttribute("value",id);
+	$("#deleteModal").modal();
+	});
+}
+
+
+$("#closeModal").click(function() {
+	$("#deleteModal").modal('hide');
+});
+
+$(".close").click(function() {
+	$("#deleteModal").modal('hide');
+});
