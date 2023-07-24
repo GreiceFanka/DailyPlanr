@@ -64,5 +64,26 @@ public class Mail {
 			System.out.println(e.getMessage());
 		}
 	}
-
+	
+	public static void sendContactEmail(String userEmail, String subject ,String message, String passwordEmail) throws EmailException {
+		try {
+			
+			SimpleEmail contactEmail = new SimpleEmail();
+			contactEmail.setHostName("smtp.zoho.eu");
+			contactEmail.setSmtpPort(465);
+			
+			contactEmail.setFrom("dailyplanr@zohomail.eu", userEmail);
+			contactEmail.addTo("greicefcardoso@gmail.com");
+			contactEmail.setSubject(subject);
+			contactEmail.setMsg(message);
+			
+			contactEmail.setSSL(true);
+			contactEmail.setAuthentication("dailyplanr@zohomail.eu", passwordEmail);
+			System.out.println("Sending...");
+			contactEmail.send();
+			System.out.println("Email sent!");
+		}catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+	}
 }
