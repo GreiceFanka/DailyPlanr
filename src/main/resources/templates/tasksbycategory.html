@@ -70,14 +70,14 @@
 					</div>
 				</div>
 			</form>
-			<div class="card border-light" id="kanban"
-				style="min-width: 25%; max-width: 25%; margin-top: 3%;">
+			<div class="card border-light" id="kanban">
 				<div class="row">
-					<div class="card border-light" id="tasks" th:each="task:${tasks}">
+					<div class="card border-light" id="tasks" th:each="task:${tasks}" style="min-width: 20%; max-width: 20%;">
 						<span
 							class="badge badge-pill badge-secondary align-self-start mb-2"
 							th:text="${task.categories.categoryName}"></span>
 						<div class="card-body text-center">
+							<input type="hidden" id="task_id" th:value="${task.id}" name="task_id">
 							<h6 class="card-title" th:text="${task.title}"></h6>
 							<p class="card-text" th:text="${task.description}"></p>
 							<p class="card-text"
@@ -103,12 +103,34 @@
 								<li><a th:href="@{/edit/task/{id}(id=${task.id})}"><i
 										class="bi bi-pencil-fill"></i>Edit</a></li>
 								<li><a class="text-danger"
-									th:href="@{/delete/task/{id}(id=${task.id})}"><i
+									th:href="@{#deleteModal}"><i
 										class="bi bi-trash-fill"></i>Delete</a></li>
 							</ul>
 						</div>
 					</div>
 				</div>
+			</div>
+			<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+			  <div class="modal-dialog modal-dialog-centered" role="document">
+			    <div class="modal-content">
+			      <div class="modal-header">
+			        <h6 class="modal-title" id="exampleModalLongTitle">Delete Task</h6>
+			        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			          <span aria-hidden="true">&times;</span>
+			        </button>
+			      </div>
+			      <form action="/delete/task" method="POST">
+			      <div class="modal-body">
+			      	<input type="hidden" id="tid" name="id">
+			        <p>Are you sure you want to delete this task?</p>
+			      </div>
+			      <div class="modal-footer">
+			        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			    	<button type="submit" class="btn btn-danger">Delete</button>
+			      </div>
+			      </form>
+			    </div>
+			  </div>
 			</div>
 		</div>
 	</div>
