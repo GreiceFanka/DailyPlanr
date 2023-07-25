@@ -88,9 +88,9 @@
 							<div class="form-group">
 								<label class="control-label col-sm-2" for="description">Priority:</label>
 								<select class="form-select" aria-label="Default select example"
-									name="priority">
+									name="priority" th:each="task:${tasks}">
 									<option th:each="priority:${priorities}" id=""
-										th:value="${priority}" th:text="${priority}"></option>
+										th:value="${priority}" th:text="${priority}" th:selected="${priority == task.priority}"></option>
 								</select>
 							</div>
 							<div class="d-grid gap-2 d-md-flex">
