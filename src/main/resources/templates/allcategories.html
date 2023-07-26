@@ -58,12 +58,13 @@
 
 			<div class="container">
 				<div class="row">
-					<div class="card col-3" style="margin: 30px; padding: 10px;"
+					<div class="card col-4 border-white" style="margin: 30px; padding: 10px;"
 						th:each="category:${categories}">
-						<div class="card-body">
-							<p class="card-text" th:text="${category.categoryName}"></p>
+						<div class="card-body row">
+						<i class="bi bi-tag-fill"></i>
+							<p class="card-text col-4" th:text="${category.categoryName}"></p>
 							<a th:href="@{/edit/category/{id}(id=${category.id})}"><button
-									type="button" class="btn btn-outline-success">Edit</button></a>
+									type="button" class="btn btn-primary align-self-end">Edit</button></a>
 						</div>
 					</div>
 				</div>
