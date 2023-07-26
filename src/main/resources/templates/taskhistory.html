@@ -76,7 +76,6 @@
 			<table class="table table-striped" th:if="${completedTasks}">
 				  <thead>
 				    <tr>
-				      <th scope="col">#</th>
 				      <th scope="col" >Title</th>
 				       <th scope="col" >Date</th>
 				      <th scope="col">Status</th>
@@ -85,7 +84,6 @@
 				  </thead>
 				  <tbody th:each="task:${completedTasks}" th:if="${completedTasks}">
 				    <tr>
-				      <th scope="row"></th>
 				      <td th:text="${task.title}"></td>
 				       <td th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></td>
 				      <td th:text="${task.taskStatus}"></td>
