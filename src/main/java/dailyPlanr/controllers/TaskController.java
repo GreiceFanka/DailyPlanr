@@ -61,13 +61,18 @@ public class TaskController {
 	@PostMapping("/newtask/create/")
 	public String newTask(@Valid Task task, @Valid User user, RedirectAttributes redirAttrs) {
 		if (user != null) {
-			task.addUser(user);
-			taskRepository.save(task);
-			redirAttrs.addFlashAttribute("success", "Everything went just fine.");
-			return "redirect:/newtask";
+			if(task.getData() != null) {
+				task.addUser(user);
+				taskRepository.save(task);
+				redirAttrs.addFlashAttribute("success", "Everything went just fine.");
+				return "redirect:/newtask";
+			}else {
+				redirAttrs.addFlashAttribute("error", "You need insert a date.");
+				return "redirect:/newtask";
+			}
 		} else {
 			redirAttrs.addFlashAttribute("error", "Something went wrong, try again.");
-			return "/newtask";
+			return "redirect:/newtask";
 		}
 	}
 
@@ -130,8 +135,27 @@ public class TaskController {
 
 	@PostMapping("/update/task")
 	public String updateTask(@RequestParam String data, @RequestParam String title, @RequestParam String description, @RequestParam String priority,
-			@RequestParam int task_id) {
-		taskRepository.updateTask(data, title, description, priority, task_id);
+			@RequestParam int task_id, ModelMap model) {
+		if(data != null && !data.isEmpty()) {
+			taskRepository.updateTask(data, title, description, priority, task_id);
+		}else {
+			int user_id = loggedUser.getUserId();
+
+			List<Task> tasks = taskRepository.findTaskById(task_id);
+			List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
+			List<String> allStatus = Status.getAllStatus();
+			List<String> allPriorities = Priority.getAllPriorities();
+			
+			model.addAttribute("name", loggedUser.getName());
+			model.addAttribute("user", loggedUser.getUserId());
+			model.addAttribute("tasks", tasks);
+			model.addAttribute("categories", listCategories);
+			model.addAttribute("status", allStatus);
+			model.addAttribute("priorities", allPriorities);
+			model.addAttribute("error", "You need insert a date!");
+			
+			return "/updatetask";
+		}
 		return "redirect:/alltasks";
 	}
 
