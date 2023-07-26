@@ -83,12 +83,14 @@ public class TaskController {
 			now.format(dateTimeFormatter);
 	
 			for (Task task : allTasks) {
-				int latedTasks = task.getData().compareTo(now);
-				boolean toDoStatus = task.getTaskStatus().equalsIgnoreCase("To do");
-				boolean inProgressStatus = task.getTaskStatus().equalsIgnoreCase("In progress");
-	
-				if (latedTasks <= -1 && (toDoStatus || inProgressStatus)) {
-					alert = "You have late tasks!";
+				if(task.getData() != null) {
+					int latedTasks = task.getData().compareTo(now);
+					boolean toDoStatus = task.getTaskStatus().equalsIgnoreCase("To do");
+					boolean inProgressStatus = task.getTaskStatus().equalsIgnoreCase("In progress");
+		
+					if (latedTasks <= -1 && (toDoStatus || inProgressStatus)) {
+						alert = "You have late tasks!";
+					}
 				}
 			}
 				
