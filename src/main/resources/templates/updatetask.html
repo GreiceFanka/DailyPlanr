@@ -57,6 +57,8 @@
 
 		<div id="content" class="p-4 p-md-5 pt-5">
 			<div class="container contact">
+				<div class="alert alert-danger" role="alert" th:text="${error}"
+					th:if="${error}" style="max-width:25%;"></div>
 				<div class="col-md-12"></div>
 				<div class="col-md-9">
 					<div class="contact-form">
@@ -90,7 +92,8 @@
 								<select class="form-select" aria-label="Default select example"
 									name="priority" th:each="task:${tasks}">
 									<option th:each="priority:${priorities}" id=""
-										th:value="${priority}" th:text="${priority}" th:selected="${priority == task.priority}"></option>
+										th:value="${priority}" th:text="${priority}"
+										th:selected="${priority == task.priority}"></option>
 								</select>
 							</div>
 							<div class="d-grid gap-2 d-md-flex">
