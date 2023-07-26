@@ -10,7 +10,8 @@
 	href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet"
 	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 <link rel="stylesheet" type="text/css" href="/css/task.css">
 </head>
 <body>
@@ -56,13 +57,14 @@
 		<div id="content" class="p-4 p-md-5 pt-5">
 			<div class="container">
 				<form th:action="@{/update/category}" method="post">
-					<div class="row" style="padding: 30px;">
-						<div th:each="category:${categories}">
-							<label class="control-label col-sm-2" for="name">Name: </label> <input
-								id="title" th:value="${category.categoryName}"
+					<div class="row">
+						<div th:each="category:${categories}" class="col-12">
+							<label class="control-label col-2" for="name">Category name: </label> <input
+								class="col-4" id="title" th:value="${category.categoryName}"
 								name="categoryName"> <input type="hidden"
 								th:value="${category.id}" name="id">
-							<button type="submit" class="btn btn-outline-success">Save</button>
+							<button type="submit" class="btn btn-primary"
+								style="margin-left: 3%;">Save</button>
 						</div>
 					</div>
 				</form>
