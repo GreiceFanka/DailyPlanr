@@ -135,26 +135,13 @@ public class TaskController {
 
 	@PostMapping("/update/task")
 	public String updateTask(@RequestParam String data, @RequestParam String title, @RequestParam String description, @RequestParam String priority,
-			@RequestParam int task_id, ModelMap model) {
+			@RequestParam int task_id, RedirectAttributes redirectAttributes) {
 		if(data != null && !data.isEmpty()) {
 			taskRepository.updateTask(data, title, description, priority, task_id);
 		}else {
-			int user_id = loggedUser.getUserId();
-
-			List<Task> tasks = taskRepository.findTaskById(task_id);
-			List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
-			List<String> allStatus = Status.getAllStatus();
-			List<String> allPriorities = Priority.getAllPriorities();
-			
-			model.addAttribute("name", loggedUser.getName());
-			model.addAttribute("user", loggedUser.getUserId());
-			model.addAttribute("tasks", tasks);
-			model.addAttribute("categories", listCategories);
-			model.addAttribute("status", allStatus);
-			model.addAttribute("priorities", allPriorities);
-			model.addAttribute("error", "You need insert a date!");
-			
-			return "/updatetask";
+			redirectAttributes.addAttribute("id", task_id);
+			redirectAttributes.addFlashAttribute("error", "Date is required!");
+			return "redirect:/edit/task/{id}";
 		}
 		return "redirect:/alltasks";
 	}
