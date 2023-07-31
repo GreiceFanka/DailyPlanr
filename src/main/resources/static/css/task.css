@@ -8441,4 +8441,21 @@ a[data-toggle="collapse"] {
 	background-color: #2ec27e;
 	border-bottom-color:#2ec27e;
 	}
+	.bi-eye-slash-fill {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+	}
+	#password {
+    border-radius: 0;
+    padding: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+    box-sizing: border-box;
+	}
+	#divPass {
+    position: relative;
+    width: 50%;
+}
 	
