@@ -129,3 +129,23 @@ $("#closeModal").click(function() {
 $(".close").click(function() {
 	$("#deleteModal").modal('hide');
 });
+
+let btn = document.querySelector('#first-eye');
+btn.addEventListener('click', function() {
+    let input = document.querySelector('#password');
+    if(input.getAttribute('type') == 'password') {
+        input.setAttribute('type', 'text');
+    } else {
+        input.setAttribute('type', 'password');
+    }
+});
+
+let secondBtn = document.querySelector('#second-eye');
+secondBtn.addEventListener('click', function() {
+    let input = document.querySelector('#password2');
+    if(input.getAttribute('type') == 'password') {
+        input.setAttribute('type', 'text');
+    } else {
+        input.setAttribute('type', 'password');
+    }
+});
