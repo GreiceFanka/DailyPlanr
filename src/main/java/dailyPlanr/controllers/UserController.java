@@ -23,115 +23,153 @@ import dailyPlanr.models.UserRepository;
 import jakarta.validation.Valid;
 
 @Controller
-public class UserController{
+public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
 
 	private final PasswordEncoder encoder;
-	
+
 	@Inject
 	private LoggedUser loggedUser;
-	
+
 	@Inject
 	private Mail mail;
-	
+
 	public UserController(PasswordEncoder encoder) {
 		this.encoder = encoder;
 	}
-	
+
 	@GetMapping("/login")
 	public String login() {
 		return "login";
 	}
-	
+
 	@GetMapping("/signup")
 	public String signup() {
 		return "signup";
 	}
-	
+
 	@GetMapping("/index")
 	public String homePage() {
 		return "/index";
 	}
-	
+
 	@PostMapping("/new")
-	public String newUser(@Valid User user, RedirectAttributes redirAttrs ){
+	public String newUser(@Valid User user, RedirectAttributes redirAttrs) {
 		user.setPassword(encoder.encode(user.getPassword()));
 		boolean isEmail = false;
 		String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
-		   Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
-	       Matcher matcher = pattern.matcher(user.getLogin());
-	       
-	       if(matcher.matches()) {
-	    	   isEmail = true;
-	       }
-		
+		Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
+		Matcher matcher = pattern.matcher(user.getLogin());
+
+		if (matcher.matches()) {
+			isEmail = true;
+		}
+
 		Optional<User> opUser = userRepository.findByLogin(user.getLogin());
-		
-		if(opUser.isEmpty() && isEmail) {
+
+		if (opUser.isEmpty() && isEmail) {
 			userRepository.save(user);
 			redirAttrs.addFlashAttribute("success", "Everything went just fine.");
 			return "redirect:/login";
-		}else if (!isEmail) {
+		} else if (!isEmail) {
 			redirAttrs.addFlashAttribute("error", "Invalid email format, please try again.");
-		}else {
+		} else {
 			redirAttrs.addFlashAttribute("error", "User already registered");
 		}
 		return "redirect:/signup";
 	}
-	
+
 	@GetMapping("/allusers")
 	public @ResponseBody Iterable<User> getAllUsers() {
 		return userRepository.findAll();
 	}
-	
+
 	@PostMapping("/passwordcheck")
-	public String validatePassword (@RequestParam String login, @RequestParam String password, RedirectAttributes redirAttrs) {
-		
+	public String validatePassword(@RequestParam String login, @RequestParam String password,
+			RedirectAttributes redirAttrs) {
+
 		Optional<User> opUser = userRepository.findByLogin(login);
-		
-		if(opUser.isEmpty()) {
+
+		if (opUser.isEmpty()) {
 			redirAttrs.addFlashAttribute("error", "Login not found.");
 			return "redirect:/login";
 		}
 
 		User user = opUser.get();
 		boolean valid = encoder.matches(password, user.getPassword());
-		if(valid) {
-			this.loggedUser.setUserLogged(user);		
+		if (valid) {
+			this.loggedUser.setUserLogged(user);
 			return "redirect:/alltasks";
-		}else {
+		} else {
 			redirAttrs.addFlashAttribute("error", "Incorrect Password!");
-			 return "redirect:/login";
+			return "redirect:/login";
 		}
 	}
-	
+
+	@GetMapping("/changepassword")
+	public String changePassword(ModelMap model) {
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			model.addAttribute("name", loggedUser.getName());
+			return "/changepassword";
+		}
+		return "redirect:/login";
+	}
+
+	@PostMapping("/changepassword")
+	public String updatePassword(@RequestParam String oldPass, @RequestParam String newPass,
+			RedirectAttributes redirAttrs) {
+		boolean logged = loggedUser.isLogged();
+
+		if (logged) {
+			String login = loggedUser.getLoginUser();
+			Optional<User> opUser = userRepository.findByLogin(login);
+			User user = opUser.get();
+			boolean valid = encoder.matches(oldPass, user.getPassword());
+
+			if (valid) {
+				int id = loggedUser.getUserId();
+				String password = (encoder.encode(newPass));
+				userRepository.updatePassword(password, id);
+				redirAttrs.addFlashAttribute("success", "New password save with success.");
+				return "redirect:/changepassword";
+			} else {
+				redirAttrs.addFlashAttribute("error", "Your password does not match.");
+				return "redirect:/changepassword";
+			}
+		} else {
+			return "redirect:/login";
+		}
+	}
+
 	@GetMapping("/search/user/{task_id}")
 	public String searchUser(@PathVariable int task_id, RedirectAttributes redirAttrs, ModelMap model) {
 		int taskId = task_id;
 		String company = loggedUser.getCompany();
-		
-		if(!company.isEmpty()) {
-		Iterable<User> usersCompany = userRepository.findUserWithSameCompany(company);
-		model.addAttribute("usersCompany", usersCompany);
-		model.addAttribute("taskId", taskId);
-		model.addAttribute("name", loggedUser.getName());
-		return "/adduser";
-		}else {
+
+		if (!company.isEmpty()) {
+			Iterable<User> usersCompany = userRepository.findUserWithSameCompany(company);
+			model.addAttribute("usersCompany", usersCompany);
+			model.addAttribute("taskId", taskId);
+			model.addAttribute("name", loggedUser.getName());
+			return "/adduser";
+		} else {
 			redirAttrs.addFlashAttribute("error", "You don't have company.");
 			return "redirect:/alltasks";
 		}
 	}
-	
+
 	@GetMapping("/exit")
 	public String logout() {
 		loggedUser.logOff();
 		return "redirect:/login";
 	}
-	
+
 	@PostMapping("/sendcontact")
-	public String sendContact(@RequestParam String userEmail,@RequestParam String subject ,@RequestParam String message, RedirectAttributes redirAttrs) throws EmailException {
+	public String sendContact(@RequestParam String userEmail, @RequestParam String subject,
+			@RequestParam String message, RedirectAttributes redirAttrs) throws EmailException {
 		String passwordEmail = mail.getPasswordMail();
 		try {
 			Mail.sendContactEmail(userEmail, subject, message, passwordEmail);
