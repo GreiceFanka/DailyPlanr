@@ -8457,5 +8457,18 @@ a[data-toggle="collapse"] {
 	#divPass {
     position: relative;
     width: 50%;
-}
+	}
+	.bi-person-plus-fill{
+	padding:3%;
+	
+	}
+	.bi-pencil-fill{
+	padding:3%;
+	}
+	.bi-trash-fill{
+	padding:3%;
+	}
+	.bi-archive-fill{
+	padding:3%;
+	}
 	
