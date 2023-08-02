@@ -130,6 +130,35 @@ $(".close").click(function() {
 	$("#deleteModal").modal('hide');
 });
 
+const taskArchiveModal = document.querySelectorAll('#tasks');
+
+taskArchiveModal.forEach(task => {
+	task.addEventListener('click', archive);
+});
+
+function archive(){
+	const element = this.querySelector("#task_id");
+	const element_id = element.getAttribute("value");
+	const id = parseInt(element_id,10);
+	$(".archive").click(function() {	
+	const inputId = document.querySelector("#id")
+	inputId.setAttribute("value",id);
+	const inputStatus = document.querySelector("#task_status")
+	const status = "Archive"
+	inputStatus.setAttribute("value",status)
+	$("#archiveModal").modal();
+	});
+}
+
+$("#closeModal").click(function() {
+	$("#archiveModal").modal('hide');
+});
+
+$(".close").click(function() {
+	$("#archiveModal").modal('hide');
+});
+
+
 let btn = document.querySelector('#first-eye');
 btn.addEventListener('click', function() {
     let input = document.querySelector('#password');
