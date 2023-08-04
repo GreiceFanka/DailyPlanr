@@ -262,4 +262,23 @@ public class TaskController {
 		model.addAttribute("name", loggedUser.getName());
 		return"/taskhistory";
 	}
+	
+	@GetMapping("delete/person/{id}")
+	public String deletePerson(@PathVariable int id, ModelMap model) {
+		List<Task> tasks = taskRepository.findTaskById(id);
+			model.addAttribute("tasks", tasks);
+			model.addAttribute("name", loggedUser.getName());
+			return "/deleteperson";
+	}
+	
+	@PostMapping("/delete/person")
+	public String removePerson(@RequestParam int taskId, @RequestParam int userId, RedirectAttributes redirectAttributes) {
+		try {
+			taskRepository.deleteUserTask(taskId, userId);
+			redirectAttributes.addFlashAttribute("success", "Person deleted from task with success!");
+		} catch (Exception e) {
+			redirectAttributes.addFlashAttribute("error", "Something went wrog, please try later.");
+		}
+		return "redirect:/alltasks";
+	}
 }
