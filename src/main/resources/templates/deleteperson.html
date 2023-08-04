@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link
+	href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet"
+	href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+<link rel="stylesheet" type="text/css" href="/css/task.css">
+</head>
+<body>
+	<div class="wrapper d-flex align-items-stretch">
+		<nav id="sidebar">
+			<div class="custom-menu">
+				<button type="button" id="sidebarCollapse" class="btn btn-primary">
+					<i class="fa fa-bars"></i> <span class="sr-only">Toggle Menu</span>
+				</button>
+			</div>
+			<div class="p-4 pt-5">
+				<h3>
+					<a href="/alltasks" class="logo" th:text="${name}"></a>
+				</h3>
+				<ul class="list-unstyled components mb-5">
+					<li class="active"><a href="#homeSubmenu"
+						data-toggle="collapse" aria-expanded="false" class="dropdown">Tasks<i
+							class="bi bi-caret-down-fill"></i></a>
+						<ul class="collapse list-unstyled" id="homeSubmenu">
+							<li><a href="/alltasks">My tasks</a></li>
+							<li><a href="/newtask">New task</a></li>
+							<li><a href="/tasksbycategory">Tasks by category</a></li>
+							<li><a href="/archive">Archive</a></li>
+							<li><a href="/taskhistory">Tasks history</a></li>
+						</ul></li>
+					<li><a href="#pageSubmenu" data-toggle="collapse"
+						aria-expanded="false" class="dropdown">Categories<i
+							class="bi bi-caret-down-fill"></i></a>
+						<ul class="collapse list-unstyled" id="pageSubmenu">
+							<li><a href="/allcategories">All categories</a></li>
+							<li><a href="/newcategory">New category</a></li>
+						</ul></li>
+					<li><a href="/changepassword">Change password</a></li>
+					<li><a href="/exit">Logout</a></li>
+				</ul>
+
+				<div class="mb-5"></div>
+
+			</div>
+		</nav>
+
+		<!-- Page Content  -->
+
+		<div id="content" class="p-4 p-md-5 pt-5">
+			<div class="alert alert-danger" role="alert" th:text="${error}"
+				th:if="${error}"></div>
+			<div class="alert alert-success" role="alert" th:text="${success}"
+				th:if="${success}"></div>
+			<div class="row" th:each="task:${tasks}">
+				<form action="/delete/person" method="post">
+					<label class="control-label col-sm-2" for="Id"></label> <input
+							type="hidden" name="taskId" th:value="${task.id}" readonly>
+					<div class="form-group col-sm-12" th:each="user:${task.users}"
+						th:if="${user.name != name}">
+						<select class="form-select" name="userId">
+							<option th:if="${user.name != name}" th:each="user:${task.users}"
+								th:value="${user.id}" th:text="${user.name}"></option>
+						</select>
+						<button type="submit" style="margin-top: 15%;" class="btn btn-danger">Delete</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+	</div>
+
+	<script src="/vendor/jquery/jquery-3.2.1.min.js"></script>
+	<!--===============================================================================================-->
+	<script src="/vendor/animsition/js/animsition.min.js"></script>
+	<!--===============================================================================================-->
+	<script src="/vendor/bootstrap/js/popper.js"></script>
+	<script src="/vendor/bootstrap/js/bootstrap.min.js"></script>
+	<!--===============================================================================================-->
+	<script src="/vendor/select2/select2.min.js"></script>
+	<!--===============================================================================================-->
+	<script src="/vendor/daterangepicker/moment.min.js"></script>
+	<script src="/vendor/daterangepicker/daterangepicker.js"></script>
+	<!--===============================================================================================-->
+	<script src="/vendor/countdowntime/countdowntime.js"></script>
+	<script src="/js/scripts.js"></script>
+</body>
+</html>
