@@ -67,5 +67,10 @@ public interface TaskRepository extends PagingAndSortingRepository<Task, Integer
 			+ "VALUES (?, ?) ", nativeQuery = true)
 	public void insertUserTask(int taskId, int userId);
 	
+	@Transactional
+	@Modifying
+	@Query(value="DELETE FROM task_user WHERE task_id = ? AND user_id = ? ", nativeQuery = true)
+	public void deleteUserTask(int taskId, int userId);
+	
 	public List<Task> findTaskById(int id);
 }
