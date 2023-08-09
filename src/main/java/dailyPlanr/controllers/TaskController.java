@@ -164,8 +164,25 @@ public class TaskController {
 
 	@PostMapping("/add/user")
 	public String addUser(@RequestParam int taskId, @RequestParam int userId, RedirectAttributes redirectAttributes) {
-		taskRepository.insertUserTask(taskId, userId);
-		redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
+		List<Task> tasks = taskRepository.findTaskById(taskId);
+		boolean user = false;
+		
+		for (User users : tasks.get(0).getUsers()) {
+			if(users.getId() == userId) {
+				user = true;
+			}
+		}
+		
+		if(user == false) {
+			
+			taskRepository.insertUserTask(taskId, userId);
+			
+			redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
+			
+		}else {
+			redirectAttributes.addFlashAttribute("error", "This user is already signed to this task!");
+		}
+	
 		return "redirect:/alltasks";
 	}
 
