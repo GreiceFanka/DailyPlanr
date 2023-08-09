@@ -60,19 +60,21 @@
 				th:if="${error}"></div>
 			<div class="alert alert-success" role="alert" th:text="${success}"
 				th:if="${success}"></div>
-			<div class="row" th:each="task:${tasks}">
-				<form action="/delete/person" method="post">
-					<label class="control-label col-sm-2" for="Id"></label> <input
-							type="hidden" name="taskId" th:value="${task.id}" readonly>
-					<div class="form-group col-sm-12" th:each="user:${task.users}"
-						th:if="${user.name != name}">
-						<select class="form-select" name="userId">
-							<option th:if="${user.name != name}" th:each="user:${task.users}"
-								th:value="${user.id}" th:text="${user.name}"></option>
-						</select>
-						<button type="submit" style="margin-top: 15%;" class="btn btn-danger">Delete</button>
-					</div>
-				</form>
+			<div class="contact-form">
+				<div class="form-group" th:each="task:${tasks}">
+					<form action="/delete/person" method="post">
+						<label class="control-label col-sm-2" for="Id"></label> <input
+								type="hidden" name="taskId" th:value="${task.id}" readonly>
+						<div class="form-group col-sm-12" th:each="user:${task.users}"
+							th:if="${user.name != name}">
+							<select class="form-select" name="userId">
+								<option th:if="${user.name != name}" th:each="user:${task.users}"
+									th:value="${user.id}" th:text="${user.name}"></option>
+							</select>
+							<button type="submit" style="margin-left:2%;" class="btn btn-danger">Delete</button>
+						</div>
+					</form>
+				</div>
 			</div>
 		</div>
 
