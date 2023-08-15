@@ -15,6 +15,12 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	
 	@Transactional
 	@Modifying
+	@Query(value="UPDATE User SET image = ? "
+			+ "WHERE id = ? ",nativeQuery = true)
+	public void saveImageById(byte[] image, int user_id);
+	
+	@Transactional
+	@Modifying
 	@Query(value="UPDATE User SET password = ? WHERE id = ? ", nativeQuery = true)
 	public void updatePassword(String password, int id);
 }
