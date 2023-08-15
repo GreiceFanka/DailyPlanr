@@ -8,6 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 
 @Entity
@@ -27,6 +28,10 @@ public class User {
 	
 	@Column
 	private String company;
+	
+	@Lob
+	@Column(columnDefinition="longblob")
+	private byte[] image;
 	
 	@ManyToMany(mappedBy = "users")
 	List<Task> tasks = new ArrayList<>();
@@ -72,6 +77,12 @@ public class User {
 	}
 	public void setCompany(String company) {
 		this.company = company;
+	}
+	public byte[] getImage() {
+		return image;
+	}
+	public void setImage(byte[] image) {
+		this.image = image;
 	}
 	public List<Task> getTasks() {
 		return tasks;
