@@ -8474,4 +8474,10 @@ a[data-toggle="collapse"] {
 	.bi-person-dash-fill{
 	padding:3%;
 	}
+	.rounded-circle{
+	width:50%;
+	height:10%;
+	margin-bottom:15%;
+	border-radius:50%;
+	}
 	
