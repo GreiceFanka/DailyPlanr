@@ -1,5 +1,6 @@
 package dailyPlanr.controllers;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import dailyPlanr.models.User;
@@ -87,7 +89,7 @@ public class UserController {
 	}
 
 	@PostMapping("/passwordcheck")
-	public String validatePassword(@RequestParam String login, @RequestParam String password,
+	public String validatePassword(@RequestParam String login,@RequestParam String password,
 			RedirectAttributes redirAttrs) {
 
 		Optional<User> opUser = userRepository.findByLogin(login);
@@ -179,5 +181,40 @@ public class UserController {
 			redirAttrs.addFlashAttribute("error", error);
 		}
 		return "redirect:/index";
+	}
+
+	@GetMapping("/uploadimage")
+	public String uploadImage(ModelMap model) {
+		boolean logged = loggedUser.isLogged();
+		if (logged) {
+			model.addAttribute("name", loggedUser.getName());
+			return "/uploadimage";
+		} else {
+			return "redirect:/login";
+		}
+	}
+
+	@PostMapping("/save/image")
+	public String saveUserImage(@RequestParam("image") MultipartFile file, RedirectAttributes redirAttrs)
+			throws IOException {
+		try {
+			byte[] image = file.getBytes();
+			int user_id = loggedUser.getUserId();
+			userRepository.saveImageById(image, user_id);
+			redirAttrs.addFlashAttribute("success", "Image saved with success!");
+		} catch (Exception e) {
+			String error = e.getMessage();
+			redirAttrs.addFlashAttribute("error", error);
+		}
+		return "redirect:/uploadimage";
+	}
+
+	@GetMapping("/getimage")
+	@ResponseBody
+	public byte[] getUserImage() {
+		int id = loggedUser.getUserId();
+		Optional<User> user = userRepository.findById(id);
+		byte[] image = user.get().getImage();
+		return image;
 	}
 }
