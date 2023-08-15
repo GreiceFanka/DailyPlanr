@@ -23,9 +23,13 @@
 				</button>
 			</div>
 			<div class="p-4 pt-5">
-				<h3>
-					<a href="/alltasks" class="logo" th:text="${name}"></a>
-				</h3>
+				<div class="text-center">
+					<img class="rounded-circle" alt="Image" src="/getimage">
+						<h3>
+						<a href="/alltasks" class="logo" th:text="Hello"></a>
+						<a href="/alltasks" class="logo" th:text="${name}"></a>
+					</h3>
+				</div>
 				<ul class="list-unstyled components mb-5">
 					<li class="active"><a href="#homeSubmenu"
 						data-toggle="collapse" aria-expanded="false" class="dropdown">Tasks<i
@@ -43,6 +47,7 @@
 							<li><a href="/allcategories">All categories</a></li>
 							<li><a href="/newcategory">New category</a></li>
 						</ul></li>
+						<li><a href="/uploadimage">Upload your picture</a></li>
 						<li><a href="/changepassword">Change password</a></li>
 					<li><a href="/exit">Logout</a></li>
 				</ul>
