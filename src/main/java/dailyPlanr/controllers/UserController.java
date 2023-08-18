@@ -1,10 +1,14 @@
 package dailyPlanr.controllers;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
 import org.apache.commons.mail.EmailException;
@@ -211,10 +215,25 @@ public class UserController {
 
 	@GetMapping("/getimage")
 	@ResponseBody
-	public byte[] getUserImage() {
+	public byte[] getUserImage() throws IOException {
 		int id = loggedUser.getUserId();
 		Optional<User> user = userRepository.findById(id);
-		byte[] image = user.get().getImage();
-		return image;
+		byte [] photo = null;
+		byte [] image = user.get().getImage();
+		
+		if(image != null) {
+			return image;
+		}else {
+			try {
+				BufferedImage rd = ImageIO.read(new File("/home/greice-dev/eclipse-workspace/dailyplanr/src/main/resources/static/images/perfil.png"));
+				ByteArrayOutputStream wr = new ByteArrayOutputStream();
+				ImageIO.write(rd, "png", wr);
+				photo = wr.toByteArray();
+	
+			} catch (Exception e) {
+				e.getMessage();
+			}
+			return photo;
+		}
 	}
 }
