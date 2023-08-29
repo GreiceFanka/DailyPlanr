@@ -110,8 +110,12 @@ public class TaskController {
 
 	@PostMapping("/delete/task")
 	public String deleteTask(@RequestParam int id) {
-		taskRepository.deleteById(id);
-		return "redirect:/alltasks";
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			taskRepository.deleteById(id);
+			return "redirect:/alltasks";
+		}
+		return "redirect:/login";
 	}
 
 	@GetMapping("/edit/task/{id}")
@@ -140,14 +144,19 @@ public class TaskController {
 	@PostMapping("/update/task")
 	public String updateTask(@RequestParam String data, @RequestParam String title, @RequestParam String description,
 			@RequestParam String priority, @RequestParam int task_id, RedirectAttributes redirectAttributes) {
-		if (data != null && !data.isEmpty()) {
-			taskRepository.updateTask(data, title, description, priority, task_id);
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			if (data != null && !data.isEmpty()) {
+				taskRepository.updateTask(data, title, description, priority, task_id);
+			} else {
+				redirectAttributes.addAttribute("id", task_id);
+				redirectAttributes.addFlashAttribute("error", "Date is required!");
+				return "redirect:/edit/task/{id}";
+			}
+			return "redirect:/alltasks";
 		} else {
-			redirectAttributes.addAttribute("id", task_id);
-			redirectAttributes.addFlashAttribute("error", "Date is required!");
-			return "redirect:/edit/task/{id}";
+			return "redirect:/login";
 		}
-		return "redirect:/alltasks";
 	}
 
 	@PostMapping("edit/status")
@@ -166,32 +175,39 @@ public class TaskController {
 
 	@PostMapping("edit/category")
 	public String editTaskCategory(@RequestParam int cat_id, @RequestParam int id) {
-		taskRepository.editTaskCategory(cat_id, id);
-		return "redirect:/alltasks";
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			taskRepository.editTaskCategory(cat_id, id);
+			return "redirect:/alltasks";
+		}
+		return "redirect:/login";
 	}
 
 	@PostMapping("/add/user")
 	public String addUser(@RequestParam int taskId, @RequestParam int userId, RedirectAttributes redirectAttributes) {
 		List<Task> tasks = taskRepository.findTaskById(taskId);
 		boolean user = false;
-
-		for (User users : tasks.get(0).getUsers()) {
-			if (users.getId() == userId) {
-				user = true;
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			for (User users : tasks.get(0).getUsers()) {
+				if (users.getId() == userId) {
+					user = true;
+				}
 			}
+
+			if (user == false) {
+
+				taskRepository.insertUserTask(taskId, userId);
+
+				redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
+
+			} else {
+				redirectAttributes.addFlashAttribute("error", "This user is already signed to this task!");
+			}
+
+			return "redirect:/alltasks";
 		}
-
-		if (user == false) {
-
-			taskRepository.insertUserTask(taskId, userId);
-
-			redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
-
-		} else {
-			redirectAttributes.addFlashAttribute("error", "This user is already signed to this task!");
-		}
-
-		return "redirect:/alltasks";
+		return "redirect:/login";
 	}
 
 	@GetMapping("/late/tasks")
@@ -240,12 +256,16 @@ public class TaskController {
 
 	@GetMapping("archive/{id}")
 	public String changeStatus(@PathVariable int id, ModelMap model) {
-		List<Task> tasks = taskRepository.findTaskById(id);
-		List<String> allStatus = Status.getAllStatus();
-		model.addAttribute("name", loggedUser.getName());
-		model.addAttribute("status", allStatus);
-		model.addAttribute("tasks", tasks);
-		return "/changestatus";
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			List<Task> tasks = taskRepository.findTaskById(id);
+			List<String> allStatus = Status.getAllStatus();
+			model.addAttribute("name", loggedUser.getName());
+			model.addAttribute("status", allStatus);
+			model.addAttribute("tasks", tasks);
+			return "/changestatus";
+		}
+		return "redirect:/login";
 	}
 
 	@GetMapping("/tasksbycategory")
@@ -289,21 +309,29 @@ public class TaskController {
 
 	@GetMapping("delete/person/{id}")
 	public String deletePerson(@PathVariable int id, ModelMap model) {
-		List<Task> tasks = taskRepository.findTaskById(id);
-		model.addAttribute("tasks", tasks);
-		model.addAttribute("name", loggedUser.getName());
-		return "/deleteperson";
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			List<Task> tasks = taskRepository.findTaskById(id);
+			model.addAttribute("tasks", tasks);
+			model.addAttribute("name", loggedUser.getName());
+			return "/deleteperson";
+		}
+		return "redirect:/login";
 	}
 
 	@PostMapping("/delete/person")
 	public String removePerson(@RequestParam int taskId, @RequestParam int userId,
 			RedirectAttributes redirectAttributes) {
-		try {
-			taskRepository.deleteUserTask(taskId, userId);
-			redirectAttributes.addFlashAttribute("success", "Person deleted from task with success!");
-		} catch (Exception e) {
-			redirectAttributes.addFlashAttribute("error", "Something went wrog, please try later.");
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			try {
+				taskRepository.deleteUserTask(taskId, userId);
+				redirectAttributes.addFlashAttribute("success", "Person deleted from task with success!");
+			} catch (Exception e) {
+				redirectAttributes.addFlashAttribute("error", "Something went wrog, please try later.");
+			}
+			return "redirect:/alltasks";
 		}
-		return "redirect:/alltasks";
+		return "redirect:/login";
 	}
 }
