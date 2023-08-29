@@ -87,13 +87,8 @@ public class UserController {
 		return "redirect:/signup";
 	}
 
-	@GetMapping("/allusers")
-	public @ResponseBody Iterable<User> getAllUsers() {
-		return userRepository.findAll();
-	}
-
 	@PostMapping("/passwordcheck")
-	public String validatePassword(@RequestParam String login,@RequestParam String password,
+	public String validatePassword(@RequestParam String login, @RequestParam String password,
 			RedirectAttributes redirAttrs) {
 
 		Optional<User> opUser = userRepository.findByLogin(login);
@@ -154,17 +149,20 @@ public class UserController {
 	public String searchUser(@PathVariable int task_id, RedirectAttributes redirAttrs, ModelMap model) {
 		int taskId = task_id;
 		String company = loggedUser.getCompany();
-
-		if (!company.isEmpty()) {
-			Iterable<User> usersCompany = userRepository.findUserWithSameCompany(company);
-			model.addAttribute("usersCompany", usersCompany);
-			model.addAttribute("taskId", taskId);
-			model.addAttribute("name", loggedUser.getName());
-			return "/adduser";
-		} else {
-			redirAttrs.addFlashAttribute("error", "You don't have company.");
-			return "redirect:/alltasks";
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			if (!company.isEmpty()) {
+				Iterable<User> usersCompany = userRepository.findUserWithSameCompany(company);
+				model.addAttribute("usersCompany", usersCompany);
+				model.addAttribute("taskId", taskId);
+				model.addAttribute("name", loggedUser.getName());
+				return "/adduser";
+			} else {
+				redirAttrs.addFlashAttribute("error", "You don't have company.");
+				return "redirect:/alltasks";
+			}
 		}
+		return "redirect:/login";
 	}
 
 	@GetMapping("/exit")
@@ -201,16 +199,20 @@ public class UserController {
 	@PostMapping("/save/image")
 	public String saveUserImage(@RequestParam("image") MultipartFile file, RedirectAttributes redirAttrs)
 			throws IOException {
-		try {
-			byte[] image = file.getBytes();
-			int user_id = loggedUser.getUserId();
-			userRepository.saveImageById(image, user_id);
-			redirAttrs.addFlashAttribute("success", "Image saved with success!");
-		} catch (Exception e) {
-			String error = e.getMessage();
-			redirAttrs.addFlashAttribute("error", error);
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			try {
+				byte[] image = file.getBytes();
+				int user_id = loggedUser.getUserId();
+				userRepository.saveImageById(image, user_id);
+				redirAttrs.addFlashAttribute("success", "Image saved with success!");
+			} catch (Exception e) {
+				String error = e.getMessage();
+				redirAttrs.addFlashAttribute("error", error);
+			}
+			return "redirect:/uploadimage";
 		}
-		return "redirect:/uploadimage";
+		return "redirect:/login";
 	}
 
 	@GetMapping("/getimage")
@@ -218,18 +220,19 @@ public class UserController {
 	public byte[] getUserImage() throws IOException {
 		int id = loggedUser.getUserId();
 		Optional<User> user = userRepository.findById(id);
-		byte [] photo = null;
-		byte [] image = user.get().getImage();
-		
-		if(image != null) {
+		byte[] photo = null;
+		byte[] image = user.get().getImage();
+
+		if (image != null) {
 			return image;
-		}else {
+		} else {
 			try {
-				BufferedImage rd = ImageIO.read(new File("/home/greice-dev/eclipse-workspace/dailyplanr/src/main/resources/static/images/perfil.png"));
+				BufferedImage rd = ImageIO.read(new File(
+						"/home/greice-dev/eclipse-workspace/dailyplanr/src/main/resources/static/images/perfil.png"));
 				ByteArrayOutputStream wr = new ByteArrayOutputStream();
 				ImageIO.write(rd, "png", wr);
 				photo = wr.toByteArray();
-	
+
 			} catch (Exception e) {
 				e.getMessage();
 			}
