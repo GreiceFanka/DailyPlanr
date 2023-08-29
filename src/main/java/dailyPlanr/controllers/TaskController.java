@@ -61,12 +61,12 @@ public class TaskController {
 	@PostMapping("/newtask/create/")
 	public String newTask(@Valid Task task, @Valid User user, RedirectAttributes redirAttrs) {
 		if (user != null) {
-			if(task.getData() != null) {
+			if (task.getData() != null) {
 				task.addUser(user);
 				taskRepository.save(task);
 				redirAttrs.addFlashAttribute("success", "Everything went just fine.");
 				return "redirect:/newtask";
-			}else {
+			} else {
 				redirAttrs.addFlashAttribute("error", "You need insert a date.");
 				return "redirect:/newtask";
 			}
@@ -86,24 +86,24 @@ public class TaskController {
 			LocalDateTime now = LocalDateTime.now();
 			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 			now.format(dateTimeFormatter);
-	
+
 			for (Task task : allTasks) {
-				if(task.getData() != null) {
+				if (task.getData() != null) {
 					int latedTasks = task.getData().compareTo(now);
 					boolean toDoStatus = task.getTaskStatus().equalsIgnoreCase("To do");
 					boolean inProgressStatus = task.getTaskStatus().equalsIgnoreCase("In progress");
-		
+
 					if (latedTasks <= -1 && (toDoStatus || inProgressStatus)) {
 						alert = "You have late tasks!";
 					}
 				}
 			}
-				
-				model.addAttribute("name", loggedUser.getName());
-				model.addAttribute("user", loggedUser.getUserId());				
-				model.addAttribute("tasks", allTasks);
-				model.addAttribute("alert", alert);
-				return "/alltasks";
+
+			model.addAttribute("name", loggedUser.getName());
+			model.addAttribute("user", loggedUser.getUserId());
+			model.addAttribute("tasks", allTasks);
+			model.addAttribute("alert", alert);
+			return "/alltasks";
 		}
 		return "redirect:/login";
 	}
@@ -116,29 +116,33 @@ public class TaskController {
 
 	@GetMapping("/edit/task/{id}")
 	public String editTask(@PathVariable int id, ModelMap model, Status status) {
-		int user_id = loggedUser.getUserId();
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			int user_id = loggedUser.getUserId();
+			List<Task> tasks = taskRepository.findTaskById(id);
+			List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
+			List<String> allStatus = Status.getAllStatus();
+			List<String> allPriorities = Priority.getAllPriorities();
 
-		List<Task> tasks = taskRepository.findTaskById(id);
-		List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
-		List<String> allStatus = Status.getAllStatus();
-		List<String> allPriorities = Priority.getAllPriorities();
- 
-		model.addAttribute("name", loggedUser.getName());
-		model.addAttribute("user", loggedUser.getUserId());
-		model.addAttribute("tasks", tasks);
-		model.addAttribute("categories", listCategories);
-		model.addAttribute("status", allStatus);
-		model.addAttribute("priorities", allPriorities);
-	
-		return "/updatetask";
+			model.addAttribute("name", loggedUser.getName());
+			model.addAttribute("user", loggedUser.getUserId());
+			model.addAttribute("tasks", tasks);
+			model.addAttribute("categories", listCategories);
+			model.addAttribute("status", allStatus);
+			model.addAttribute("priorities", allPriorities);
+			return "/updatetask";
+
+		} else {
+			return "redirect:/login";
+		}
 	}
 
 	@PostMapping("/update/task")
-	public String updateTask(@RequestParam String data, @RequestParam String title, @RequestParam String description, @RequestParam String priority,
-			@RequestParam int task_id, RedirectAttributes redirectAttributes) {
-		if(data != null && !data.isEmpty()) {
+	public String updateTask(@RequestParam String data, @RequestParam String title, @RequestParam String description,
+			@RequestParam String priority, @RequestParam int task_id, RedirectAttributes redirectAttributes) {
+		if (data != null && !data.isEmpty()) {
 			taskRepository.updateTask(data, title, description, priority, task_id);
-		}else {
+		} else {
 			redirectAttributes.addAttribute("id", task_id);
 			redirectAttributes.addFlashAttribute("error", "Date is required!");
 			return "redirect:/edit/task/{id}";
@@ -148,12 +152,16 @@ public class TaskController {
 
 	@PostMapping("edit/status")
 	public String editTaskStatus(@RequestParam String taskStatus, @RequestParam int id) {
-		LocalDate updatedStatus = LocalDate.now();
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-		updatedStatus.format(dateTimeFormatter);
-		
-		taskRepository.editStatus(taskStatus,updatedStatus, id);
-		return "redirect:/alltasks";
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			LocalDate updatedStatus = LocalDate.now();
+			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+			updatedStatus.format(dateTimeFormatter);
+
+			taskRepository.editStatus(taskStatus, updatedStatus, id);
+			return "redirect:/alltasks";
+		}
+		return "redirect:/login";
 	}
 
 	@PostMapping("edit/category")
@@ -166,23 +174,23 @@ public class TaskController {
 	public String addUser(@RequestParam int taskId, @RequestParam int userId, RedirectAttributes redirectAttributes) {
 		List<Task> tasks = taskRepository.findTaskById(taskId);
 		boolean user = false;
-		
+
 		for (User users : tasks.get(0).getUsers()) {
-			if(users.getId() == userId) {
+			if (users.getId() == userId) {
 				user = true;
 			}
 		}
-		
-		if(user == false) {
-			
+
+		if (user == false) {
+
 			taskRepository.insertUserTask(taskId, userId);
-			
+
 			redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
-			
-		}else {
+
+		} else {
 			redirectAttributes.addFlashAttribute("error", "This user is already signed to this task!");
 		}
-	
+
 		return "redirect:/alltasks";
 	}
 
@@ -200,24 +208,23 @@ public class TaskController {
 	}
 
 	@GetMapping("/archive")
-	public String tasksInArchive(ModelMap model, @RequestParam(value="page",defaultValue = "1") int page, @RequestParam(value="size", defaultValue = "8") int size) {
+	public String tasksInArchive(ModelMap model, @RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "8") int size) {
 		boolean session = loggedUser.isLogged();
 		int id = loggedUser.getUserId();
 		int currentPage = page;
-        int pageSize = size;
-		Page<Task> allTasks = taskRepository.findTaskByUserAndStatus(id,(PageRequest.of(currentPage -1, pageSize)));
-		
+		int pageSize = size;
+		Page<Task> allTasks = taskRepository.findTaskByUserAndStatus(id, (PageRequest.of(currentPage - 1, pageSize)));
+
 		int totalPages = allTasks.getTotalPages();
-		
+
 		if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
-                .boxed()
-                .collect(Collectors.toList());
-            model.addAttribute("pageNumbers", pageNumbers);
-        }
-		
+			List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages).boxed().collect(Collectors.toList());
+			model.addAttribute("pageNumbers", pageNumbers);
+		}
+
 		List<String> allStatus = Status.getAllStatus();
-	
+
 		if (session) {
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("tasks", allTasks);
@@ -240,14 +247,14 @@ public class TaskController {
 		model.addAttribute("tasks", tasks);
 		return "/changestatus";
 	}
-	
+
 	@GetMapping("/tasksbycategory")
-	public String showTasksByCategory(@Valid Integer category,ModelMap model) {
+	public String showTasksByCategory(@Valid Integer category, ModelMap model) {
 		boolean session = loggedUser.isLogged();
 		int id = loggedUser.getUserId();
-		if(session) {
-			if(category != null) {
-				List<Task> tasks = taskRepository.findTaskByUserAndCategory(id,category);
+		if (session) {
+			if (category != null) {
+				List<Task> tasks = taskRepository.findTaskByUserAndCategory(id, category);
 				List<Category> categories = categoryRepository.findCategoryByUser(id);
 				model.addAttribute("name", loggedUser.getName());
 				model.addAttribute("tasks", tasks);
@@ -260,36 +267,37 @@ public class TaskController {
 		}
 		return "redirect:/login";
 	}
-	
+
 	@GetMapping("/taskhistory")
-	public String getTaskHistory(@Valid LocalDate initialDate,@Valid LocalDate finalDate, ModelMap model) {
+	public String getTaskHistory(@Valid LocalDate initialDate, @Valid LocalDate finalDate, ModelMap model) {
 		int id = loggedUser.getUserId();
 		boolean tasksEmpty = false;
-		
-		if(finalDate != null && initialDate != null) {
-			Iterable<Task> completedTasks =	taskRepository.findCompletedTasks(id, initialDate, finalDate);
-			if(completedTasks.iterator().hasNext()) {
+
+		if (finalDate != null && initialDate != null) {
+			Iterable<Task> completedTasks = taskRepository.findCompletedTasks(id, initialDate, finalDate);
+			if (completedTasks.iterator().hasNext()) {
 				model.addAttribute("completedTasks", completedTasks);
-			}else {
+			} else {
 				tasksEmpty = true;
 				model.addAttribute("tasksEmpty", tasksEmpty);
 			}
 		}
 		model.addAttribute("tasksEmpty", tasksEmpty);
 		model.addAttribute("name", loggedUser.getName());
-		return"/taskhistory";
+		return "/taskhistory";
 	}
-	
+
 	@GetMapping("delete/person/{id}")
 	public String deletePerson(@PathVariable int id, ModelMap model) {
 		List<Task> tasks = taskRepository.findTaskById(id);
-			model.addAttribute("tasks", tasks);
-			model.addAttribute("name", loggedUser.getName());
-			return "/deleteperson";
+		model.addAttribute("tasks", tasks);
+		model.addAttribute("name", loggedUser.getName());
+		return "/deleteperson";
 	}
-	
+
 	@PostMapping("/delete/person")
-	public String removePerson(@RequestParam int taskId, @RequestParam int userId, RedirectAttributes redirectAttributes) {
+	public String removePerson(@RequestParam int taskId, @RequestParam int userId,
+			RedirectAttributes redirectAttributes) {
 		try {
 			taskRepository.deleteUserTask(taskId, userId);
 			redirectAttributes.addFlashAttribute("success", "Person deleted from task with success!");
