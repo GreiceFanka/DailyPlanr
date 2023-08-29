@@ -16,21 +16,22 @@ import dailyPlanr.models.Category;
 import dailyPlanr.models.CategoryRepository;
 import dailyPlanr.models.User;
 import jakarta.validation.Valid;
+
 @Controller
 public class CategoryController {
-	
+
 	@Autowired
 	private CategoryRepository categoryRepository;
-	
+
 	@Inject
 	private LoggedUser loggedUser;
-	
+
 	@GetMapping("/allcategories")
-	public String getAllCategories(ModelMap model){
+	public String getAllCategories(ModelMap model) {
 		boolean session = loggedUser.isLogged();
 		int id = loggedUser.getUserId();
 		List<Category> categories = categoryRepository.findCategoryByUser(id);
-		if(session) {
+		if (session) {
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("categories", categories);
@@ -38,35 +39,51 @@ public class CategoryController {
 		}
 		return "redirect:/login";
 	}
-	
+
 	@PostMapping("/create/categories")
-		public String createCategory(@Valid Category category, @Valid User user) {
+	public String createCategory(@Valid Category category, @Valid User user) {
+		boolean session = loggedUser.isLogged();
+		if (session) {
 			category.addUsersCategory(user);
 			categoryRepository.save(category);
 			return "redirect:/allcategories";
+		}
+		return "redirect:/login";
 	}
-	
+
 	@GetMapping("/edit/category/{id}")
-		public String editCategory(@PathVariable int id, ModelMap model) {
+	public String editCategory(@PathVariable int id, ModelMap model) {
+		boolean session = loggedUser.isLogged();
+		if (session) {
 			List<Category> categories = categoryRepository.findCategoryById(id);
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("categories", categories);
-		return "/editcategory";
+			return "/editcategory";
+		}
+		return "redirect:/login";
 	}
-	
+
 	@PostMapping("/update/category")
-		public String updateCategory(@RequestParam String categoryName,@RequestParam int id, ModelMap model) {
-		categoryRepository.updateCategory(categoryName, id);
-		model.addAttribute("name", loggedUser.getName());
-		model.addAttribute("user", loggedUser.getUserId());
-		return "redirect:/allcategories";
+	public String updateCategory(@RequestParam String categoryName, @RequestParam int id, ModelMap model) {
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			categoryRepository.updateCategory(categoryName, id);
+			model.addAttribute("name", loggedUser.getName());
+			model.addAttribute("user", loggedUser.getUserId());
+			return "redirect:/allcategories";
+		}
+		return "redirect:/login";
 	}
-	
+
 	@GetMapping("/newcategory")
-		public String newCategory(ModelMap model) {
-		model.addAttribute("name", loggedUser.getName());
-		model.addAttribute("user", loggedUser.getUserId());
-		return "/newcategory";
+	public String newCategory(ModelMap model) {
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			model.addAttribute("name", loggedUser.getName());
+			model.addAttribute("user", loggedUser.getUserId());
+			return "/newcategory";
+		}
+		return "redirect:/login";
 	}
 }
