@@ -16,7 +16,7 @@ public interface TaskRepository extends PagingAndSortingRepository<Task, Integer
 	
 	@Query(value= "select * from Task tk\n"
 			+ "inner join task_user tku ON tk.id=tku.task_id\n"
-			+ "where user_id = ? ", nativeQuery = true)
+			+ "where user_id = ? ORDER BY data ASC ", nativeQuery = true)
 	public Iterable<Task> findTaskByUser(int id); 
 	
 	@Query(value= "select * from Task tk\n"
