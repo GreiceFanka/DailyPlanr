@@ -103,7 +103,7 @@ public class TaskController {
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("tasks", allTasks);
 			model.addAttribute("alert", alert);
-			return "/alltasks";
+			return "alltasks";
 		}
 		return "redirect:/login";
 	}

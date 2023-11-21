@@ -58,7 +58,7 @@ public class UserController {
 
 	@GetMapping("/index")
 	public String homePage() {
-		return "/index";
+		return "index";
 	}
 
 	@PostMapping("/new")
@@ -114,7 +114,7 @@ public class UserController {
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			model.addAttribute("name", loggedUser.getName());
-			return "/changepassword";
+			return "changepassword";
 		}
 		return "redirect:/login";
 	}
@@ -156,7 +156,7 @@ public class UserController {
 				model.addAttribute("usersCompany", usersCompany);
 				model.addAttribute("taskId", taskId);
 				model.addAttribute("name", loggedUser.getName());
-				return "/adduser";
+				return "adduser";
 			} else {
 				redirAttrs.addFlashAttribute("error", "You don't have company.");
 				return "redirect:/alltasks";
@@ -190,7 +190,7 @@ public class UserController {
 		boolean logged = loggedUser.isLogged();
 		if (logged) {
 			model.addAttribute("name", loggedUser.getName());
-			return "/uploadimage";
+			return "uploadimage";
 		} else {
 			return "redirect:/login";
 		}
