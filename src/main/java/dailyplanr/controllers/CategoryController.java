@@ -35,7 +35,7 @@ public class CategoryController {
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("categories", categories);
-			return "/allcategories";
+			return "allcategories";
 		}
 		return "redirect:/login";
 	}
@@ -59,7 +59,7 @@ public class CategoryController {
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("categories", categories);
-			return "/editcategory";
+			return "editcategory";
 		}
 		return "redirect:/login";
 	}
@@ -82,7 +82,7 @@ public class CategoryController {
 		if (session) {
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
-			return "/newcategory";
+			return "newcategory";
 		}
 		return "redirect:/login";
 	}

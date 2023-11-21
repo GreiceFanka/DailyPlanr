@@ -228,7 +228,7 @@ public class UserController {
 		} else {
 			try {
 				BufferedImage rd = ImageIO.read(new File(
-						"/home/greice-dev/eclipse-workspace/dailyplanr/src/main/resources/static/images/perfil.png"));
+						"/dailyplanr/src/main/resources/static/images/perfil.png"));
 				ByteArrayOutputStream wr = new ByteArrayOutputStream();
 				ImageIO.write(rd, "png", wr);
 				photo = wr.toByteArray();

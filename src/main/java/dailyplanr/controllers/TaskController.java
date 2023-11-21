@@ -53,7 +53,7 @@ public class TaskController {
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("categories", listCategories);
 			model.addAttribute("priorities", allPriorities);
-			return "/newtask";
+			return "newtask";
 		}
 		return "redirect:/login";
 	}
@@ -134,7 +134,7 @@ public class TaskController {
 			model.addAttribute("categories", listCategories);
 			model.addAttribute("status", allStatus);
 			model.addAttribute("priorities", allPriorities);
-			return "/updatetask";
+			return "updatetask";
 
 		} else {
 			return "redirect:/login";
@@ -220,7 +220,7 @@ public class TaskController {
 		Iterable<Task> lateTasks = taskRepository.findLateTasks(id, date);
 		model.addAttribute("lateTasks", lateTasks);
 		model.addAttribute("name", loggedUser.getName());
-		return "/lateTask";
+		return "lateTask";
 	}
 
 	@GetMapping("/archive")
@@ -249,7 +249,7 @@ public class TaskController {
 			model.addAttribute("currentPage", currentPage);
 			model.addAttribute("totalPages", allTasks.getTotalPages());
 			model.addAttribute("totalItems", allTasks.getTotalElements());
-			return "/archive";
+			return "archive";
 		}
 		return "redirect:/login";
 	}
@@ -263,7 +263,7 @@ public class TaskController {
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("status", allStatus);
 			model.addAttribute("tasks", tasks);
-			return "/changestatus";
+			return "changestatus";
 		}
 		return "redirect:/login";
 	}
@@ -283,7 +283,7 @@ public class TaskController {
 			List<Category> categories = categoryRepository.findCategoryByUser(id);
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("categories", categories);
-			return "/tasksbycategory";
+			return "tasksbycategory";
 		}
 		return "redirect:/login";
 	}
@@ -304,7 +304,7 @@ public class TaskController {
 		}
 		model.addAttribute("tasksEmpty", tasksEmpty);
 		model.addAttribute("name", loggedUser.getName());
-		return "/taskhistory";
+		return "taskhistory";
 	}
 
 	@GetMapping("delete/person/{id}")
@@ -314,7 +314,7 @@ public class TaskController {
 			List<Task> tasks = taskRepository.findTaskById(id);
 			model.addAttribute("tasks", tasks);
 			model.addAttribute("name", loggedUser.getName());
-			return "/deleteperson";
+			return "deleteperson";
 		}
 		return "redirect:/login";
 	}
