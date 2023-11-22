@@ -29,15 +29,15 @@ public class CategoryController {
 	@GetMapping("/allcategories")
 	public String getAllCategories(ModelMap model) {
 		boolean session = loggedUser.isLogged();
-		int id = loggedUser.getUserId();
-		List<Category> categories = categoryRepository.findCategoryByUser(id);
 		if (session) {
+			int id = loggedUser.getUserId();
+			List<Category> categories = categoryRepository.findCategoryByUser(id);
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("categories", categories);
 			return "allcategories";
 		}
-		return "redirect:/login";
+			return "redirect:/login";
 	}
 
 	@PostMapping("/create/categories")
