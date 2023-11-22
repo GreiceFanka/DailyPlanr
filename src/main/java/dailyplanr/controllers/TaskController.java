@@ -41,7 +41,7 @@ public class TaskController {
 	private LoggedUser loggedUser;
 
 	@GetMapping("/newtask")
-	public String tasks(ModelMap model, RedirectAttributes redirAttrs) {
+	public String tasks(ModelMap model) {
 		boolean session = loggedUser.isLogged();
 		
 		if (session) {
