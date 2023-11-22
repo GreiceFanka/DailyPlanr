@@ -41,9 +41,9 @@ public class TaskController {
 	private LoggedUser loggedUser;
 
 	@GetMapping("/newtask")
-	public String tasks(ModelMap model) {
+	public String tasks(ModelMap model, RedirectAttributes redirAttrs) {
 		boolean session = loggedUser.isLogged();
-
+		
 		if (session) {
 			int id = loggedUser.getUserId();
 			List<Category> listCategories = categoryRepository.findCategoryByUser(id);
@@ -66,6 +66,7 @@ public class TaskController {
 				taskRepository.save(task);
 				redirAttrs.addFlashAttribute("success", "Everything went just fine.");
 				return "redirect:/newtask";
+
 			} else {
 				redirAttrs.addFlashAttribute("error", "You need insert a date.");
 				return "redirect:/newtask";
