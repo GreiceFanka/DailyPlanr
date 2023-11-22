@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import dailyplanr.models.Category;
+import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
 import jakarta.validation.Valid;
@@ -33,6 +36,9 @@ public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Autowired
+	private CategoryRepository categoryRepository;
 
 	private final PasswordEncoder encoder;
 
@@ -102,6 +108,13 @@ public class UserController {
 		boolean valid = encoder.matches(password, user.getPassword());
 		if (valid) {
 			this.loggedUser.setUserLogged(user);
+			List<Category> listCat = categoryRepository.findCategoryByUser(loggedUser.getUserId());
+			if(listCat.isEmpty()) {
+				Category category = new Category();
+				category.setCategoryName("Default");
+				category.addUsersCategory(user);
+				categoryRepository.save(category);
+			}
 			return "redirect:/alltasks";
 		} else {
 			redirAttrs.addFlashAttribute("error", "Incorrect Password!");
@@ -228,7 +241,7 @@ public class UserController {
 		} else {
 			try {
 				BufferedImage rd = ImageIO.read(new File(
-						"/dailyplanr/src/main/resources/static/images/perfil.png"));
+						"/src/main/resources/static/images/perfil.png"));
 				ByteArrayOutputStream wr = new ByteArrayOutputStream();
 				ImageIO.write(rd, "png", wr);
 				photo = wr.toByteArray();
