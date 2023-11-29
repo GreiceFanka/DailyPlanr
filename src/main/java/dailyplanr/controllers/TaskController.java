@@ -43,7 +43,7 @@ public class TaskController {
 	@GetMapping("/newtask")
 	public String tasks(ModelMap model) {
 		boolean session = loggedUser.isLogged();
-		
+
 		if (session) {
 			int id = loggedUser.getUserId();
 			List<Category> listCategories = categoryRepository.findCategoryByUser(id);
@@ -228,21 +228,22 @@ public class TaskController {
 	public String tasksInArchive(ModelMap model, @RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "size", defaultValue = "8") int size) {
 		boolean session = loggedUser.isLogged();
-		int id = loggedUser.getUserId();
-		int currentPage = page;
-		int pageSize = size;
-		Page<Task> allTasks = taskRepository.findTaskByUserAndStatus(id, (PageRequest.of(currentPage - 1, pageSize)));
-
-		int totalPages = allTasks.getTotalPages();
-
-		if (totalPages > 0) {
-			List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages).boxed().collect(Collectors.toList());
-			model.addAttribute("pageNumbers", pageNumbers);
-		}
-
-		List<String> allStatus = Status.getAllStatus();
-
 		if (session) {
+			int id = loggedUser.getUserId();
+			int currentPage = page;
+			int pageSize = size;
+			Page<Task> allTasks = taskRepository.findTaskByUserAndStatus(id,
+					(PageRequest.of(currentPage - 1, pageSize)));
+
+			int totalPages = allTasks.getTotalPages();
+
+			if (totalPages > 0) {
+				List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages).boxed().collect(Collectors.toList());
+				model.addAttribute("pageNumbers", pageNumbers);
+			}
+
+			List<String> allStatus = Status.getAllStatus();
+
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("tasks", allTasks);
 			model.addAttribute("status", allStatus);
@@ -291,21 +292,25 @@ public class TaskController {
 
 	@GetMapping("/taskhistory")
 	public String getTaskHistory(@Valid LocalDate initialDate, @Valid LocalDate finalDate, ModelMap model) {
-		int id = loggedUser.getUserId();
 		boolean tasksEmpty = false;
-
-		if (finalDate != null && initialDate != null) {
-			Iterable<Task> completedTasks = taskRepository.findCompletedTasks(id, initialDate, finalDate);
-			if (completedTasks.iterator().hasNext()) {
-				model.addAttribute("completedTasks", completedTasks);
-			} else {
-				tasksEmpty = true;
-				model.addAttribute("tasksEmpty", tasksEmpty);
+		boolean session = loggedUser.isLogged();
+		
+		if (session) {
+			if (finalDate != null && initialDate != null) {
+				int id = loggedUser.getUserId();
+				Iterable<Task> completedTasks = taskRepository.findCompletedTasks(id, initialDate, finalDate);
+				if (completedTasks.iterator().hasNext()) {
+					model.addAttribute("completedTasks", completedTasks);
+				} else {
+					tasksEmpty = true;
+					model.addAttribute("tasksEmpty", tasksEmpty);
+				}
 			}
+			model.addAttribute("tasksEmpty", tasksEmpty);
+			model.addAttribute("name", loggedUser.getName());
+			return "taskhistory";
 		}
-		model.addAttribute("tasksEmpty", tasksEmpty);
-		model.addAttribute("name", loggedUser.getName());
-		return "taskhistory";
+		return "redirect:/login";
 	}
 
 	@GetMapping("delete/person/{id}")
