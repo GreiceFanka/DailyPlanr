@@ -36,7 +36,7 @@ public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private CategoryRepository categoryRepository;
 
@@ -109,7 +109,7 @@ public class UserController {
 		if (valid) {
 			this.loggedUser.setUserLogged(user);
 			List<Category> listCat = categoryRepository.findCategoryByUser(loggedUser.getUserId());
-			if(listCat.isEmpty()) {
+			if (listCat.isEmpty()) {
 				Category category = new Category();
 				category.setCategoryName("Default");
 				category.addUsersCategory(user);
@@ -160,10 +160,10 @@ public class UserController {
 
 	@GetMapping("/search/user/{task_id}")
 	public String searchUser(@PathVariable int task_id, RedirectAttributes redirAttrs, ModelMap model) {
-		int taskId = task_id;
-		String company = loggedUser.getCompany();
 		boolean session = loggedUser.isLogged();
 		if (session) {
+			String company = loggedUser.getCompany();
+			int taskId = task_id;
 			if (!company.isEmpty()) {
 				Iterable<User> usersCompany = userRepository.findUserWithSameCompany(company);
 				model.addAttribute("usersCompany", usersCompany);
@@ -240,8 +240,7 @@ public class UserController {
 			return image;
 		} else {
 			try {
-				BufferedImage rd = ImageIO.read(new File(
-						"/src/main/resources/static/images/perfil.png"));
+				BufferedImage rd = ImageIO.read(new File("/src/main/resources/static/images/perfil.png"));
 				ByteArrayOutputStream wr = new ByteArrayOutputStream();
 				ImageIO.write(rd, "png", wr);
 				photo = wr.toByteArray();
