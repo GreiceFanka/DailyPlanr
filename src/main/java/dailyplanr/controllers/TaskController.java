@@ -273,8 +273,8 @@ public class TaskController {
 	@GetMapping("/tasksbycategory")
 	public String showTasksByCategory(@Valid Integer category, ModelMap model) {
 		boolean session = loggedUser.isLogged();
-		int id = loggedUser.getUserId();
 		if (session) {
+			int id = loggedUser.getUserId();
 			if (category != null) {
 				List<Task> tasks = taskRepository.findTaskByUserAndCategory(id, category);
 				List<Category> categories = categoryRepository.findCategoryByUser(id);
