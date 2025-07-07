@@ -3,6 +3,7 @@ package dailyplanr.models;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +14,12 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 public interface TaskRepository extends PagingAndSortingRepository<Task, Integer>, CrudRepository<Task, Integer>{
+	
+	@Query(value="SELECT user_id FROM task_user WHERE task_id = ? ", nativeQuery = true)
+	public List<Integer> findTaskUser(int task_id);
+	
+	@Query(value="SELECT * FROM Task WHERE encryptId = ? ", nativeQuery = true)
+	public Optional<Task> findTaskInf(String encryptId);
 	
 	@Query(value= "select * from Task tk\n"
 			+ "inner join task_user tku ON tk.id=tku.task_id\n"
@@ -73,4 +80,10 @@ public interface TaskRepository extends PagingAndSortingRepository<Task, Integer
 	public void deleteUserTask(int taskId, int userId);
 	
 	public List<Task> findTaskById(int id);
+	
+	@Transactional
+	@Modifying
+	@Query(value="UPDATE Task SET encryptId = ?, iv = ?, symmetricKey = ? WHERE id = ? ", nativeQuery = true)
+	public void encryptKeyCreation(String encryptId,String taskIv, byte[] taskKey, int id);
+	
 }

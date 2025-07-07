@@ -29,6 +29,21 @@ public class User {
 	@Column
 	private String company;
 	
+	@Column
+	private String salt;
+	
+	@Column(nullable = false)
+	private int login_attempts;
+	
+	@Column(nullable = false)
+	private int time_block;
+	
+	@Column(nullable = false)
+	private int temporary_salt;
+	
+	@Column(nullable = false)
+	private String token; 
+	
 	@Lob
 	@Column(columnDefinition="longblob")
 	private byte[] image;
@@ -42,11 +57,14 @@ public class User {
 	public User() {
 
 	}
-	public User(String login, String password, String name, String company) {
+	public User(String login, String password, String name, String company, String salt, int login_attempts, int time_block) {
 		this.login = login;
 		this.password = password;
 		this.name = name;
 		this.company = company;
+		this.salt = salt;
+		this.login_attempts = login_attempts;
+		this.time_block = time_block;
 	}
 	public int getId() {
 		return id;
@@ -96,5 +114,35 @@ public class User {
 	public void setCategories(List<Category> categories) {
 		this.categories = categories;
 	}
-
+	public String getSalt() {
+		return salt;
+	}
+	public void setSalt(String salt) {
+		this.salt = salt;
+	}
+	public int getLogin_attempts() {
+		return login_attempts;
+	}
+	public void setLogin_attempts(int login_attempts) {
+		this.login_attempts = login_attempts;
+	}
+	public int getTime_block() {
+		return time_block;
+	}
+	public void setTime_block(int time_block) {
+		this.time_block = time_block;
+	}
+	public int getTemporary_salt() {
+		return temporary_salt;
+	}
+	public void setTemporary_salt(int temporary_salt) {
+		this.temporary_salt = temporary_salt;
+	}
+	public String getToken() {
+		return token;
+	}
+	public void setToken(String token) {
+		this.token = token;
+	}
+	
 }

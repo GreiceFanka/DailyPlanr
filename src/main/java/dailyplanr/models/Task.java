@@ -41,6 +41,15 @@ public class Task {
 	
 	@Column(nullable = false)
 	private String priority;
+	
+	@Column(nullable=false)
+	private String encryptId;
+	
+	@Column(nullable=false)
+	private String iv;
+	
+	@Column(nullable=false)
+	private byte[] symmetricKey;
 
 	@ManyToMany
 	@JoinTable(name = "task_user", joinColumns = { @JoinColumn(name = "task_id") }, inverseJoinColumns = {
@@ -138,6 +147,30 @@ public class Task {
 
 	public void setPriority(String priority) {
 		this.priority = priority;
+	}
+
+	public String getEncryptId() {
+		return encryptId;
+	}
+
+	public void setEncryptId(String encryptId) {
+		this.encryptId = encryptId;
+	}
+
+	public String getIv() {
+		return iv;
+	}
+
+	public void setIv(String iv) {
+		this.iv = iv;
+	}
+
+	public byte[] getSymmetricKey() {
+		return symmetricKey;
+	}
+
+	public void setSymmetricKey(byte[] symmetricKey) {
+		this.symmetricKey = symmetricKey;
 	}
 
 }

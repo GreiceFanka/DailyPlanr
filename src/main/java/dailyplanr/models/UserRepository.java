@@ -13,6 +13,12 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	
 	public Optional<User> findByLogin(String login);
 	
+	@Query(value="SELECT * FROM User WHERE token = ? ", nativeQuery = true)
+	public Optional<User> findToken(String token);
+	
+	@Query(value="SELECT * FROM User WHERE token <> '' AND temporary_salt > 0", nativeQuery = true)
+	public Iterable<User> findUsersWithToken();
+	
 	@Transactional
 	@Modifying
 	@Query(value="UPDATE User SET image = ? "
@@ -23,4 +29,19 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	@Modifying
 	@Query(value="UPDATE User SET password = ? WHERE id = ? ", nativeQuery = true)
 	public void updatePassword(String password, int id);
+	
+	@Transactional
+	@Modifying
+	@Query(value="UPDATE User SET token = ?, temporary_salt = ? WHERE id = ? ", nativeQuery = true)
+	public void userDestroyToken(String token, int temporary_salt, int id);
+	
+	@Transactional
+	@Modifying
+	@Query(value="UPDATE User SET login_attempts = ?, time_block = ? WHERE id = ? ", nativeQuery = true)
+	public void userTimeBlock (int login_attempts, int time_block, int id);
+	
+	@Transactional
+	@Modifying
+	@Query(value="UPDATE User SET temporary_salt = ?, token = ? WHERE id = ? ", nativeQuery = true)
+	public void saveTemporary(int temporary_salt, String token, int id);
 }
