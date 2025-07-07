@@ -26,15 +26,52 @@
 	<link rel="stylesheet" type="text/css" href="css/util.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 <!--===============================================================================================-->
+	
 </head>
 <body>
 	
 	<div class="limiter">
 		<div class="container-login100" style="background-image: url('images/bg-01.jpg');background-size: 100%;">
 			<div class="wrap-login100">
-				<form class="login100-form validate-form" action="/passwordcheck" method="post">
-					<div class="alert alert-success" role="alert" th:text="${success}" th:if="${success}"></div>
-					<div class="alert alert-danger" role="alert" th:text="${error}" th:if="${error}"></div>
+				<form class="login100-form validate-form" action="javascript:authUser()" method="post">
+					<!-- Modal -->
+					<div class="modal fade" id="error" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					  <div class="modal-dialog" role="document">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h5 class="modal-title" id="exampleModalLabel">Error</h5>
+					        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					          <span aria-hidden="true">&times;</span>
+					        </button>
+					      </div>
+					      <div class="modal-body">
+					        	<p>Invalid credentials</p>
+					      </div>
+					      <div class="modal-footer">
+					        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+					      </div>
+					    </div>
+					  </div>
+					</div>
+					<!-- Modal -->
+					<div class="modal fade" id="block" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					  <div class="modal-dialog" role="document">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h5 class="modal-title" id="exampleModalLabel">Tentative Blocked!</h5>
+					        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					          <span aria-hidden="true">&times;</span>
+					        </button>
+					      </div>
+					      <div class="modal-body">
+					        	
+					      </div>
+					      <div class="modal-footer">
+					        <button type="button login100-form-btn" class="btn btn-danger" data-dismiss="modal">Close</button>
+					      </div>
+					    </div>
+					  </div>
+					</div>
 					<span class="login100-form-title p-b-26">
 						 Dailyplanr
 					</span>
@@ -46,7 +83,7 @@
 					</span>
 
 					<div class="wrap-input100 validate-input" data-validate = "Valid email is: a@b.c">
-						<input class="input100" type="text" name="login">
+						<input class="input100" type="text" name="login" id="login">
 						<span class="focus-input100" data-placeholder="Email"></span>
 					</div>
 
@@ -54,7 +91,7 @@
 						<span class="btn-show-pass">
 							<i class="zmdi zmdi-eye"></i>
 						</span>
-						<input class="input100" type="password" name="password">
+						<input class="input100" type="password" name="password" id="password">
 						<span class="focus-input100" data-placeholder="Password"></span>
 					</div>
 
@@ -74,6 +111,13 @@
 
 						<a class="txt2" href="/signup">
 							Sign Up
+						</a><br>
+							<span class="txt1">
+							Forgot your password?
+						</span>
+
+						<a class="txt2" href="/forgotpass">
+							Reset
 						</a>
 					</div>
 				</form>
@@ -83,7 +127,10 @@
 	
 
 	<div id="dropDownSelect1"></div>
-	
+	<!-- Crypto.JS -->
+	<script src="js/node_modules/crypto-js/crypto-js.js"></script>
+	<script src="js/node_modules/crypto-js/sha256.js"> </script>
+		
 <!--===============================================================================================-->
 	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->
@@ -100,12 +147,5 @@
 	<script src="vendor/countdowntime/countdowntime.js"></script>
 <!--===============================================================================================-->
 	<script src="js/main.js"></script>
-	<script type="text/javascript">
-		setTimeout(() => {
-			$(".alert").fadeOut("slow", function(){
-				$(this).alert('close');
-			});				
-		    }, 5000);
-	</script>
 </body>
 </html>

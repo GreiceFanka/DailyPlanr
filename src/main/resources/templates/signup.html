@@ -39,12 +39,45 @@
 	<div class="limiter">
 		<div class="container-login100" style="background-image: url('images/bg-01.jpg');background-size: 100%;">
 			<div class="wrap-login100">
-				<form class="login100-form validate-form" action="/new"
+				<form class="login100-form validate-form" action="javascript:newUser()"
 					method="post">
-					<div class="alert alert-success" role="alert" th:text="${success}"
-						th:if="${success}"></div>
-					<div class="alert alert-danger" role="alert" th:text="${error}"
-						th:if="${error}"></div>
+				<!-- Modal -->
+					<div class="modal fade" id="error" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					  <div class="modal-dialog" role="document">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h5 class="modal-title" id="exampleModalLabel">Error</h5>
+					        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					          <span aria-hidden="true">&times;</span>
+					        </button>
+					      </div>
+					      <div class="modal-body">
+					        	
+					      </div>
+					      <div class="modal-footer">
+					        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					      </div>
+					    </div>
+					  </div>
+					</div>
+					<!-- Modal -->
+					<div class="modal fade" id="success" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+					  <div class="modal-dialog" role="document">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h5 class="modal-title" id="exampleModalLabel">Success!</h5>
+					        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					          <span aria-hidden="true">&times;</span>
+					        </button>
+					      </div>
+					      <div class="modal-body">
+					      </div>
+					      <div class="modal-footer">
+					        <button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
+					      </div>
+					    </div>
+					  </div>
+					</div>
 					<span class="login100-form-title p-b-26"> Create your account </span> <span
 						class="login100-form-title p-b-48"> <i
 						class=""></i>
@@ -52,23 +85,23 @@
 
 					<div class="wrap-input100 validate-input"
 						data-validate="Valid email is: a@b.c">
-						<input class="input100" type="text" name="login"> <span
+						<input class="input100" type="text" name="login" id="login"> <span
 							class="focus-input100" data-placeholder="Email"></span>
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="">
-						<input class="input100" type="text" name="name"> <span
+						<input class="input100" type="text" name="name" id="name"> <span
 							class="focus-input100" data-placeholder="Name"></span>
 					</div>
 					<div class="wrap-input100" data-validate="">
-						<input class="input100" type="text" name="company"> <span
+						<input class="input100" type="text" name="company" id="company"> <span
 							class="focus-input100" data-placeholder="Company"></span>
 					</div>
 
 					<div class="wrap-input100 validate-input"
 						data-validate="Enter password">
 						<span class="btn-show-pass"> <i class="zmdi zmdi-eye"></i>
-						</span> <input class="input100" type="password" name="password">
+						</span> <input class="input100" type="password" name="password" id ="password">
 						<span class="focus-input100" data-placeholder="Password"></span>
 					</div>
 
@@ -90,6 +123,9 @@
 
 
 	<div id="dropDownSelect1"></div>
+	<!-- Crypto.JS -->
+	<script src="js/node_modules/crypto-js/crypto-js.js"></script>
+	<script src="js/node_modules/crypto-js/sha256.js"> </script>
 
 	<!--===============================================================================================-->
 	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
