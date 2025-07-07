@@ -57,11 +57,10 @@ function dragEnd() {
 	this.classList.remove('dragging');
 	const el = this.querySelector("#task_id");
 	const task_id = el.getAttribute("value");
-	const id = parseInt(task_id, 10);
 	const status = this.querySelector("#task_id");
 	const taskStatus = $(status).parent().parent().parent().data('id');
 
-	saveData(id, taskStatus);
+	saveData(task_id, taskStatus);
 }
 
 lists.forEach(list => {
@@ -82,9 +81,9 @@ function drop() {
 	this.classList.remove('over');
 }
 
-function saveData(id, taskStatus) {
+function saveData(task_id, taskStatus) {
 	var formData = new FormData();
-	formData.append('id', id);
+	formData.append('task_id', task_id);
 	formData.append('taskStatus', taskStatus);
 
 	fetch('/edit/status', {
@@ -112,11 +111,10 @@ cardsDeleteModal.forEach(card => {
 
 function click(){
 	const element = this.querySelector("#task_id");
-	const element_id = element.getAttribute("value");
-	const id = parseInt(element_id,10);
+	const task_id = element.getAttribute("value");
 	$(".text-danger").click(function() {	
 	const taskInput = document.querySelector("#tid")
-	taskInput.setAttribute("value",id);
+	taskInput.setAttribute("value",task_id);
 	$("#deleteModal").modal();
 	});
 }
@@ -138,11 +136,10 @@ taskArchiveModal.forEach(task => {
 
 function archive(){
 	const element = this.querySelector("#task_id");
-	const element_id = element.getAttribute("value");
-	const id = parseInt(element_id,10);
+	const task_id = element.getAttribute("value");
 	$(".archive").click(function() {	
 	const inputId = document.querySelector("#id")
-	inputId.setAttribute("value",id);
+	inputId.setAttribute("value",task_id);
 	const inputStatus = document.querySelector("#task_status")
 	const status = "Archive"
 	inputStatus.setAttribute("value",status)
@@ -157,24 +154,30 @@ $("#closeModal").click(function() {
 $(".close").click(function() {
 	$("#archiveModal").modal('hide');
 });
+  document.addEventListener("DOMContentLoaded", function () {
+    // Seleciona todos os containers de cards de tarefas
+    const taskCards = document.querySelectorAll(".task-card");
 
+    taskCards.forEach(taskCard => {
+      const images = taskCard.querySelectorAll(".card-image");
+      const moreUsersDiv = taskCard.querySelector(".moreUsers");
+      const extraCountSpan = moreUsersDiv?.querySelector("#extraCount");
 
-let btn = document.querySelector('#first-eye');
-btn.addEventListener('click', function() {
-    let input = document.querySelector('#password');
-    if(input.getAttribute('type') == 'password') {
-        input.setAttribute('type', 'text');
-    } else {
-        input.setAttribute('type', 'password');
-    }
-});
+      const maxVisible = 3;
 
-let secondBtn = document.querySelector('#second-eye');
-secondBtn.addEventListener('click', function() {
-    let input = document.querySelector('#password2');
-    if(input.getAttribute('type') == 'password') {
-        input.setAttribute('type', 'text');
-    } else {
-        input.setAttribute('type', 'password');
-    }
-});
+      if (images.length > maxVisible && moreUsersDiv && extraCountSpan) {
+        images.forEach((img, index) => {
+          if (index >= maxVisible) img.style.display = "none";
+        });
+
+        const extraCount = images.length - maxVisible;
+        extraCountSpan.textContent = `${extraCount}`;
+        moreUsersDiv.classList.remove("d-none");
+
+        moreUsersDiv.addEventListener("click", () => {
+          images.forEach(img => img.style.display = "inline-block");
+          moreUsersDiv.style.display = "none";
+        });
+      }
+    });
+  });
