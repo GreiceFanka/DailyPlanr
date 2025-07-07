@@ -10,8 +10,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 public class DailyPlanrApplication {
 	
+	
 	public static void main(String[] args) {
-		SpringApplication.run(DailyPlanrApplication.class, args);}
+		SpringApplication.run(DailyPlanrApplication.class, args);
+	}
 	
 	@Bean
 	public PasswordEncoder getPasswordEncoder() {
