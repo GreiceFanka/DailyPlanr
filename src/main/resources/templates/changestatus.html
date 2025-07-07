@@ -31,15 +31,28 @@
 					</h3>
 				</div>
 				<ul class="list-unstyled components mb-5">
-					<li class="active">
-					<li><a href="/newtask">New task</a></li>
-					<li><a href="/allcategories">All categories</a></li>
-					<li><a href="/tasksbycategory">Tasks by category</a></li>
-					<li><a href="/archive">Archive</a></li>
+					<li class="active"><a href="#homeSubmenu"
+						data-toggle="collapse" aria-expanded="false" class="dropdown">Tasks<i
+							class="bi bi-caret-down-fill"></i></a>
+						<ul class="collapse list-unstyled" id="homeSubmenu">
+							<li><a href="/alltasks">My tasks</a></li>
+							<li><a href="/newtask">New task</a></li>
+							<li><a href="/tasksbycategory">Tasks by category</a></li>
+							<li><a href="/archive">Archive</a></li>
+							<li><a href="/taskhistory">Tasks history</a></li>
+						</ul></li>
+					<li><a href="#pageSubmenu" data-toggle="collapse"
+						aria-expanded="false" class="dropdown">Categories<i
+							class="bi bi-caret-down-fill"></i></a>
+						<ul class="collapse list-unstyled" id="pageSubmenu">
+							<li><a href="/allcategories">All categories</a></li>
+							<li><a href="/newcategory">New category</a></li>
+						</ul></li>
 					<li><a href="/uploadimage">Upload your picture</a></li>
 					<li><a href="/changepassword">Change password</a></li>
 					<li><a href="/exit">Logout</a></li>
 				</ul>
+				
 
 				<div class="mb-5"></div>
 
@@ -55,8 +68,7 @@
 						<div class="row">
 							<label class="control-label col-4">Current Status: </label>
 							<p th:each="task:${tasks}" th:text="${task.taskStatus}"></p>
-							<input th:each="task:${tasks}" type="hidden"
-								th:value="${task.id}" name="id">
+							<input th:each="task:${tasks}" type="hidden" th:value="${task.encryptId}" name="task_id">
 						</div>
 
 						<div class="row">

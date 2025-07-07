@@ -74,7 +74,7 @@
 								<div class="col-sm-10">
 									<input th:each="task:${tasks}" type="text" class="form-control"
 										id="title" name="title" th:value="${task.title}"> <input
-										th:each="task:${tasks}" type="hidden" th:value="${task.id}"
+										th:each="task:${tasks}" type="hidden" th:value="${task.encryptId}"
 										name="task_id">
 								</div>
 							</div>
@@ -142,7 +142,7 @@
 												<label class="control-label col-4">Current Status: </label>
 												<p th:each="task:${tasks}" th:text="${task.taskStatus}"></p>
 												<input th:each="task:${tasks}" type="hidden"
-													th:value="${task.id}" name="id">
+													th:value="${task.encryptId}" name="task_id">
 											</div>
 											<div class="row">
 												<label class="control-label col-4">New status: </label> <select
@@ -183,7 +183,7 @@
 												<p th:each="task:${tasks}"
 													th:text="${task.categories.categoryName}"></p>
 												<input th:each="task:${tasks}" type="hidden"
-													th:value="${task.id}" name="id">
+													th:value="${task.encryptId}" name="task_id">
 											</div>
 											<div class="row">
 												<label class="control-label col-4">New Category: </label> <select

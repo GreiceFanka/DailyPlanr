@@ -69,9 +69,8 @@
 				<div class="form-group" th:each="task:${tasks}">
 					<form action="/delete/person" method="post">
 						<label class="control-label col-sm-2" for="Id"></label> <input
-								type="hidden" name="taskId" th:value="${task.id}" readonly>
-						<div class="form-group col-sm-12" th:each="user:${task.users}"
-							th:if="${user.name != name}">
+								type="hidden" name="taskId" th:value="${task.encryptId}" readonly>
+						<div class="form-group col-sm-12">
 							<select class="form-select" name="userId">
 								<option th:if="${user.name != name}" th:each="user:${task.users}"
 									th:value="${user.id}" th:text="${user.name}"></option>

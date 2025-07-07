@@ -83,11 +83,16 @@
 							class="badge badge-pill badge-secondary align-self-start mb-2"
 							th:text="${task.categories.categoryName}"></span>
 						<div class="card-body text-center">
-							<input type="hidden" id="task_id" th:value="${task.id}" name="task_id">
+							<input type="hidden" id="task_id" th:value="${task.encryptId}" name="task_id">
 							<h6 class="card-title" th:text="${task.title}"></h6>
 							<p class="card-text" th:text="${task.description}"></p>
-							<p class="card-text"
-								th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></p>
+							<div class="row justify-content-center task-card" th:attr="id='cardImages-' + ${task.encryptId}" id="cardImages">
+								<img class="rounded-circle card-image" th:each="user:${task.users}" id="card_image" alt="Image" th:title="${user.name}" th:src="@{'/img/' + ${user.id}}">
+								   <div class="rounded-circle moreUsers d-none" th:attr="data-task-id=${task.encryptId}">
+       									 <i class="bi bi-plus"></i><span id="extraCount"></span>
+    								</div>								
+							</div>
+							<p class="card-text" th:text="${#temporals.format(task.data, 'dd-MM-yyyy HH:mm')}"></p>
 						</div>
 						<span th:if="${task.taskStatus} == 'To do'"
 							class="badge badge-pill text-white align-self-end mb-2"
@@ -103,16 +108,45 @@
 							</a>
 							<ul class="dropdown-menu text-center"
 								aria-labelledby="dropdownMenu1">
-								<li><a
-									th:href="@{/search/user/{task_id}(task_id=${task.id})}"><i
-										class="bi bi-person-plus-fill"></i>Add Person</a></li>
-								<li><a th:href="@{/edit/task/{id}(id=${task.id})}"><i
-										class="bi bi-pencil-fill"></i>Edit</a></li>
-								<li><a class="text-danger"
-									th:href="@{#deleteModal}"><i
-										class="bi bi-trash-fill"></i>Delete</a></li>
+								<li><a th:href="@{/search/user/{task_id}(task_id=${task.encryptId})}">
+								<i class="bi bi-person-plus-fill"></i>Add Person</a></li>
+								<li><a th:href="@{/delete/person/{id}(id=${task.encryptId})}">
+								<i class="bi-person-dash-fill"></i>Delete Person</a></li>
+								<li><a th:href="@{/edit/task/{encryptId}(encryptId=${task.encryptId})}">
+								<i class="bi bi-pencil-fill"></i>Edit</a></li>
+								<li><a class="archive" th:href="@{#archiveModal}">
+								<i class="bi bi-archive-fill"></i>Archive</a></li>
+								<li><a class="text-danger" th:href="@{#deleteModal}">
+								<i class="bi bi-trash-fill"></i>Delete</a></li>
 							</ul>
 						</div>
+					</div>
+				</div>
+			</div>
+				<div class="modal fade" id="archiveModal" tabindex="-1" role="dialog"
+				aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h6 class="modal-title" id="exampleModalLongTitle">Archive
+								Task</h6>
+							<button type="button" class="close" data-dismiss="modal"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+						</div>
+						<form action="/edit/status" method="POST">
+							<div class="modal-body">
+								<input type="hidden" id="id" name="task_id"> <input
+									type="hidden" id="task_status" name="taskStatus">
+								<p>Are you sure you want to archive this task?</p>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-secondary"
+									data-dismiss="modal">Close</button>
+								<button type="submit" class="btn btn-primary">Archive</button>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
@@ -127,7 +161,7 @@
 			      </div>
 			      <form action="/delete/task" method="POST">
 			      <div class="modal-body">
-			      	<input type="hidden" id="tid" name="id">
+			      	<input type="hidden" id="tid" name="encryptId">
 			        <p>Are you sure you want to delete this task?</p>
 			      </div>
 			      <div class="modal-footer">
