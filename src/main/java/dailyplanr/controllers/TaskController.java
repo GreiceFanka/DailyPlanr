@@ -3,7 +3,6 @@ package dailyplanr.controllers;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -315,7 +314,8 @@ public class TaskController {
 	}
 
 	@PostMapping("/add/user")
-	public String addUser(@RequestParam String taskId, @RequestParam int userId, RedirectAttributes redirectAttributes)throws Exception {
+	public String addUser(@RequestParam String taskId, @RequestParam String hashu, RedirectAttributes redirectAttributes)throws Exception {
+				
 		Optional<Task> taskInf = taskRepository.findTaskInf(taskId);
 		Task task = taskInf.get();
 		
@@ -332,18 +332,31 @@ public class TaskController {
 		int idDecrypt = Integer.parseInt(decryptedText);
 		
 		List<Task> tasks = taskRepository.findTaskById(idDecrypt);
+		
+		Optional<User> userInf = userRepository.findUsrInf(hashu);
+		
+		byte [] ukey = userInf.get().getSymmetricKey();
+		SecretKey oKey = new SecretKeySpec(ukey, "AES");
+		
+		byte[] uIv = Base64.getDecoder().decode(userInf.get().getIv());
+		IvParameterSpec uIvSpec = new IvParameterSpec(uIv);
+		
+		byte[] uCipherText = Base64.getUrlDecoder().decode(hashu);
+		String decryptHashu = Security.decrypt(uCipherText, oKey, uIvSpec);
+		int decryptUserId = Integer.parseInt(decryptHashu);		
+		
 		boolean user = false;
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			for (User users : tasks.get(0).getUsers()) {
-				if (users.getId() == userId) {
+				if (users.getId() == decryptUserId) {
 					user = true;
 				}
 			}
 
 			if (user == false) {
 
-				taskRepository.insertUserTask(idDecrypt, userId);
+				taskRepository.insertUserTask(idDecrypt, decryptUserId);
 
 				redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
 
@@ -499,7 +512,7 @@ public class TaskController {
 	}
 
 	@PostMapping("/delete/person")
-	public String removePerson(@RequestParam String taskId, @RequestParam int userId,
+	public String removePerson(@RequestParam String taskId, @RequestParam String hashu,
 			RedirectAttributes redirectAttributes) {
 		boolean session = loggedUser.isLogged();
 		if (session) {
@@ -519,7 +532,19 @@ public class TaskController {
 				
 				int idDecrypt = Integer.parseInt(decryptedText);
 				
-				taskRepository.deleteUserTask(idDecrypt, userId);
+				Optional<User> userInf = userRepository.findUsrInf(hashu);
+				
+				byte [] ukey = userInf.get().getSymmetricKey();
+				SecretKey oKey = new SecretKeySpec(ukey, "AES");
+				
+				byte[] uIv = Base64.getDecoder().decode(userInf.get().getIv());
+				IvParameterSpec uIvSpec = new IvParameterSpec(uIv);
+				
+				byte[] uCipherText = Base64.getUrlDecoder().decode(hashu);
+				String decryptHashu = Security.decrypt(uCipherText, oKey, uIvSpec);
+				int decryptUserId = Integer.parseInt(decryptHashu);	
+				
+				taskRepository.deleteUserTask(idDecrypt, decryptUserId);
 				
 				redirectAttributes.addFlashAttribute("success", "Person deleted from task with success!");
 			} catch (Exception e) {
@@ -530,11 +555,23 @@ public class TaskController {
 		return "redirect:/login";
 	}
 	
-	@GetMapping("/img/{userId}")
+	@GetMapping("/img/{hashu}")
 	@ResponseBody
-	public byte[] getUserImage(@PathVariable int userId) throws IOException {
+	public byte[] getUserImage(@PathVariable String hashu) throws Exception {
+		Optional<User> userInf = userRepository.findUsrInf(hashu);
+		
+		byte [] ukey = userInf.get().getSymmetricKey();
+		SecretKey oKey = new SecretKeySpec(ukey, "AES");
+		
+		byte[] uIv = Base64.getDecoder().decode(userInf.get().getIv());
+		IvParameterSpec uIvSpec = new IvParameterSpec(uIv);
+		
+		byte[] uCipherText = Base64.getUrlDecoder().decode(hashu);
+		String decryptHashu = Security.decrypt(uCipherText, oKey, uIvSpec);
+		int decryptUserId = Integer.parseInt(decryptHashu);	
+		
 		byte[] photo = null;
-		Optional<User> users = userRepository.findById(userId);
+		Optional<User> users = userRepository.findById(decryptUserId);
 		byte[]images = users.get().getImage();
 			
 			if (images != null) {

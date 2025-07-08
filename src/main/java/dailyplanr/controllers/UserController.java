@@ -6,11 +6,14 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
@@ -297,13 +300,29 @@ public class UserController {
 	}
 
 	@GetMapping("/search/user/{task_id}")
-	public String searchUser(@PathVariable String task_id, RedirectAttributes redirAttrs, ModelMap model) {
+	public String searchUser(@PathVariable String task_id, RedirectAttributes redirAttrs, ModelMap model) throws Exception {
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			String company = loggedUser.getCompany();
 			
 			if (!company.isEmpty()) {
 				Iterable<User> usersCompany = userRepository.findUserWithSameCompany(company);
+				for (User user : usersCompany) {
+					int uid = user.getId();
+					String userId = Integer.toString(uid);
+					IvParameterSpec iv = Security.iv();
+					SecretKey symmetricKey = Security.secretKey();
+					byte[] cipherText = Security.encrypt(userId, symmetricKey, iv);
+					
+					String userEncryptId = Base64.getUrlEncoder().withoutPadding().encodeToString(cipherText);
+					user.setHashu(userEncryptId);
+					byte[] uIv = iv.getIV();
+					byte[] uKey = symmetricKey.getEncoded();
+					String base64Iv = Base64.getEncoder().encodeToString(uIv);
+					userRepository.saveKeys(userEncryptId, base64Iv, uKey, uid);
+				}
+				
+				
 				model.addAttribute("usersCompany", usersCompany);
 				model.addAttribute("taskId", task_id);
 				model.addAttribute("name", loggedUser.getName());
