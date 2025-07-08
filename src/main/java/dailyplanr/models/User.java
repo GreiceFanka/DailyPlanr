@@ -48,6 +48,15 @@ public class User {
 	@Column(columnDefinition="longblob")
 	private byte[] image;
 	
+	@Column
+	private String hashu;
+	
+	@Column
+	private String iv;
+	
+	@Column
+	private byte[] symmetricKey;
+	
 	@ManyToMany(mappedBy = "users")
 	List<Task> tasks = new ArrayList<>();
 	
@@ -143,6 +152,24 @@ public class User {
 	}
 	public void setToken(String token) {
 		this.token = token;
+	}
+	public String getHashu() {
+		return hashu;
+	}
+	public void setHashu(String hashu) {
+		this.hashu = hashu;
+	}
+	public String getIv() {
+		return iv;
+	}
+	public void setIv(String iv) {
+		this.iv = iv;
+	}
+	public byte[] getSymmetricKey() {
+		return symmetricKey;
+	}
+	public void setSymmetricKey(byte[] symmetricKey) {
+		this.symmetricKey = symmetricKey;
 	}
 	
 }
