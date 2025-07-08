@@ -11,6 +11,9 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	@Query(value="SELECT * FROM User WHERE company = ? ", nativeQuery = true)
 	public Iterable<User> findUserWithSameCompany(String company);
 	
+	@Query(value="SELECT * FROM User WHERE hashu = ? ", nativeQuery = true)
+	public Optional<User> findUsrInf(String hashu);
+	
 	public Optional<User> findByLogin(String login);
 	
 	@Query(value="SELECT * FROM User WHERE token = ? ", nativeQuery = true)
@@ -44,4 +47,9 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	@Modifying
 	@Query(value="UPDATE User SET temporary_salt = ?, token = ? WHERE id = ? ", nativeQuery = true)
 	public void saveTemporary(int temporary_salt, String token, int id);
+	
+	@Transactional
+	@Modifying
+	@Query(value="UPDATE User SET hashu = ?, iv = ?, symmetricKey = ?  WHERE id = ? ", nativeQuery = true)
+	public void saveKeys(String hashu, String iv, byte[] uKey, int uid);
 }
