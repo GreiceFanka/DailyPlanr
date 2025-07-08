@@ -89,7 +89,7 @@
 							<h6 class="card-title" th:text="${task.title}"></h6>
 							<p class="card-text" th:text="${task.description}"></p>
 							<div class="row justify-content-center task-card" th:attr="id='cardImages-' + ${task.encryptId}" id="cardImages">
-								<img class="rounded-circle card-image" th:each="user:${task.users}" id="card_image" alt="Image" th:title="${user.name}" th:src="@{'/img/' + ${user.id}}">
+								<img class="rounded-circle card-image" th:each="user:${task.users}" id="card_image" alt="Image" th:title="${user.name}" th:src="@{'/img/' + ${user.hashu}}">
 								   <div class="rounded-circle moreUsers d-none" th:attr="data-task-id=${task.encryptId}">
        									 <i class="bi bi-plus"></i><span id="extraCount"></span>
     								</div>								
@@ -146,7 +146,7 @@
 							<h6 class="card-title" th:text="${task.title}"></h6>
 							<p class="card-text" th:text="${task.description}"></p>
 							<div class="row justify-content-center task-card" th:attr="id='cardImages-' + ${task.encryptId}" id="cardImages">
-								<img class="rounded-circle card-image" th:each="user:${task.users}" id="card_image" alt="Image" th:title="${user.name}" th:src="@{'/img/' + ${user.id}}">
+								<img class="rounded-circle card-image" th:each="user:${task.users}" id="card_image" alt="Image" th:title="${user.name}" th:src="@{'/img/' + ${user.hashu}}">
 								   <div class="rounded-circle moreUsers d-none" th:attr="data-task-id=${task.encryptId}">
        									 <i class="bi bi-plus"></i><span id="extraCount"></span>
     								</div>	
@@ -200,7 +200,7 @@
 							<h6 class="card-title" th:text="${task.title}"></h6>
 							<p class="card-text" th:text="${task.description}"></p>
 							<div class="row justify-content-center task-card" th:attr="id='cardImages-' + ${task.encryptId}" id="cardImages">
-								<img class="rounded-circle card-image" th:each="user:${task.users}" id="card_image" alt="Image" th:title="${user.name}" th:src="@{'/img/' + ${user.id}}">
+								<img class="rounded-circle card-image" th:each="user:${task.users}" id="card_image" alt="Image" th:title="${user.name}" th:src="@{'/img/' + ${user.hashu}}">
 								   <div class="rounded-circle moreUsers d-none" th:attr="data-task-id=${task.encryptId}">
        									 <i class="bi bi-plus"></i><span id="extraCount"></span>
     								</div>								

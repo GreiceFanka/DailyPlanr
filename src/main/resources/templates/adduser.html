@@ -78,8 +78,8 @@
 								<div class="form-group col-sm-10"></div>
 							</div>
 							<select class="form-select" aria-label="Default select example"
-								name="userId">
-								<option th:if="${user.name != name}" th:each="user:${usersCompany}" th:value="${user.id}"
+								name="hashu">
+								<option th:if="${user.name != name}" th:each="user:${usersCompany}" th:value="${user.hashu}"
 									th:text="${user.name}"></option>
 							</select>
 							<div class="form-group">

@@ -71,9 +71,9 @@
 						<label class="control-label col-sm-2" for="Id"></label> <input
 								type="hidden" name="taskId" th:value="${task.encryptId}" readonly>
 						<div class="form-group col-sm-12">
-							<select class="form-select" name="userId">
+							<select class="form-select" name="hashu">
 								<option th:if="${user.name != name}" th:each="user:${task.users}"
-									th:value="${user.id}" th:text="${user.name}"></option>
+									th:value="${user.hashu}" th:text="${user.name}"></option>
 							</select>
 							<button type="submit" style="margin-left:2%;" class="btn btn-danger">Delete</button>
 						</div>
