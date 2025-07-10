@@ -62,10 +62,10 @@
 		<!-- Page Content  -->
 
 		<div id="content" class="p-4 p-md-5 pt-5">
-
+			<div class="alert alert-danger col-4" role="alert" th:text="${error}"
+				th:if="${error}"></div>
 			<div class="container">
 				<form th:action="@{/create/categories}" method="post">
-					<input type="hidden" th:value="${user}" name="user"></input>
 					<div class="row">
 						<div class="control-label col-sm-2">
 							<label for="name">New category: </label> <input id="title"

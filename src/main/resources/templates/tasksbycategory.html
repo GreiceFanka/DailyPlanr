@@ -62,14 +62,14 @@
 		<!-- Page Content  -->
 
 		<div id="content" class="p-4 p-md-5 pt-5">
-			<form action="/tasksbycategory" method="GET">
+			<form action="/tasksCategory" method="GET">
 				<div class="row">
 					<div class="form-group col-sm-12">
 						<label class="control-label" for="description">Filter By
 							Category:</label> <select class="form-select"
 							aria-label="Default select example" name="category">
 							<option th:each="category:${categories}" id="categories"
-								th:value="${category.id}" th:text="${category.categoryName}"></option>
+								th:value="${category.catId}" th:text="${category.categoryName}"></option>
 						</select>
 						<button type="submit" id="submit" class="btn btn-primary"
 							style="margin-left: 2%;">Filter</button>
