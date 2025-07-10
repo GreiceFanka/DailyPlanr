@@ -41,7 +41,7 @@ public class User {
 	@Column(nullable = false)
 	private int temporary_salt;
 	
-	@Column(nullable = false)
+	@Column
 	private String token; 
 	
 	@Lob
@@ -66,7 +66,7 @@ public class User {
 	public User() {
 
 	}
-	public User(String login, String password, String name, String company, String salt, int login_attempts, int time_block) {
+	public User(String login, String password, String name, String company, String salt, int login_attempts, int time_block, String token) {
 		this.login = login;
 		this.password = password;
 		this.name = name;
@@ -74,6 +74,7 @@ public class User {
 		this.salt = salt;
 		this.login_attempts = login_attempts;
 		this.time_block = time_block;
+		this.token = token;
 	}
 	public int getId() {
 		return id;
