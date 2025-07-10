@@ -2,8 +2,8 @@ package dailyplanr.controllers;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -409,8 +409,8 @@ public class UserController {
 		if (image != null) {
 			return image;
 		} else {
-			try {
-				BufferedImage rd = ImageIO.read(new File("/src/main/resources/static/images/perfil.png"));
+			try (InputStream is = getClass().getResourceAsStream("/static/images/perfil.png")) {
+				BufferedImage rd = ImageIO.read(is);
 				ByteArrayOutputStream wr = new ByteArrayOutputStream();
 				ImageIO.write(rd, "png", wr);
 				photo = wr.toByteArray();
