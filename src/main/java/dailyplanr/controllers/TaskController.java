@@ -80,30 +80,48 @@ public class TaskController {
 	}
 
 	@PostMapping("/newtask/create/")
-	public String newTask(@Valid Task task, @Valid User user, RedirectAttributes redirAttrs) throws Exception {
-		if (user != null) {
-			if (task.getData() != null) {
-				task.setEncryptId("XXXX");
-				iv = Security.iv();
-				symmetricKey = Security.secretKey();
-				byte[] taskIv = iv.getIV();
-				byte[] taskKey = symmetricKey.getEncoded();
-				String base64Iv = Base64.getEncoder().encodeToString(taskIv);
-				task.setIv(base64Iv);
-				task.setSymmetricKey(taskKey);
-				task.addUser(user);
-				taskRepository.save(task);
-				redirAttrs.addFlashAttribute("success", "Everything went just fine.");
-				return "redirect:/newtask";
+	public String newTask(@RequestParam String title, @Valid LocalDateTime data,@RequestParam String description,@RequestParam String categories,@RequestParam String priority, RedirectAttributes redirAttrs) throws Exception {
+		if (!loggedUser.isLogged()) {
+	        redirAttrs.addFlashAttribute("error", "Something went wrong, try again.");
+	        return "redirect:/newtask";
+	    }
 
-			} else {
-				redirAttrs.addFlashAttribute("error", "You need insert a date.");
-				return "redirect:/newtask";
-			}
-		} else {
-			redirAttrs.addFlashAttribute("error", "Something went wrong, try again.");
-			return "redirect:/newtask";
-		}
+	    if (data == null) {
+	        redirAttrs.addFlashAttribute("error", "You need to insert a date.");
+	        return "redirect:/newtask";
+	    }
+
+	    try {
+	        User user = new User();
+	        user.setId(loggedUser.getUserId());
+
+	        int categoryId = categoryRepository.findCategory(categories);
+	        Category category = categoryRepository.findById(categoryId)
+	            .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+
+	        Task task = new Task();
+	        task.setTitle(title);
+	        task.setData(data);
+	        task.setDescription(description);
+	        task.setCategories(category);
+	        task.setPriority(priority);
+	        task.setEncryptId("XXXX");
+
+	        iv = Security.iv();
+	        symmetricKey = Security.secretKey();
+
+	        task.setIv(Base64.getEncoder().encodeToString(iv.getIV()));
+	        task.setSymmetricKey(symmetricKey.getEncoded());
+	        task.addUser(user);
+
+	        taskRepository.save(task);
+	        redirAttrs.addFlashAttribute("success", "Everything went just fine.");
+	        
+	    } catch (Exception e) {
+	        redirAttrs.addFlashAttribute("error", "Failed to create task. Try again later." );
+	    }
+
+	    return "redirect:/newtask";
 	}
 
 	@GetMapping("/alltasks")
@@ -289,26 +307,28 @@ public class TaskController {
 	}
 
 	@PostMapping("edit/category")
-	public String editTaskCategory(@RequestParam int cat_id, @RequestParam String task_id) throws Exception {
+	public String editTaskCategory(@RequestParam String cat_id, @RequestParam String task_id) throws Exception {
 		boolean session = loggedUser.isLogged();
 		if (session) {
-			Optional<Task> taskInf = taskRepository.findTaskInf(task_id);
-			Task task = taskInf.get();
-			
-			byte [] key = task.getSymmetricKey();
-			SecretKey originalKey = new SecretKeySpec(key, "AES");
-			
-			byte[] decIv = Base64.getDecoder().decode(task.getIv());
-			IvParameterSpec ivSpec = new IvParameterSpec(decIv);
-			
-			cipherText = Base64.getUrlDecoder().decode(task_id);
-			
-			String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
-			
-			int idDecrypt = Integer.parseInt(decryptedText);
-			
-			taskRepository.editTaskCategory(cat_id, idDecrypt);
-			return "redirect:/alltasks";
+			int cId = categoryRepository.findCategory(cat_id);
+		
+				Optional<Task> taskInf = taskRepository.findTaskInf(task_id);
+				Task task = taskInf.get();
+				
+				byte [] key = task.getSymmetricKey();
+				SecretKey originalKey = new SecretKeySpec(key, "AES");
+				
+				byte[] decIv = Base64.getDecoder().decode(task.getIv());
+				IvParameterSpec ivSpec = new IvParameterSpec(decIv);
+				
+				cipherText = Base64.getUrlDecoder().decode(task_id);
+				
+				String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
+				
+				int idDecrypt = Integer.parseInt(decryptedText);
+				
+				taskRepository.editTaskCategory(cId, idDecrypt);
+				return "redirect:/alltasks";
 		}
 		return "redirect:/login";
 	}
@@ -443,21 +463,37 @@ public class TaskController {
 	}
 
 	@GetMapping("/tasksbycategory")
-	public String showTasksByCategory(@Valid Integer category, ModelMap model) {
+	public String showTasksByCategory(ModelMap model) {
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			int id = loggedUser.getUserId();
-			if (category != null) {
-				List<Task> tasks = taskRepository.findTaskByUserAndCategory(id, category);
-				List<Category> categories = categoryRepository.findCategoryByUser(id);
-				model.addAttribute("name", loggedUser.getName());
-				model.addAttribute("tasks", tasks);
-				model.addAttribute("categories", categories);
-			}
 			List<Category> categories = categoryRepository.findCategoryByUser(id);
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("categories", categories);
 			return "tasksbycategory";
+		}
+		return "redirect:/login";
+	}
+	
+	@GetMapping("/tasksCategory")
+	public String showTasksCategory(@RequestParam String category, ModelMap model) {
+		boolean session = loggedUser.isLogged();
+		if (session) {
+			int id = loggedUser.getUserId();
+			try {
+				int catId = categoryRepository.findCategory(category);
+				if (catId > 0) {
+					List<Task> tasks = taskRepository.findTaskByUserAndCategory(id, catId);
+					List<Category> categories = categoryRepository.findCategoryByUser(id);
+					model.addAttribute("name", loggedUser.getName());
+					model.addAttribute("tasks", tasks);
+					model.addAttribute("categories", categories);
+					return "tasksbycategory";
+				}
+				
+			} catch (Exception e) {
+				return "redirect:/login";
+			}
 		}
 		return "redirect:/login";
 	}
