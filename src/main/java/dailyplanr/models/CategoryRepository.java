@@ -21,5 +21,13 @@ public interface CategoryRepository extends CrudRepository<Category, Integer>{
 			+ "WHERE id = ? ", nativeQuery = true)
 	public void updateCategory(String categoryName, int id);
 	
+	@Transactional
+	@Modifying
+	@Query(value="UPDATE Category SET catId = ?, iv = ?, symmetricKey = ?  WHERE id = ? ", nativeQuery = true)
+	public void saveKeys(String categoryEncId, String base64Iv, byte[] cKey, int catId);
+	
 	public List<Category> findCategoryById(int id);
+	
+	@Query(value="SELECT id FROM Category WHERE catId = ? ", nativeQuery = true)
+	public int findCategory(String catId);
 }
