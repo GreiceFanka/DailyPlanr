@@ -22,6 +22,15 @@ public class Category {
 	@Column
 	private String categoryName;
 	
+	@Column
+	private String catId;
+	
+	@Column
+	private String iv;
+	
+	@Column
+	private byte[] symmetricKey;
+	
 	@OneToMany(mappedBy = "categories")
 	private List<Task> tasks;
 	
@@ -56,6 +65,30 @@ public class Category {
 
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
+	}
+
+	public String getCatId() {
+		return catId;
+	}
+
+	public void setCatId(String catId) {
+		this.catId = catId;
+	}
+
+	public String getIv() {
+		return iv;
+	}
+
+	public void setIv(String iv) {
+		this.iv = iv;
+	}
+
+	public byte[] getSymmetricKey() {
+		return symmetricKey;
+	}
+
+	public void setSymmetricKey(byte[] symmetricKey) {
+		this.symmetricKey = symmetricKey;
 	}
 
 	public List<Task> getTasks() {
