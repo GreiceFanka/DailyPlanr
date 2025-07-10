@@ -50,7 +50,7 @@ public interface TaskRepository extends PagingAndSortingRepository<Task, Integer
 	@Query(value="select * from Task tk\n "
 			+ "inner join task_user tku ON tk.id=tku.task_id\n "
 			+ "where user_id = ? AND taskStatus IN ('In progress', 'To do') AND category_id = ? ", nativeQuery = true)
-	public List<Task> findTaskByUserAndCategory(int id, Integer category);
+	public List<Task> findTaskByUserAndCategory(int id, int category);
 	
 	@Transactional
 	@Modifying
