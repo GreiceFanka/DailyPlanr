@@ -1,7 +1,10 @@
 package dailyplanr.models;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,8 +38,8 @@ public class User {
 	@Column(nullable = false)
 	private int login_attempts;
 	
-	@Column(nullable = false)
-	private int time_block;
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+	private LocalDateTime time_block;
 	
 	@Column(nullable = false)
 	private int temporary_salt;
@@ -66,7 +69,7 @@ public class User {
 	public User() {
 
 	}
-	public User(String login, String password, String name, String company, String salt, int login_attempts, int time_block, String token) {
+	public User(String login, String password, String name, String company, String salt, int login_attempts,LocalDateTime time_block, String token) {
 		this.login = login;
 		this.password = password;
 		this.name = name;
@@ -136,10 +139,10 @@ public class User {
 	public void setLogin_attempts(int login_attempts) {
 		this.login_attempts = login_attempts;
 	}
-	public int getTime_block() {
+	public LocalDateTime getTime_block() {
 		return time_block;
 	}
-	public void setTime_block(int time_block) {
+	public void setTime_block(LocalDateTime time_block) {
 		this.time_block = time_block;
 	}
 	public int getTemporary_salt() {

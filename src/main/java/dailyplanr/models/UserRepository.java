@@ -1,5 +1,6 @@
 package dailyplanr.models;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -41,7 +42,7 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	@Transactional
 	@Modifying
 	@Query(value="UPDATE User SET login_attempts = ?, time_block = ? WHERE id = ? ", nativeQuery = true)
-	public void userTimeBlock (int login_attempts, int time_block, int id);
+	public void userTimeBlock (int login_attempts, LocalDateTime time_block, int id);
 	
 	@Transactional
 	@Modifying
