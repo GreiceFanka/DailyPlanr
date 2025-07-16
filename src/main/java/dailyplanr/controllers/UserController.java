@@ -4,8 +4,10 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -32,12 +34,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-
 import dailyplanr.models.Category;
 import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -186,7 +188,7 @@ public class UserController {
 		Optional<User> opUser = userRepository.findByLogin(user.getLogin());
 
 		if (opUser.isEmpty() && isEmail) {
-			user.setTime_block(0);
+			user.setTime_block(null);
 			user.setLogin_attempts(0);
 			userRepository.save(user);
 			return ResponseEntity.status(HttpStatus.OK).body("Account created successfully!");
@@ -199,8 +201,8 @@ public class UserController {
 	}
 
 	@PostMapping("/passwordcheck")
-	public ResponseEntity<String> validatePassword(@RequestParam String login, @RequestParam String password) {
-		int time_block = 0;
+	public ResponseEntity<String> validatePassword(@RequestParam String login, @RequestParam String password, HttpSession session, HttpServletRequest request) {
+		LocalDateTime time_block = null;
 		int login_attempts = 0;
 		int min_block = 0;
 		
@@ -212,13 +214,14 @@ public class UserController {
 
 		User user = opUser.get();
 		int id = user.getId();
-		String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
-		time = time.replace(":", "");
-		int minute = Integer.parseInt(time);
+		LocalDateTime time_now = LocalDateTime.now();
+		LocalDateTime unblockTime = user.getTime_block();
 		
-		if(user.getTime_block() > minute) {
+		if(unblockTime != null && time_now.isBefore(unblockTime)) {
 			time_block = user.getTime_block();
-			min_block = time_block - minute;
+			Duration duration = Duration.between(time_now, unblockTime);
+			duration = duration.plusMinutes(1);
+			min_block = duration.toMinutesPart();
 			return ResponseEntity.status(HttpStatus.LOCKED).body("Blocked for " + min_block + " minutes due to multiple tentatives!Try again later.");
 			
 		}else {
@@ -228,6 +231,10 @@ public class UserController {
 				boolean valid = encoder.matches(encodedPass, user.getPassword());
 				
 				if (valid) {
+					session.invalidate();
+					HttpSession newSession = request.getSession(true);
+					newSession.setAttribute("user", user.getLogin());
+					newSession.setMaxInactiveInterval(30 * 60);
 					this.loggedUser.setUserLogged(user);
 					List<Category> listCat = categoryRepository.findCategoryByUser(loggedUser.getUserId());
 					if (listCat.isEmpty()) {
@@ -242,10 +249,8 @@ public class UserController {
 					login_attempts = user.getLogin_attempts();
 					user.setLogin_attempts(login_attempts++);
 					if(login_attempts >= 5) {
-						String newTime = LocalTime.now().plusMinutes(10).format(DateTimeFormatter.ofPattern("HH:mm"));
-						newTime = newTime.replace(":", "");
-						int newMinute = Integer.parseInt(newTime);
-						user.setTime_block(newMinute);
+						LocalDateTime newTime = LocalDateTime.now().plusMinutes(10);
+						user.setTime_block(newTime);
 						time_block = user.getTime_block();
 						login_attempts = 0;
 					}
@@ -336,7 +341,8 @@ public class UserController {
 	}
 
 	@GetMapping("/exit")
-	public String logout() {
+	public String logout(HttpSession session) {
+		session.invalidate();
 		loggedUser.logOff();
 		return "redirect:/login";
 	}
