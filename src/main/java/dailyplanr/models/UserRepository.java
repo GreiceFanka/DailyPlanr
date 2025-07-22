@@ -37,7 +37,7 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	@Transactional
 	@Modifying
 	@Query(value="UPDATE User SET token = ?, temporary_salt = ? WHERE id = ? ", nativeQuery = true)
-	public void userDestroyToken(String token, int temporary_salt, int id);
+	public void userDestroyToken(String token, LocalDateTime temporary_salt, int id);
 	
 	@Transactional
 	@Modifying
@@ -47,7 +47,7 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	@Transactional
 	@Modifying
 	@Query(value="UPDATE User SET temporary_salt = ?, token = ? WHERE id = ? ", nativeQuery = true)
-	public void saveTemporary(int temporary_salt, String token, int id);
+	public void saveTemporary(LocalDateTime temporary_salt, String token, int id);
 	
 	@Transactional
 	@Modifying

@@ -41,8 +41,8 @@ public class User {
 	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 	private LocalDateTime time_block;
 	
-	@Column(nullable = false)
-	private int temporary_salt;
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+	private LocalDateTime temporary_salt;
 	
 	@Column
 	private String token; 
@@ -145,10 +145,10 @@ public class User {
 	public void setTime_block(LocalDateTime time_block) {
 		this.time_block = time_block;
 	}
-	public int getTemporary_salt() {
+	public LocalDateTime getTemporary_salt() {
 		return temporary_salt;
 	}
-	public void setTemporary_salt(int temporary_salt) {
+	public void setTemporary_salt(LocalDateTime temporary_salt) {
 		this.temporary_salt = temporary_salt;
 	}
 	public String getToken() {
