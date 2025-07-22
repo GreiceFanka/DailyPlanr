@@ -1,7 +1,6 @@
 package dailyplanr.controllers;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -36,16 +35,16 @@ public class Mail {
 	
 	@Scheduled(cron="0 0 0 * * *")
 	public void destroyToken() {
-		String time = LocalTime.now().plusMinutes(5).format(DateTimeFormatter.ofPattern("HH:mm"));
-		time = time.replace(":", "");
-		int hourMinute = Integer.parseInt(time);
+		LocalDateTime time = LocalDateTime.now();
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+		time.format(dateTimeFormatter);
 		
 		Iterable<User> users = userRepository.findUsersWithToken();
 		
 		for (User user : users) {
-			if(user.getTemporary_salt() > hourMinute) {
+			if(user.getTemporary_salt().isBefore(time)) {
 				int id = user.getId();
-				userRepository.userDestroyToken("", 0, id);
+				userRepository.userDestroyToken("", null, id);
 			}
 		}
 		

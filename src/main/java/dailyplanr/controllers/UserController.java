@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.Duration;
 import java.util.Base64;
@@ -100,14 +99,13 @@ public class UserController {
 		Optional<User> findUser = userRepository.findByLogin(email);
 		User user = findUser.get();
 		String userToken = user.getToken();
-		String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
-		time = time.replace(":", "");
-		int hourMinute = Integer.parseInt(time);
+		LocalDateTime time = LocalDateTime.now();
+	
 		
 		if(findUser.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
 		}else {
-			if(userToken.equals(token) && user.getTemporary_salt() > hourMinute) {
+			if(userToken.equals(token) && user.getTemporary_salt().isAfter(time)) {
 				String currentPass = currentPassword.concat(user.getSalt());
 				boolean valid = encoder.matches(currentPass, user.getPassword());
 				
@@ -115,7 +113,7 @@ public class UserController {
 					String salt = KeyGenerators.string().generateKey();
 					user.setSalt(salt);
 					String password = (encoder.encode(newPassword.concat(salt)));
-					user.setTemporary_salt(0);
+					user.setTemporary_salt(null);
 					user.setToken("");
 					int id = user.getId();
 					userRepository.updatePassword(password, id);
@@ -126,7 +124,7 @@ public class UserController {
 				}
 		}else {
 			int id = user.getId();
-			userRepository.userDestroyToken("", 0, id);
+			userRepository.userDestroyToken("", null, id);
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid data.");
 		}
 			
@@ -152,12 +150,11 @@ public class UserController {
 			try {
 				String sender = mail.sendResetPassword(email, name, token, passwordEmail);
 				if(sender.equalsIgnoreCase("success")) {
-					String time = LocalTime.now().plusMinutes(5).format(DateTimeFormatter.ofPattern("HH:mm"));
-					time = time.replace(":", "");
-					int hourMinute = Integer.parseInt(time);
-					int temporary_salt = hourMinute;
-					userRepository.saveTemporary(temporary_salt, token, id);
-					redirAttrs.addFlashAttribute("success", "An email was sent.");
+					LocalDateTime time = LocalDateTime.now().plusMinutes(5);
+					DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+					time.format(dateTimeFormatter);
+					userRepository.saveTemporary(time, token, id);
+					redirAttrs.addFlashAttribute("success", "An email was sent, you have five minutes to change your password.");
 					return "redirect:/forgotpass";
 				}else {
 					redirAttrs.addFlashAttribute("error", sender);
@@ -236,6 +233,7 @@ public class UserController {
 					newSession.setAttribute("user", user.getLogin());
 					newSession.setMaxInactiveInterval(30 * 60);
 					this.loggedUser.setUserLogged(user);
+				
 					List<Category> listCat = categoryRepository.findCategoryByUser(loggedUser.getUserId());
 					if (listCat.isEmpty()) {
 						Category category = new Category();
