@@ -84,32 +84,30 @@ public class UserController {
 	
 	@GetMapping("/userpass/{token}")
 	public String userpass(@PathVariable String token) {
-		Optional<User> validToken = userRepository.findToken(token);
+		Optional<User> userToken = userRepository.findByToken(token);
+		LocalDateTime dateTime = LocalDateTime.now();
 		
-		if(validToken.isEmpty()) {
+		if(userToken.isEmpty()) {
 			return "redirect:/index";
-		}else if(validToken.isPresent() && token.length() >= 16) {
+		}else if(userToken.get().getTemporary_salt().isBefore(dateTime)) {
+			int id = userToken.get().getId();
+			userRepository.userDestroyToken("", null, id);
+			return "redirect:/index";
+		}else if(userToken.isPresent() && token.length() >= 16) {
 			return "userpass";
 		}
 		return "redirect:/index";
 	}
 	
 	@PostMapping("/tokenpasschange")
-	public ResponseEntity<String> tokenPassChange(String email, String currentPassword, String newPassword, String token){
-		Optional<User> findUser = userRepository.findByLogin(email);
+	public ResponseEntity<String> tokenPassChange(String newPassword, String token){
+		Optional<User> findUser = userRepository.findByToken(token);
 		User user = findUser.get();
-		String userToken = user.getToken();
 		LocalDateTime time = LocalDateTime.now();
-	
-		
 		if(findUser.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
 		}else {
-			if(userToken.equals(token) && user.getTemporary_salt().isAfter(time)) {
-				String currentPass = currentPassword.concat(user.getSalt());
-				boolean valid = encoder.matches(currentPass, user.getPassword());
-				
-				if(valid) {
+			if(user.getTemporary_salt().isAfter(time)) {
 					String salt = KeyGenerators.string().generateKey();
 					user.setSalt(salt);
 					String password = (encoder.encode(newPassword.concat(salt)));
@@ -119,13 +117,10 @@ public class UserController {
 					userRepository.updatePassword(password, id);
 					return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
 					
-				}else {
-					return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Your current password doesn´t match.");
-				}
-		}else {
-			int id = user.getId();
-			userRepository.userDestroyToken("", null, id);
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid data.");
+			}else {
+				int id = user.getId();
+				userRepository.userDestroyToken("", null, id);
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Expired token. Please request the reset password again.");
 		}
 			
 	}
@@ -154,7 +149,7 @@ public class UserController {
 					DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 					time.format(dateTimeFormatter);
 					userRepository.saveTemporary(time, token, id);
-					redirAttrs.addFlashAttribute("success", "An email was sent, you have five minutes to change your password.");
+					redirAttrs.addFlashAttribute("success", "An email was sent, you have 5 minutes to change your password.");
 					return "redirect:/forgotpass";
 				}else {
 					redirAttrs.addFlashAttribute("error", sender);
