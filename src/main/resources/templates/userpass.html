@@ -71,32 +71,28 @@
 					    </div>
 					  </div>
 					</div>
-				<form class="login100-form validate-form" action="javascript:tokenPassChange()" method="post">
+				<form class="login100-form validate-form" id="newPassForm" action="javascript:tokenPassChange()" method="post">
 					<span class="login100-form-title p-b-26">
 						 Dailyplanr
 					</span>
-
-					<div class="wrap-input100 validate-input" data-validate = "Valid email is: a@b.c">
-						<input class="input100" type="text" name="email" id="email">
-						<span class="focus-input100" data-placeholder="Please enter your Email"></span>
-					</div>
-					<div class="wrap-input100 validate-input"
-						data-validate="Enter your current password">
-						<span class="btn-show-pass"> <i class="zmdi zmdi-eye"></i>
-						</span> <input class="input100" type="password" name="currentpassword" id ="currentPassword">
-						<span class="focus-input100" data-placeholder="Current Password"></span>
-					</div>
 					<div class="wrap-input100 validate-input"
 						data-validate="Enter a new password">
 						<span class="btn-show-pass"> <i class="zmdi zmdi-eye"></i>
-						</span> <input class="input100" type="password" name="newpassword" id ="newPassword">
-						<span class="focus-input100" data-placeholder="New Password"></span>
+						</span> <input class="input100" type="password" name="newpassword" id ="newPassword" onKeyUp="verificaForcaSenha();">
+						<span class="focus-input100" data-placeholder="New password"></span>
 					</div>
+						<div class="wrap-input100 validate-input"
+						data-validate="Confirm the new password">
+						<span class="btn-show-pass"> <i class="zmdi zmdi-eye"></i>
+						</span> <input class="input100" type="password" name="confirmNewpassword" id ="confirmNewPassword">
+						<span class="focus-input100" data-placeholder="Confirm the new password"></span>
+					</div>
+					<span id="password-status"></span>
 					
 					<div class="container-login100-form-btn">
 						<div class="wrap-login100-form-btn">
 							<div class="login100-form-bgbtn"></div>
-							<button class="login100-form-btn">
+							<button class="login100-form-btn" id="saveNewPass">
 								Save
 							</button>
 						</div>
