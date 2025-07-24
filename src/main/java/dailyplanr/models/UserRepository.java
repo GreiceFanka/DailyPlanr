@@ -17,8 +17,7 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	
 	public Optional<User> findByLogin(String login);
 	
-	@Query(value="SELECT * FROM User WHERE token = ? ", nativeQuery = true)
-	public Optional<User> findToken(String token);
+	public Optional<User> findByToken(String token);
 	
 	@Query(value="SELECT * FROM User WHERE token <> '' AND temporary_salt > 0", nativeQuery = true)
 	public Iterable<User> findUsersWithToken();
