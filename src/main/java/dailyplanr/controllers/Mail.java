@@ -117,14 +117,15 @@ public class Mail {
 	
 		String message = "Hello "+name+", \n"
 				
-				+ "	This is a request to create a password to access your DailyPlanr dashboard.\n"
-				+ "	Please access the URL below, enter your registered email, set a new password, and you're all set! You will then be able to log in to the platform.\n"
-				+ "	Click now to create your password: " +urlToken+ "\n"
+				+ "	This is a request to reset your password to access your DailyPlanr dashboard.\n"
+				+ "	Please access the URL below, set a new password, and you're all set! You will then be able to log in to the platform.\n"
+				+ " Note: this URL will expire in 5 minutes. If you do not reset within this period you will need to request the password reset again.\n"
+				+ "	Click now to reset your password: " +urlToken+ "\n"
 				+ "	If you're unable to click the link above, copy the full link and paste it into your browser's address bar.\n"
 				+ ""  +urlToken+ "\n"             			
 				+ "If you did not request any changes to your account, we recommend updating the password for both your email and your DailyPlanr account.\n"
-				+ "\n"
-				+ "DailyPlanr\n";
+				+ "Best Regards, \n"
+				+ "DailyPlanr Team.\n";
 		
 		try {
 			
