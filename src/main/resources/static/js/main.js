@@ -86,16 +86,12 @@ changePass = function(){
 };
 
 tokenPassChange = function(){
-	var email = $('#email').val();
-	var currentPassword = CryptoJS.SHA256($('#currentPassword').val()).toString();
 	var newPassword = CryptoJS.SHA256($('#newPassword').val()).toString();
 	var windowPath = window.location.pathname;
 	const path = windowPath.split("/");
 	var token = path[2];
 	
 	var formData = new FormData();
-	formData.append('email', email);
-	formData.append('currentPassword', currentPassword);
 	formData.append('newPassword', newPassword);
 	formData.append('token', token);
 
@@ -119,6 +115,26 @@ tokenPassChange = function(){
 		}
 	})
 };
+
+ function verificaForcaSenha(){
+	var numeros = /([0-9])/;
+	var alfabeto = /([a-z])/;
+	var alfabetoA = /([A-Z])/;
+	var chEspeciais = /([~,!,@,#,$,%,^,&,*,-,_,+,=,?,>,<])/;
+
+	if($('#newPassword').val().length<8) 
+	{
+		$('#password-status').html("<span style='color:red'>Weak, enter at least 8 characters.</span>");
+	} else {  	
+		if($('#newPassword').val().match(numeros) && $('#newPassword').val().match(alfabeto) && $('#newPassword').val().match(chEspeciais) && $('#newPassword').val().match(alfabetoA))
+		{            
+			$('#password-status').html("<span style='color:green'>Strong</span>");
+		} else {
+			$('#password-status').html("<span style='color:orange'>Medium, the password must contain a special character, an uppercase letter and a normal letter.</span>");
+		}
+	}
+}
+  
 (function ($) {
     "use strict";
 
@@ -205,4 +221,22 @@ tokenPassChange = function(){
         
     });
     
+  const form = document.getElementById('newPassForm');
+  const password = document.getElementById('newPassword');
+  const confirmPassword = document.getElementById('confirmNewPassword');
+	  if(form !== null){
+	  form.addEventListener('submit', function (event) {
+		  var passwordStatus = $('#password-status span').text();
+		 if(passwordStatus !== 'Strong'){
+		  event.preventDefault();
+	      $('#error .modal-body').text("Password has to be strong.");
+		  $('#error').modal('show');
+	    }
+	     if(password.value !== confirmPassword.value) {
+	      event.preventDefault();
+	      $('#error .modal-body').text("Passwords don't match.");
+		  $('#error').modal('show');
+	    }
+	  });
+  } 
 })(jQuery);
