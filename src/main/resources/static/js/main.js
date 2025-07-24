@@ -116,7 +116,7 @@ tokenPassChange = function(){
 	})
 };
 
- function verificaForcaSenha(){
+ function checkPasswordStrength(){
 	var numeros = /([0-9])/;
 	var alfabeto = /([a-z])/;
 	var alfabetoA = /([A-Z])/;
