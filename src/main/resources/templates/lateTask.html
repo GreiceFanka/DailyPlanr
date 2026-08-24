@@ -101,11 +101,11 @@
 							<ul class="dropdown-menu text-center"
 								aria-labelledby="dropdownMenu1">
 								<li><a
-									th:href="@{/search/user/{task_id}(task_id=${task.id})}"><i
+									th:href="@{/search/user/{task_id}(task_id=${task.encryptId})}"><i
 										class="bi bi-person-plus-fill"></i>Add Person</a></li>
-								<li><a th:href="@{/delete/person/{id}(id=${task.id})}"><i
+								<li><a th:href="@{/delete/person/{id}(id=${task.encryptId})}"><i
 										class="bi-person-dash-fill"></i>Delete Person</a></li>
-								<li><a th:href="@{/edit/task/{id}(id=${task.id})}"><i
+								<li><a th:href="@{/edit/task/{id}(id=${task.encryptId})}"><i
 										class="bi bi-pencil-fill"></i>Edit</a></li>
 								<li><a class="archive" th:href="@{#archiveModal}"><i
 										class="bi bi-archive-fill"></i>Archive</a></li>
