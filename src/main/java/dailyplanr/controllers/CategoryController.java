@@ -31,26 +31,11 @@ public class CategoryController {
 	private LoggedUser loggedUser;
 
 	@GetMapping("/allcategories")
-	public String getAllCategories(ModelMap model)throws Exception {
+	public String getAllCategories(ModelMap model){
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			int id = loggedUser.getUserId();
-			List<Category> categories = categoryRepository.findCategoryByUser(id);
-			for (Category category : categories) {
-				int catId = category.getId();
-				String cId = Integer.toString(catId);
-				IvParameterSpec iv = Security.iv();
-				SecretKey symmetricKey = Security.secretKey();
-				byte[] cipherText = Security.encrypt(cId, symmetricKey, iv);
-				
-				String categoryEncId = Base64.getUrlEncoder().withoutPadding().encodeToString(cipherText);
-				category.setCatId(categoryEncId);
-				byte[] cIv = iv.getIV();
-				byte[] cKey = symmetricKey.getEncoded();
-				String base64Iv = Base64.getEncoder().encodeToString(cIv);
-				categoryRepository.saveKeys(categoryEncId, base64Iv, cKey, catId);
-			}
-			
+			List<Category> categories = categoryRepository.findCategoryByUser(id);			
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("categories", categories);
 			return "allcategories";
@@ -59,7 +44,7 @@ public class CategoryController {
 	}
 
 	@PostMapping("/create/categories")
-	public String createCategory(@Valid Category category, RedirectAttributes redirAttrs) {
+	public String createCategory(@Valid Category category, RedirectAttributes redirAttrs) throws Exception {
 		boolean session = loggedUser.isLogged();
 		int user = loggedUser.getUserId();
 		boolean exists = false;
@@ -81,6 +66,23 @@ public class CategoryController {
 						u.setId(user);
 						category.addUsersCategory(u);
 						categoryRepository.save(category);
+						
+						int idUser = loggedUser.getUserId();
+						List<Category> categories = categoryRepository.findCategoryByUser(idUser);
+						for (Category cat : categories) {
+							int catId = cat.getId();
+							String cId = Integer.toString(catId);
+							IvParameterSpec iv = Security.iv();
+							SecretKey symmetricKey = Security.secretKey();
+							byte[] cipherText = Security.encrypt(cId, symmetricKey, iv);
+							
+							String categoryEncId = Base64.getUrlEncoder().withoutPadding().encodeToString(cipherText);
+							category.setCatId(categoryEncId);
+							byte[] cIv = iv.getIV();
+							byte[] cKey = symmetricKey.getEncoded();
+							String base64Iv = Base64.getEncoder().encodeToString(cIv);
+							categoryRepository.saveKeys(categoryEncId, base64Iv, cKey, catId);
+						}
 						return "redirect:/allcategories";
 				}
 		}
@@ -101,15 +103,21 @@ public class CategoryController {
 	}
 
 	@PostMapping("/update/category")
-	public String updateCategory(@RequestParam String categoryName, String id, ModelMap model) {
+	public String updateCategory(@RequestParam String categoryName, String id, ModelMap model,RedirectAttributes redirAttrs) {
 		boolean session = loggedUser.isLogged();
 		int categoryId = categoryRepository.findCategory(id);
 		if (session) {
+			if(!categoryName.isEmpty()) {
 			categoryRepository.updateCategory(categoryName, categoryId);
 			model.addAttribute("name", loggedUser.getName());
 			return "redirect:/allcategories";
+			
+			}else {
+				redirAttrs.addFlashAttribute("error", "Category name must not be empty.");
+				return "redirect:/edit/category/"+ id;
+			}
 		}
-		return "redirect:/login";
+			return "redirect:/login";
 	}
 
 	@GetMapping("/newcategory")
