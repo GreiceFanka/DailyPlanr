@@ -164,9 +164,11 @@ public class UserController {
 	}
 
 	@PostMapping("/new")
-	public ResponseEntity<String> newUser(@Valid User user, RedirectAttributes redirAttrs) {
+	public ResponseEntity<String> newUser(@Valid User user, RedirectAttributes redirAttrs) throws Exception {
 		String salt = KeyGenerators.string().generateKey();
 		user.setSalt(salt);
+		String tempId = KeyGenerators.string().generateKey();
+		user.setTempId(tempId);
 		user.setPassword(encoder.encode(user.getPassword().concat(salt)));
 		boolean isEmail = false;
 		String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
@@ -183,6 +185,32 @@ public class UserController {
 			user.setTime_block(null);
 			user.setLogin_attempts(0);
 			userRepository.save(user);
+			
+			Optional<User> u = userRepository.findByLogin(user.getLogin());
+			int uId = u.get().getId();
+			List<Category> listCat = categoryRepository.findCategoryByUser(uId);
+			if (listCat.isEmpty()) {
+				Category category = new Category();
+				category.setCategoryName("Default");
+				category.addUsersCategory(user);
+				categoryRepository.save(category);
+				
+				List<Category> categories = categoryRepository.findCategoryByUser(uId);
+				for (Category cat : categories) {
+					int catId = cat.getId();
+					String cId = Integer.toString(catId);
+					IvParameterSpec iv = Security.iv();
+					SecretKey symmetricKey = Security.secretKey();
+					byte[] cipherText = Security.encrypt(cId, symmetricKey, iv);
+					
+					String categoryEncId = Base64.getUrlEncoder().withoutPadding().encodeToString(cipherText);
+					category.setCatId(categoryEncId);
+					byte[] cIv = iv.getIV();
+					byte[] cKey = symmetricKey.getEncoded();
+					String base64Iv = Base64.getEncoder().encodeToString(cIv);
+					categoryRepository.saveKeys(categoryEncId, base64Iv, cKey, catId);
+				}
+			}
 			return ResponseEntity.status(HttpStatus.OK).body("Account created successfully!");
 		} else if (!isEmail) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Error!Try again later!");
@@ -228,17 +256,10 @@ public class UserController {
 					newSession.setAttribute("user", user.getLogin());
 					newSession.setMaxInactiveInterval(30 * 60);
 					this.loggedUser.setUserLogged(user);
-				
-					List<Category> listCat = categoryRepository.findCategoryByUser(loggedUser.getUserId());
-					if (listCat.isEmpty()) {
-						Category category = new Category();
-						category.setCategoryName("Default");
-						category.addUsersCategory(user);
-						categoryRepository.save(category);
-					}
 					userRepository.userTimeBlock(login_attempts, time_block, id);
 					return ResponseEntity.status(HttpStatus.OK).body("Success");
-				} else {
+						
+				}else {
 					login_attempts = user.getLogin_attempts();
 					user.setLogin_attempts(login_attempts++);
 					if(login_attempts >= 5) {
@@ -254,10 +275,8 @@ public class UserController {
 			
 			userRepository.userTimeBlock(login_attempts, time_block, id);
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
-			
+			}
 		}
-		
-	}
 
 	@GetMapping("/changepassword")
 	public String changePassword(ModelMap model) {
