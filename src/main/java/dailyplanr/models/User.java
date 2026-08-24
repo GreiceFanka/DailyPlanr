@@ -35,6 +35,9 @@ public class User {
 	@Column
 	private String salt;
 	
+	@Column
+	private String tempId;
+	
 	@Column(nullable = false)
 	private int login_attempts;
 	
@@ -132,6 +135,12 @@ public class User {
 	}
 	public void setSalt(String salt) {
 		this.salt = salt;
+	}
+	public String getTempId() {
+		return tempId;
+	}
+	public void setTempId(String tempId) {
+		this.tempId = tempId;
 	}
 	public int getLogin_attempts() {
 		return login_attempts;
