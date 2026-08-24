@@ -591,23 +591,16 @@ public class TaskController {
 		return "redirect:/login";
 	}
 	
-	@GetMapping("/img/{hashu}")
+	@GetMapping("/img/{tempId}")
 	@ResponseBody
-	public byte[] getUserImage(@PathVariable String hashu) throws Exception {
-		Optional<User> userInf = userRepository.findUsrInf(hashu);
+	public byte[] getUserImage(@PathVariable String tempId) throws Exception {
 		
-		byte [] ukey = userInf.get().getSymmetricKey();
-		SecretKey oKey = new SecretKeySpec(ukey, "AES");
-		
-		byte[] uIv = Base64.getDecoder().decode(userInf.get().getIv());
-		IvParameterSpec uIvSpec = new IvParameterSpec(uIv);
-		
-		byte[] uCipherText = Base64.getUrlDecoder().decode(hashu);
-		String decryptHashu = Security.decrypt(uCipherText, oKey, uIvSpec);
-		int decryptUserId = Integer.parseInt(decryptHashu);	
+		Optional<User> userInf = userRepository.findTempId(tempId);
+		int id = userInf.get().getId();
+	
 		
 		byte[] photo = null;
-		Optional<User> users = userRepository.findById(decryptUserId);
+		Optional<User> users = userRepository.findById(id);
 		byte[]images = users.get().getImage();
 			
 			if (images != null) {
