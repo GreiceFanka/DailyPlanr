@@ -12,6 +12,9 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	@Query(value="SELECT * FROM User WHERE company = ? ", nativeQuery = true)
 	public Iterable<User> findUserWithSameCompany(String company);
 	
+	@Query(value="SELECT * FROM User WHERE tempId = ? ", nativeQuery = true)
+	public Optional<User> findTempId(String tempId);
+	
 	@Query(value="SELECT * FROM User WHERE hashu = ? ", nativeQuery = true)
 	public Optional<User> findUsrInf(String hashu);
 	
