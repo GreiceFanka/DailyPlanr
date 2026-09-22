@@ -39,6 +39,7 @@ import dailyplanr.models.Task;
 import dailyplanr.models.TaskRepository;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
+import dailyplanr.service.Security;
 import jakarta.validation.Valid;
 
 @Controller
