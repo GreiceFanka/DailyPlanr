@@ -37,6 +37,8 @@ import dailyplanr.models.Category;
 import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
+import dailyplanr.service.CategoryKeys;
+import dailyplanr.service.Security;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -51,6 +53,9 @@ public class UserController {
 	private CategoryRepository categoryRepository;
 
 	private final PasswordEncoder encoder;
+	
+	@Autowired
+	private CategoryKeys categoryKeys;
 
 	@Inject
 	private LoggedUser loggedUser;
@@ -164,7 +169,7 @@ public class UserController {
 	}
 
 	@PostMapping("/new")
-	public ResponseEntity<String> newUser(@Valid User user, RedirectAttributes redirAttrs) throws Exception {
+	public ResponseEntity<String> newUser(@Valid User user, RedirectAttributes redirAttrs){
 		String salt = KeyGenerators.string().generateKey();
 		user.setSalt(salt);
 		String tempId = KeyGenerators.string().generateKey();
@@ -194,21 +199,11 @@ public class UserController {
 				category.setCategoryName("Default");
 				category.addUsersCategory(user);
 				categoryRepository.save(category);
-				
-				List<Category> categories = categoryRepository.findCategoryByUser(uId);
-				for (Category cat : categories) {
-					int catId = cat.getId();
-					String cId = Integer.toString(catId);
-					IvParameterSpec iv = Security.iv();
-					SecretKey symmetricKey = Security.secretKey();
-					byte[] cipherText = Security.encrypt(cId, symmetricKey, iv);
-					
-					String categoryEncId = Base64.getUrlEncoder().withoutPadding().encodeToString(cipherText);
-					category.setCatId(categoryEncId);
-					byte[] cIv = iv.getIV();
-					byte[] cKey = symmetricKey.getEncoded();
-					String base64Iv = Base64.getEncoder().encodeToString(cIv);
-					categoryRepository.saveKeys(categoryEncId, base64Iv, cKey, catId);
+				try {
+					categoryKeys.createKey(user, category);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return ResponseEntity.status(HttpStatus.FORBIDDEN).body("A technical error ocurred. Please try again later.");
 				}
 			}
 			return ResponseEntity.status(HttpStatus.OK).body("Account created successfully!");
