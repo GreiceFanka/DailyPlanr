@@ -92,8 +92,7 @@ function saveData(task_id, taskStatus) {
 	}).then(response => {
 		if (!response.ok)
 			throw new Error("não foi possível trocar o status");
-
-		return response.text();
+		location.reload();
 	})
 }
 
