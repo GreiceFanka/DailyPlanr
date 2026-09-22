@@ -1,10 +1,9 @@
 package dailyplanr.controllers;
 
-import java.util.Base64;
+
 import java.util.List;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
+
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import dailyplanr.models.Category;
 import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
+import dailyplanr.service.CategoryKeys;
 import jakarta.validation.Valid;
 
 @Controller
@@ -26,10 +26,12 @@ public class CategoryController {
 
 	@Autowired
 	private CategoryRepository categoryRepository;
+	@Autowired
+	private CategoryKeys categoryKeys;
 
 	@Inject
 	private LoggedUser loggedUser;
-
+	
 	@GetMapping("/allcategories")
 	public String getAllCategories(ModelMap model){
 		boolean session = loggedUser.isLogged();
@@ -44,7 +46,7 @@ public class CategoryController {
 	}
 
 	@PostMapping("/create/categories")
-	public String createCategory(@Valid Category category, RedirectAttributes redirAttrs) throws Exception {
+	public String createCategory(@Valid Category category, RedirectAttributes redirAttrs){
 		boolean session = loggedUser.isLogged();
 		int user = loggedUser.getUserId();
 		boolean exists = false;
@@ -52,13 +54,10 @@ public class CategoryController {
 		
 		if (session) {
 			List<Category> catExists = categoryRepository.findCategoryByUser(user);
-			for (Category cat : catExists) {
-				String userCategoryName = cat.getCategoryName();
-				if(userCategoryName.equalsIgnoreCase(catName)) {
-					exists = true;
-				}
-			}
-				if (exists == true) {
+			exists = catExists.stream()
+			        .anyMatch(cat -> cat.getCategoryName().equalsIgnoreCase(catName));
+
+				if (exists) {
 					redirAttrs.addFlashAttribute("error", "This category already exists.");
 					return "redirect:/newcategory";
 				}else {
@@ -67,22 +66,14 @@ public class CategoryController {
 						category.addUsersCategory(u);
 						categoryRepository.save(category);
 						
-						int idUser = loggedUser.getUserId();
-						List<Category> categories = categoryRepository.findCategoryByUser(idUser);
-						for (Category cat : categories) {
-							int catId = cat.getId();
-							String cId = Integer.toString(catId);
-							IvParameterSpec iv = Security.iv();
-							SecretKey symmetricKey = Security.secretKey();
-							byte[] cipherText = Security.encrypt(cId, symmetricKey, iv);
-							
-							String categoryEncId = Base64.getUrlEncoder().withoutPadding().encodeToString(cipherText);
-							category.setCatId(categoryEncId);
-							byte[] cIv = iv.getIV();
-							byte[] cKey = symmetricKey.getEncoded();
-							String base64Iv = Base64.getEncoder().encodeToString(cIv);
-							categoryRepository.saveKeys(categoryEncId, base64Iv, cKey, catId);
+						try {
+							categoryKeys.createKey(u, category);
+						} catch (Exception e) {
+							e.printStackTrace();
+							redirAttrs.addFlashAttribute("error", "A technical error ocurred. Please try again later.");
+							return "redirect:/newcategory";
 						}
+					
 						return "redirect:/allcategories";
 				}
 		}
