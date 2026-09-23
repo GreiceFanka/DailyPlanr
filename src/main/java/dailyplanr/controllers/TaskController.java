@@ -40,6 +40,7 @@ import dailyplanr.models.TaskRepository;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
 import dailyplanr.service.Security;
+import dailyplanr.service.TaskService;
 import jakarta.validation.Valid;
 
 @Controller
@@ -52,13 +53,12 @@ public class TaskController {
 	
 	@Autowired
 	private CategoryRepository categoryRepository;
+	
+	@Autowired
+	private TaskService taskService;
 
 	@Inject
 	private LoggedUser loggedUser;
-	
-	private IvParameterSpec iv;
-	
-	private SecretKey symmetricKey;
 	
 	private byte[] cipherText;
 
@@ -81,7 +81,7 @@ public class TaskController {
 	}
 
 	@PostMapping("/newtask/create/")
-	public String newTask(@RequestParam String title, @Valid LocalDateTime data,@RequestParam String description,@RequestParam String categories,@RequestParam String priority, RedirectAttributes redirAttrs) throws Exception {
+	public String newTask(@RequestParam String title, @Valid LocalDateTime data,@RequestParam String description,@RequestParam String categories,@RequestParam String priority, RedirectAttributes redirAttrs){
 		if (!loggedUser.isLogged()) {
 	        redirAttrs.addFlashAttribute("error", "Something went wrong, try again.");
 	        return "redirect:/newtask";
@@ -93,29 +93,7 @@ public class TaskController {
 	    }
 
 	    try {
-	        User user = new User();
-	        user.setId(loggedUser.getUserId());
-
-	        int categoryId = categoryRepository.findCategory(categories);
-	        Category category = categoryRepository.findById(categoryId)
-	            .orElseThrow(() -> new IllegalArgumentException("Category not found"));
-
-	        Task task = new Task();
-	        task.setTitle(title);
-	        task.setData(data);
-	        task.setDescription(description);
-	        task.setCategories(category);
-	        task.setPriority(priority);
-	        task.setEncryptId("XXXX");
-
-	        iv = Security.iv();
-	        symmetricKey = Security.secretKey();
-
-	        task.setIv(Base64.getEncoder().encodeToString(iv.getIV()));
-	        task.setSymmetricKey(symmetricKey.getEncoded());
-	        task.addUser(user);
-
-	        taskRepository.save(task);
+	    	taskService.createTask(title, data, description, categories, priority);
 	        redirAttrs.addFlashAttribute("success", "Everything went just fine.");
 	        
 	    } catch (Exception e) {
@@ -126,53 +104,20 @@ public class TaskController {
 	}
 
 	@GetMapping("/alltasks")
-	public String getAllTasks(ModelMap model) throws Exception {
+	public String getAllTasks(ModelMap model){
 		String alert = "null";
 		boolean session = loggedUser.isLogged();
-	
-		if (session) {
-			int id = loggedUser.getUserId();
-			Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
-			LocalDateTime now = LocalDateTime.now();
-			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-			now.format(dateTimeFormatter);
 		
-			for (Task task : allTasks) {
-				if (task.getData() != null) {
-					int latedTasks = task.getData().compareTo(now);
-					boolean toDoStatus = task.getTaskStatus().equalsIgnoreCase("To do");
-					boolean inProgressStatus = task.getTaskStatus().equalsIgnoreCase("In progress");
-
-					if (latedTasks <= -1 && (toDoStatus || inProgressStatus)) {
-						alert = "You have late tasks!";
-					}
-				}
-			}
+		if (session) {
+			Iterable<Task> allTasks = taskRepository.findTaskByUser(loggedUser.getUserId());
+			alert = taskService.findLateTasks();
 			
-			
-			for (Task task : allTasks) {
-				if(!task.getTaskStatus().equalsIgnoreCase("Archive")) {
-					String taskId = Integer.toString(task.getId());
-					int tid = task.getId();
-					iv = Security.iv();
-					symmetricKey = Security.secretKey();
-					cipherText = Security.encrypt(taskId, symmetricKey, iv);
-					String taskEncryptId = Base64.getUrlEncoder().withoutPadding().encodeToString(cipherText);
-					task.setEncryptId(taskEncryptId);
-					byte[] taskIv = iv.getIV();
-					byte[] taskKey = symmetricKey.getEncoded();
-					String base64Iv = Base64.getEncoder().encodeToString(taskIv);
-					taskRepository.encryptKeyCreation(taskEncryptId, base64Iv, taskKey, tid);
-				}
-				
-			}
-
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("user", loggedUser.getUserId());
 			model.addAttribute("tasks", allTasks);
 			model.addAttribute("alert", alert);
 			return "alltasks";
-		}
+		}	
 		return "redirect:/login";
 	}
 
