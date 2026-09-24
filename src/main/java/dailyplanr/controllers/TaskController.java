@@ -41,6 +41,7 @@ import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
 import dailyplanr.service.Security;
 import dailyplanr.service.TaskService;
+import dailyplanr.service.UserService;
 import jakarta.validation.Valid;
 
 @Controller
@@ -57,6 +58,9 @@ public class TaskController {
 	@Autowired
 	private TaskService taskService;
 
+	@Autowired
+	private UserService userService;
+	
 	@Inject
 	private LoggedUser loggedUser;
 	
@@ -122,68 +126,52 @@ public class TaskController {
 	}
 
 	@PostMapping("/delete/task")
-	public String deleteTask(@RequestParam String encryptId) throws Exception {
+	public String deleteTask(@RequestParam String encryptId,RedirectAttributes redirectAttributes){
 		boolean session = loggedUser.isLogged();
 		if (session) {
-			Optional<Task> taskInf = taskRepository.findTaskInf(encryptId);
-			Task task = taskInf.get();
-			
-			byte [] key = task.getSymmetricKey();
-			SecretKey originalKey = new SecretKeySpec(key, "AES");
-			
-			byte[] decIv = Base64.getDecoder().decode(task.getIv());
-			IvParameterSpec ivSpec = new IvParameterSpec(decIv);
-			
-			cipherText = Base64.getUrlDecoder().decode(encryptId);
-			
-			String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
-			
-			int idDecrypt = Integer.parseInt(decryptedText);
-			taskRepository.deleteById(idDecrypt);
-			return "redirect:/alltasks";
+			try {
+				int idDecrypt = taskService.decryptId(encryptId);
+				taskRepository.deleteById(idDecrypt);
+				return "redirect:/alltasks";
+			} catch (Exception e) {
+				redirectAttributes.addFlashAttribute("error", "Failed to delete task.Please try again later.");
+				return "redirect:/alltasks";
+			}
 		}
 		return "redirect:/login";
 	}
 
 	@GetMapping("/edit/task/{encryptId}")
-	public String editTask(@PathVariable String encryptId, ModelMap model, Status status) throws Exception {
+	public String editTask(@PathVariable String encryptId, ModelMap model, Status status,RedirectAttributes redirectAttributes){
 		boolean session = loggedUser.isLogged();
-		Optional<Task> taskInf = taskRepository.findTaskInf(encryptId);
-		Task task = taskInf.get();
-		
-		byte [] key = task.getSymmetricKey();
-		SecretKey originalKey = new SecretKeySpec(key, "AES");
-		
-		byte[] decIv = Base64.getDecoder().decode(task.getIv());
-		IvParameterSpec ivSpec = new IvParameterSpec(decIv);
-		
-		cipherText = Base64.getUrlDecoder().decode(encryptId);
-		
-		String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
-		
-		int idDecrypt = Integer.parseInt(decryptedText);
 		
 		if (session) {
-			int user_id = loggedUser.getUserId();
-			List<Integer> taskUser = taskRepository.findTaskUser(idDecrypt);
-			for (Integer id : taskUser) {
-				if(user_id == id) {
-					List<Task> tasks = taskRepository.findTaskById(idDecrypt);
-					List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
-					List<String> allStatus = Status.getAllStatus();
-					List<String> allPriorities = Priority.getAllPriorities();
-					
-					model.addAttribute("name", loggedUser.getName());
-					model.addAttribute("user", loggedUser.getUserId());
-					model.addAttribute("tasks", tasks);
-					model.addAttribute("categories", listCategories);
-					model.addAttribute("status", allStatus);
-					model.addAttribute("priorities", allPriorities);
-					return "updatetask";
-				}else {
-					return"redirect:/alltasks";
-				}
-
+			try {
+				int idDecrypt = taskService.decryptId(encryptId);
+				int user_id = loggedUser.getUserId();
+				List<Integer> taskUser = taskRepository.findTaskUser(idDecrypt);
+				for (Integer id : taskUser) {
+					if(user_id == id) {
+						List<Task> tasks = taskRepository.findTaskById(idDecrypt);
+						List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
+						List<String> allStatus = Status.getAllStatus();
+						List<String> allPriorities = Priority.getAllPriorities();
+						
+						model.addAttribute("name", loggedUser.getName());
+						model.addAttribute("user", loggedUser.getUserId());
+						model.addAttribute("tasks", tasks);
+						model.addAttribute("categories", listCategories);
+						model.addAttribute("status", allStatus);
+						model.addAttribute("priorities", allPriorities);
+						return "updatetask";
+						
+					}else {
+						return"redirect:/alltasks";
+					}
+				} 
+			}catch (Exception e) {
+				redirectAttributes.addFlashAttribute("error", "Failed to load the page.Please try again later.");
+				return "redirect:/alltasks";
 			}
 		
 		}
@@ -192,26 +180,18 @@ public class TaskController {
 
 	@PostMapping("/update/task")
 	public String updateTask(@RequestParam String data, @RequestParam String title, @RequestParam String description,
-			@RequestParam String priority, @RequestParam String task_id, RedirectAttributes redirectAttributes) throws Exception {
+			@RequestParam String priority, @RequestParam String task_id, RedirectAttributes redirectAttributes){
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			if (data != null && !data.isEmpty()) {
-				Optional<Task> taskInf = taskRepository.findTaskInf(task_id);
-				Task task = taskInf.get();
+				try {
+					int idDecrypt = taskService.decryptId(task_id);
+					taskRepository.updateTask(data, title, description, priority, idDecrypt);
+				} catch (Exception e) {
+					redirectAttributes.addFlashAttribute("error", "Failed to edit task.Please try again later.");
+					return "redirect:/edit/task/{id}";
+				}
 				
-				byte [] key = task.getSymmetricKey();
-				SecretKey originalKey = new SecretKeySpec(key, "AES");
-				
-				byte[] decIv = Base64.getDecoder().decode(task.getIv());
-				IvParameterSpec ivSpec = new IvParameterSpec(decIv);
-				
-				cipherText = Base64.getUrlDecoder().decode(task_id);
-				
-				String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
-				
-				int idDecrypt = Integer.parseInt(decryptedText);
-				
-				taskRepository.updateTask(data, title, description, priority, idDecrypt);
 			} else {
 				redirectAttributes.addAttribute("id", task_id);
 				redirectAttributes.addFlashAttribute("error", "Date is required!");
@@ -224,114 +204,65 @@ public class TaskController {
 	}
 
 	@PostMapping("edit/status")
-	public String editTaskStatus(@RequestParam String taskStatus, @RequestParam String task_id) throws Exception {
+	public String editTaskStatus(@RequestParam String taskStatus, @RequestParam String task_id,RedirectAttributes redirectAttributes){
 		boolean session = loggedUser.isLogged();
 		if (session) {
-			Optional<Task> taskInf = taskRepository.findTaskInf(task_id);
-			Task task = taskInf.get();
-			
-			byte [] key = task.getSymmetricKey();
-			SecretKey originalKey = new SecretKeySpec(key, "AES");
-			
-			byte[] decIv = Base64.getDecoder().decode(task.getIv());
-			IvParameterSpec ivSpec = new IvParameterSpec(decIv);
-			
-			cipherText = Base64.getUrlDecoder().decode(task_id);
-			
-			String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
-			
-			int idDecrypt = Integer.parseInt(decryptedText);
-			
-			LocalDate updatedStatus = LocalDate.now();
-			DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			updatedStatus.format(dateTimeFormatter);
+			try {
+				int idDecrypt = taskService.decryptId(task_id);
+				LocalDate updatedStatus = LocalDate.now();
+				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+				updatedStatus.format(dateTimeFormatter);
 
-			taskRepository.editStatus(taskStatus, updatedStatus, idDecrypt);
-			return "redirect:/alltasks";
+				taskRepository.editStatus(taskStatus, updatedStatus, idDecrypt);
+				return "redirect:/alltasks";
+			} catch (Exception e) {
+				redirectAttributes.addFlashAttribute("error", "Failed to edit status.Please try again later.");
+				return "redirect:/alltasks";
+			}
 		}
 		return "redirect:/login";
 	}
 
 	@PostMapping("edit/category")
-	public String editTaskCategory(@RequestParam String cat_id, @RequestParam String task_id) throws Exception {
+	public String editTaskCategory(@RequestParam String cat_id, @RequestParam String task_id,RedirectAttributes redirectAttributes){
 		boolean session = loggedUser.isLogged();
 		if (session) {
-			int cId = categoryRepository.findCategory(cat_id);
-		
-				Optional<Task> taskInf = taskRepository.findTaskInf(task_id);
-				Task task = taskInf.get();
-				
-				byte [] key = task.getSymmetricKey();
-				SecretKey originalKey = new SecretKeySpec(key, "AES");
-				
-				byte[] decIv = Base64.getDecoder().decode(task.getIv());
-				IvParameterSpec ivSpec = new IvParameterSpec(decIv);
-				
-				cipherText = Base64.getUrlDecoder().decode(task_id);
-				
-				String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
-				
-				int idDecrypt = Integer.parseInt(decryptedText);
-				
+			try {
+				int cId = categoryRepository.findCategory(cat_id);
+				int idDecrypt = taskService.decryptId(task_id);
 				taskRepository.editTaskCategory(cId, idDecrypt);
 				return "redirect:/alltasks";
+				
+			} catch (Exception e) {
+				redirectAttributes.addFlashAttribute("error", "Failed to edit category.Please try again later.");
+				return "redirect:/alltasks";
+			}
 		}
 		return "redirect:/login";
 	}
 
 	@PostMapping("/add/user")
-	public String addUser(@RequestParam String taskId, @RequestParam String hashu, RedirectAttributes redirectAttributes)throws Exception {
-				
-		Optional<Task> taskInf = taskRepository.findTaskInf(taskId);
-		Task task = taskInf.get();
-		
-		byte [] key = task.getSymmetricKey();
-		SecretKey originalKey = new SecretKeySpec(key, "AES");
-		
-		byte[] decIv = Base64.getDecoder().decode(task.getIv());
-		IvParameterSpec ivSpec = new IvParameterSpec(decIv);
-		
-		cipherText = Base64.getUrlDecoder().decode(taskId);
-		
-		String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
-		
-		int idDecrypt = Integer.parseInt(decryptedText);
-		
-		List<Task> tasks = taskRepository.findTaskById(idDecrypt);
-		
-		Optional<User> userInf = userRepository.findUsrInf(hashu);
-		
-		byte [] ukey = userInf.get().getSymmetricKey();
-		SecretKey oKey = new SecretKeySpec(ukey, "AES");
-		
-		byte[] uIv = Base64.getDecoder().decode(userInf.get().getIv());
-		IvParameterSpec uIvSpec = new IvParameterSpec(uIv);
-		
-		byte[] uCipherText = Base64.getUrlDecoder().decode(hashu);
-		String decryptHashu = Security.decrypt(uCipherText, oKey, uIvSpec);
-		int decryptUserId = Integer.parseInt(decryptHashu);		
-		
-		boolean user = false;
-		boolean session = loggedUser.isLogged();
+	public String addUser(@RequestParam String taskId, @RequestParam String hashu, RedirectAttributes redirectAttributes){
+		boolean session = loggedUser.isLogged();	
 		if (session) {
-			for (User users : tasks.get(0).getUsers()) {
-				if (users.getId() == decryptUserId) {
-					user = true;
+			try {
+				int idDecrypt = taskService.decryptId(taskId);
+				int decryptUserId = userService.decryptHash(hashu);	
+				boolean user = taskService.userInTask(idDecrypt, decryptUserId);
+				if (!user) {
+					taskRepository.insertUserTask(idDecrypt, decryptUserId);
+					redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
+				} else {
+					redirectAttributes.addFlashAttribute("error", "This user is already signed to this task!");
 				}
+				return "redirect:/alltasks";
+			} catch (Exception e) {
+				redirectAttributes.addFlashAttribute("error", "Failed to add the user.Please try again later.");
+				return "redirect:/alltasks";
 			}
-
-			if (user == false) {
-
-				taskRepository.insertUserTask(idDecrypt, decryptUserId);
-
-				redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
-
-			} else {
-				redirectAttributes.addFlashAttribute("error", "This user is already signed to this task!");
-			}
-
-			return "redirect:/alltasks";
+		
 		}
+	
 		return "redirect:/login";
 	}
 
