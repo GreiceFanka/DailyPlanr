@@ -3,9 +3,12 @@ package dailyplanr.service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +109,36 @@ public class TaskService {
 			}
 			
 		}
+	}
+	
+	public int decryptId(String encryptId)throws Exception {
+		Optional<Task> taskInf = taskRepository.findTaskInf(encryptId);
+		Task task = taskInf.get();
+		
+		byte [] key = task.getSymmetricKey();
+		SecretKey originalKey = new SecretKeySpec(key, "AES");
+		
+		byte[] decIv = Base64.getDecoder().decode(task.getIv());
+		IvParameterSpec ivSpec = new IvParameterSpec(decIv);
+		
+		cipherText = Base64.getUrlDecoder().decode(encryptId);
+		
+		String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
+		
+		int idDecrypt = Integer.parseInt(decryptedText);
+		
+		return idDecrypt;
+	}
+	
+	public boolean userInTask(int idDecrypt, int decryptUserId) {
+		List<Task> tasks = taskRepository.findTaskById(idDecrypt);
+		boolean user = false;
+		for (User users : tasks.get(0).getUsers()) {
+				if (users.getId() == decryptUserId) {
+					user = true;
+				}
+			}
+		return user;
 	}
 
 }
