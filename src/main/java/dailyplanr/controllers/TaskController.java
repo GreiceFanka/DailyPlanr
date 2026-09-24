@@ -1,22 +1,12 @@
 package dailyplanr.controllers;
 
-
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +27,6 @@ import dailyplanr.models.Priority;
 import dailyplanr.models.Status;
 import dailyplanr.models.Task;
 import dailyplanr.models.TaskRepository;
-import dailyplanr.models.User;
-import dailyplanr.models.UserRepository;
-import dailyplanr.service.Security;
 import dailyplanr.service.TaskService;
 import dailyplanr.service.UserService;
 import jakarta.validation.Valid;
@@ -48,9 +35,6 @@ import jakarta.validation.Valid;
 public class TaskController {
 	@Autowired
 	private TaskRepository taskRepository;
-	
-	@Autowired
-	private UserRepository userRepository;
 	
 	@Autowired
 	private CategoryRepository categoryRepository;
@@ -63,8 +47,6 @@ public class TaskController {
 	
 	@Inject
 	private LoggedUser loggedUser;
-	
-	private byte[] cipherText;
 
 	@GetMapping("/newtask")
 	public String tasks(ModelMap model) {
@@ -312,29 +294,22 @@ public class TaskController {
 	}
 
 	@GetMapping("archive/{id}")
-	public String changeStatus(@PathVariable String id, ModelMap model) throws Exception {
+	public String changeStatus(@PathVariable String id, ModelMap model,RedirectAttributes redirectAttributes){
 		boolean session = loggedUser.isLogged();
 		if (session) {
-			Optional<Task> taskInf = taskRepository.findTaskInf(id);
-			Task task = taskInf.get();
+			try {
+				int idDecrypt = taskService.decryptId(id);
+				List<Task> tasks = taskRepository.findTaskById(idDecrypt);
+				List<String> allStatus = Status.getAllStatus();
+				model.addAttribute("name", loggedUser.getName());
+				model.addAttribute("status", allStatus);
+				model.addAttribute("tasks", tasks);
+				return "changestatus";
+			} catch (Exception e) {
+				redirectAttributes.addFlashAttribute("error", "Failed to load the page.Please try again later.");
+				return "redirect:/alltasks";
+			}
 			
-			byte [] key = task.getSymmetricKey();
-			SecretKey originalKey = new SecretKeySpec(key, "AES");
-			
-			byte[] decIv = Base64.getDecoder().decode(task.getIv());
-			IvParameterSpec ivSpec = new IvParameterSpec(decIv);
-			
-			cipherText = Base64.getUrlDecoder().decode(id);
-			
-			String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
-			
-			int idDecrypt = Integer.parseInt(decryptedText);
-			List<Task> tasks = taskRepository.findTaskById(idDecrypt);
-			List<String> allStatus = Status.getAllStatus();
-			model.addAttribute("name", loggedUser.getName());
-			model.addAttribute("status", allStatus);
-			model.addAttribute("tasks", tasks);
-			return "changestatus";
 		}
 		return "redirect:/login";
 	}
@@ -399,27 +374,19 @@ public class TaskController {
 	}
 
 	@GetMapping("delete/person/{id}")
-	public String deletePerson(@PathVariable String id, ModelMap model) throws Exception {
+	public String deletePerson(@PathVariable String id, ModelMap model,RedirectAttributes redirectAttributes){
 		boolean session = loggedUser.isLogged();
 		if (session) {
-			Optional<Task> taskInf = taskRepository.findTaskInf(id);
-			Task task = taskInf.get();
-			
-			byte [] key = task.getSymmetricKey();
-			SecretKey originalKey = new SecretKeySpec(key, "AES");
-			
-			byte[] decIv = Base64.getDecoder().decode(task.getIv());
-			IvParameterSpec ivSpec = new IvParameterSpec(decIv);
-			
-			cipherText = Base64.getUrlDecoder().decode(id);
-			
-			String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
-			
-			int idDecrypt = Integer.parseInt(decryptedText);
-			List<Task> tasks = taskRepository.findTaskById(idDecrypt);
-			model.addAttribute("tasks", tasks);
-			model.addAttribute("name", loggedUser.getName());
-			return "deleteperson";
+			try {
+				int idDecrypt = taskService.decryptId(id);
+				List<Task> tasks = taskRepository.findTaskById(idDecrypt);
+				model.addAttribute("tasks", tasks);
+				model.addAttribute("name", loggedUser.getName());
+				return "deleteperson";
+			} catch (Exception e) {
+				redirectAttributes.addFlashAttribute("error", "Something went wrog, please try later.");
+				return "redirect:/alltasks";
+			}
 		}
 		return "redirect:/login";
 	}
@@ -430,35 +397,9 @@ public class TaskController {
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			try {
-				Optional<Task> taskInf = taskRepository.findTaskInf(taskId);
-				Task task = taskInf.get();
-				
-				byte [] key = task.getSymmetricKey();
-				SecretKey originalKey = new SecretKeySpec(key, "AES");
-				
-				byte[] decIv = Base64.getDecoder().decode(task.getIv());
-				IvParameterSpec ivSpec = new IvParameterSpec(decIv);
-				
-				cipherText = Base64.getUrlDecoder().decode(taskId);
-				
-				String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
-				
-				int idDecrypt = Integer.parseInt(decryptedText);
-				
-				Optional<User> userInf = userRepository.findUsrInf(hashu);
-				
-				byte [] ukey = userInf.get().getSymmetricKey();
-				SecretKey oKey = new SecretKeySpec(ukey, "AES");
-				
-				byte[] uIv = Base64.getDecoder().decode(userInf.get().getIv());
-				IvParameterSpec uIvSpec = new IvParameterSpec(uIv);
-				
-				byte[] uCipherText = Base64.getUrlDecoder().decode(hashu);
-				String decryptHashu = Security.decrypt(uCipherText, oKey, uIvSpec);
-				int decryptUserId = Integer.parseInt(decryptHashu);	
-				
+				int idDecrypt = taskService.decryptId(taskId);
+				int decryptUserId = userService.decryptHash(hashu);				
 				taskRepository.deleteUserTask(idDecrypt, decryptUserId);
-				
 				redirectAttributes.addFlashAttribute("success", "Person deleted from task with success!");
 			} catch (Exception e) {
 				redirectAttributes.addFlashAttribute("error", "Something went wrog, please try later.");
@@ -470,33 +411,9 @@ public class TaskController {
 	
 	@GetMapping("/img/{tempId}")
 	@ResponseBody
-	public byte[] getUserImage(@PathVariable String tempId) throws Exception {
-		
-		Optional<User> userInf = userRepository.findTempId(tempId);
-		int id = userInf.get().getId();
-	
-		
-		byte[] photo = null;
-		Optional<User> users = userRepository.findById(id);
-		byte[]images = users.get().getImage();
-			
-			if (images != null) {
-				return images;
-			} else {
-				try (InputStream is = getClass().getResourceAsStream("/static/images/user.jpg")) {
-				    if (is != null) {
-				        BufferedImage rd = ImageIO.read(is);
-				        ByteArrayOutputStream wr = new ByteArrayOutputStream();
-				        ImageIO.write(rd, "jpg", wr);
-				        photo = wr.toByteArray();
-				    } else {
-				        System.out.println("Imagem default não encontrada!");
-				    }
-				} catch (Exception e) {
-				    e.printStackTrace();
-				}
-				return photo;
-			}
+	public byte[] getUserImage(@PathVariable String tempId){
+		byte[] photo = userService.userImg(tempId);
+		return photo;
 	}
 
 }
