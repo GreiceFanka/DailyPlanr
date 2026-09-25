@@ -37,7 +37,7 @@ import dailyplanr.models.Category;
 import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
-import dailyplanr.service.CategoryKeys;
+import dailyplanr.service.CategoryService;
 import dailyplanr.service.Security;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -55,7 +55,7 @@ public class UserController {
 	private final PasswordEncoder encoder;
 	
 	@Autowired
-	private CategoryKeys categoryKeys;
+	private CategoryService categoryService;
 
 	@Inject
 	private LoggedUser loggedUser;
@@ -200,7 +200,7 @@ public class UserController {
 				category.addUsersCategory(user);
 				categoryRepository.save(category);
 				try {
-					categoryKeys.createKey(user, category);
+					categoryService.createKey(user, category);
 				} catch (Exception e) {
 					e.printStackTrace();
 					return ResponseEntity.status(HttpStatus.FORBIDDEN).body("A technical error ocurred. Please try again later.");

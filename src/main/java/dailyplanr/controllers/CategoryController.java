@@ -18,7 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import dailyplanr.models.Category;
 import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
-import dailyplanr.service.CategoryKeys;
+import dailyplanr.service.CategoryService;
 import jakarta.validation.Valid;
 
 @Controller
@@ -27,7 +27,7 @@ public class CategoryController {
 	@Autowired
 	private CategoryRepository categoryRepository;
 	@Autowired
-	private CategoryKeys categoryKeys;
+	private CategoryService categoryService;
 
 	@Inject
 	private LoggedUser loggedUser;
@@ -67,7 +67,7 @@ public class CategoryController {
 						categoryRepository.save(category);
 						
 						try {
-							categoryKeys.createKey(u, category);
+							categoryService.createKey(u, category);
 						} catch (Exception e) {
 							e.printStackTrace();
 							redirAttrs.addFlashAttribute("error", "A technical error ocurred. Please try again later.");
