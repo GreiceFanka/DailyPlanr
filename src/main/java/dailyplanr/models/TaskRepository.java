@@ -15,9 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface TaskRepository extends PagingAndSortingRepository<Task, Integer>, CrudRepository<Task, Integer>{
 	
-	@Query(value="SELECT user_id FROM task_user WHERE task_id = ? ", nativeQuery = true)
-	public List<Integer> findTaskUser(int task_id);
-	
 	@Query(value="SELECT * FROM Task WHERE encryptId = ? ", nativeQuery = true)
 	public Optional<Task> findTaskInf(String encryptId);
 	
