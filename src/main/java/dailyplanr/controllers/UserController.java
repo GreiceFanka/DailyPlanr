@@ -7,18 +7,13 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.Duration;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
-import org.apache.commons.mail.EmailException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +33,7 @@ import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
 import dailyplanr.service.CategoryService;
-import dailyplanr.service.Security;
+import dailyplanr.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -56,6 +51,9 @@ public class UserController {
 	
 	@Autowired
 	private CategoryService categoryService;
+	
+	@Autowired
+	private UserService userService;
 
 	@Inject
 	private LoggedUser loggedUser;
@@ -201,8 +199,8 @@ public class UserController {
 				categoryRepository.save(category);
 				try {
 					categoryService.createKey(user, category);
+					userService.createKeys(uId);
 				} catch (Exception e) {
-					e.printStackTrace();
 					return ResponseEntity.status(HttpStatus.FORBIDDEN).body("A technical error ocurred. Please try again later.");
 				}
 			}
@@ -312,29 +310,14 @@ public class UserController {
 	}
 
 	@GetMapping("/search/user/{task_id}")
-	public String searchUser(@PathVariable String task_id, RedirectAttributes redirAttrs, ModelMap model) throws Exception {
+	public String searchUser(@PathVariable String task_id, RedirectAttributes redirAttrs, ModelMap model){
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			String company = loggedUser.getCompany();
 			
 			if (!company.isEmpty()) {
 				Iterable<User> usersCompany = userRepository.findUserWithSameCompany(company);
-				for (User user : usersCompany) {
-					int uid = user.getId();
-					String userId = Integer.toString(uid);
-					IvParameterSpec iv = Security.iv();
-					SecretKey symmetricKey = Security.secretKey();
-					byte[] cipherText = Security.encrypt(userId, symmetricKey, iv);
-					
-					String userEncryptId = Base64.getUrlEncoder().withoutPadding().encodeToString(cipherText);
-					user.setHashu(userEncryptId);
-					byte[] uIv = iv.getIV();
-					byte[] uKey = symmetricKey.getEncoded();
-					String base64Iv = Base64.getEncoder().encodeToString(uIv);
-					userRepository.saveKeys(userEncryptId, base64Iv, uKey, uid);
-				}
-				
-				
+								
 				model.addAttribute("usersCompany", usersCompany);
 				model.addAttribute("taskId", task_id);
 				model.addAttribute("name", loggedUser.getName());
@@ -356,7 +339,7 @@ public class UserController {
 
 	@PostMapping("/sendcontact")
 	public String sendContact(@RequestParam String userEmail, @RequestParam String subject,
-			@RequestParam String message, RedirectAttributes redirAttrs) throws EmailException {
+			@RequestParam String message, RedirectAttributes redirAttrs){
 		String passwordEmail = mail.getPasswordMail();
 		try {
 			Mail mm = new Mail();
