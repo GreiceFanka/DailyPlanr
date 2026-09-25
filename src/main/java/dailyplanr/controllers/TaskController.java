@@ -131,13 +131,11 @@ public class TaskController {
 			try {
 				int idDecrypt = taskService.decryptId(encryptId);
 				int user_id = loggedUser.getUserId();
-				List<Integer> taskUser = taskRepository.findTaskUser(idDecrypt);
-				for (Integer id : taskUser) {
-					if(user_id == id) {
-						List<Task> tasks = taskRepository.findTaskById(idDecrypt);
-						List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
-						List<String> allStatus = Status.getAllStatus();
-						List<String> allPriorities = Priority.getAllPriorities();
+	
+				List<Task> tasks = taskRepository.findTaskById(idDecrypt);
+				List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
+				List<String> allStatus = Status.getAllStatus();
+				List<String> allPriorities = Priority.getAllPriorities();
 						
 						model.addAttribute("name", loggedUser.getName());
 						model.addAttribute("user", loggedUser.getUserId());
@@ -145,12 +143,7 @@ public class TaskController {
 						model.addAttribute("categories", listCategories);
 						model.addAttribute("status", allStatus);
 						model.addAttribute("priorities", allPriorities);
-						return "updatetask";
-						
-					}else {
-						return"redirect:/alltasks";
-					}
-				} 
+						return "updatetask"; 
 			}catch (Exception e) {
 				redirectAttributes.addFlashAttribute("error", "Failed to load the page.Please try again later.");
 				return "redirect:/alltasks";
