@@ -14,7 +14,7 @@ import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
 
 @Service
-public class CategoryKeys {
+public class CategoryService {
 	
 	@Autowired
 	private CategoryRepository categoryRepository;
