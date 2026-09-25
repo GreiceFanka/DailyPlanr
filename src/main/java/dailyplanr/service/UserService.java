@@ -65,4 +65,18 @@ public class UserService {
 			return photo;
 	}
 	
+	public void createKeys(int uId) throws Exception {
+		
+		String userId = Integer.toString(uId);
+		IvParameterSpec iv = Security.iv();
+		SecretKey symmetricKey = Security.secretKey();
+		byte[] cipherText = Security.encrypt(userId, symmetricKey, iv);
+		
+		String userEncryptId = Base64.getUrlEncoder().withoutPadding().encodeToString(cipherText);
+		byte[] uIv = iv.getIV();
+		byte[] uKey = symmetricKey.getEncoded();
+		String base64Iv = Base64.getEncoder().encodeToString(uIv);
+		userRepository.saveKeys(userEncryptId, base64Iv, uKey, uId);
+	}
+	
 }
