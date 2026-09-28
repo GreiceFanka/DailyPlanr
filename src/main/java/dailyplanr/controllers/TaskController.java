@@ -405,7 +405,7 @@ public class TaskController {
 	@GetMapping("/img/{tempId}")
 	@ResponseBody
 	public byte[] getUserImage(@PathVariable String tempId){
-		byte[] photo = userService.userImg(tempId);
+		byte[] photo = userService.getUserTaskImg(tempId);
 		return photo;
 	}
 
