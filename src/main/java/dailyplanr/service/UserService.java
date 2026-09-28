@@ -1,7 +1,7 @@
 package dailyplanr.service;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.Optional;
@@ -9,11 +9,13 @@ import java.util.Optional;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.imageio.ImageIO;
+import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import dailyplanr.controllers.LoggedUser;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
 
@@ -21,6 +23,9 @@ import dailyplanr.models.UserRepository;
 public class UserService {
 	@Autowired
 	private UserRepository userRepository;
+	
+	@Inject
+	private LoggedUser loggedUser;
 	
 	public int decryptHash(String hashu) throws Exception {
 		
@@ -38,31 +43,24 @@ public class UserService {
 		return decryptUserId;
 	}
 	
-	public byte[] userImg(String tempId) {
+	public byte[] getUserTaskImg(String tempId) {
 		Optional<User> userInf = userRepository.findTempId(tempId);
 		int id = userInf.get().getId();
-		byte[] photo = null;
-		Optional<User> users = userRepository.findById(id);
-		byte[]images = users.get().getImage();
+		
+		return userRepository.findById(id)
+	            .map(User::getImage)
+	            .filter(image -> image != null && image.length > 0)
+	            .orElseGet(this::getUserDefaultTaskImg);
+	}
+	
+	private byte[] getUserDefaultTaskImg() {
+		try(InputStream is = getClass().getResourceAsStream("/static/images/user.jpg")){
+			return is.readAllBytes();
 			
-		try {
-			if (images != null) {
-				return images;
-			} else {
-				InputStream is = getClass().getResourceAsStream("/static/images/user.jpg");
-						if (is != null) {
-					        BufferedImage rd = ImageIO.read(is);
-					        ByteArrayOutputStream wr = new ByteArrayOutputStream();
-					        ImageIO.write(rd, "jpg", wr);
-					        photo = wr.toByteArray();
-					    } else {
-					        System.out.println("Imagem default não encontrada!");
-					    }
-			}
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
+		} catch (IOException e) {
+			throw new IllegalStateException("A technical error occurred.", e);
 		}
-			return photo;
+	
 	}
 	
 	public void createKeys(int uId) throws Exception {
@@ -78,5 +76,30 @@ public class UserService {
 		String base64Iv = Base64.getEncoder().encodeToString(uIv);
 		userRepository.saveKeys(userEncryptId, base64Iv, uKey, uId);
 	}
+	
+	public void saveImg(MultipartFile file) throws IOException{
+		byte[] image = file.getBytes();
+		int user_id = loggedUser.getUserId();
+		userRepository.saveImageById(image, user_id);
+	}
+	
+	public byte[] getUserImg(){
+		    int userId = loggedUser.getUserId();
+
+		    return userRepository.findById(userId)
+		            .map(User::getImage)
+		            .filter(image -> image != null && image.length > 0)
+		            .orElseGet(this::getDefaultUserImage);
+	}
+
+	private byte[] getDefaultUserImage() {
+		    try (InputStream inputStream = getClass()
+		            .getResourceAsStream("/static/images/perfil.png")) {
+		    	return inputStream.readAllBytes();
+
+		    } catch (IOException e) {
+		        throw new IllegalStateException("A technical error occurred.", e);
+		    }
+		}
 	
 }
