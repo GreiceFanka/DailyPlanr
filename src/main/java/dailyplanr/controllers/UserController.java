@@ -1,9 +1,5 @@
 package dailyplanr.controllers;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.Duration;
@@ -11,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -201,7 +196,7 @@ public class UserController {
 					categoryService.createKey(user, category);
 					userService.createKeys(uId);
 				} catch (Exception e) {
-					return ResponseEntity.status(HttpStatus.FORBIDDEN).body("A technical error ocurred. Please try again later.");
+					return ResponseEntity.status(HttpStatus.FORBIDDEN).body("A technical error occurred. Please try again later.");
 				}
 			}
 			return ResponseEntity.status(HttpStatus.OK).body("Account created successfully!");
@@ -369,21 +364,17 @@ public class UserController {
 	}
 
 	@PostMapping("/save/image")
-	public String saveUserImage(@RequestParam("image") MultipartFile file, RedirectAttributes redirAttrs)
-			throws IOException {
+	public String saveUserImage(@RequestParam("image") MultipartFile file, RedirectAttributes redirAttrs){
 		boolean session = loggedUser.isLogged();
 		String images = file.getContentType();
 	
 		if (session) {
 			if(images.endsWith("jpeg") || images.endsWith("png")) {
 			try {
-				byte[] image = file.getBytes();
-				int user_id = loggedUser.getUserId();
-				userRepository.saveImageById(image, user_id);
+				userService.saveImg(file);
 				redirAttrs.addFlashAttribute("success", "Image saved with success!");
 			} catch (Exception e) {
-				String error = e.getMessage();
-				redirAttrs.addFlashAttribute("error", error);
+				redirAttrs.addFlashAttribute("error", "A technical error occurred. Please try again later.");
 			}
 				return "redirect:/uploadimage";
 			}else {
@@ -396,25 +387,8 @@ public class UserController {
 
 	@GetMapping("/getimage")
 	@ResponseBody
-	public byte[] getUserImage() throws IOException {
-		int id = loggedUser.getUserId();
-		Optional<User> user = userRepository.findById(id);
-		byte[] photo = null;
-		byte[] image = user.get().getImage();
-
-		if (image != null) {
-			return image;
-		} else {
-			try (InputStream is = getClass().getResourceAsStream("/static/images/perfil.png")) {
-				BufferedImage rd = ImageIO.read(is);
-				ByteArrayOutputStream wr = new ByteArrayOutputStream();
-				ImageIO.write(rd, "png", wr);
-				photo = wr.toByteArray();
-
-			} catch (Exception e) {
-				e.getMessage();
-			}
+	public byte[] getUserImage(RedirectAttributes redirAttrs){
+		byte[] photo = userService.getUserImg();
 			return photo;
 		}
-	}
 }
