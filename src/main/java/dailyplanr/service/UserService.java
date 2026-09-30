@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
@@ -12,10 +14,14 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.keygen.KeyGenerators;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import dailyplanr.controllers.LoggedUser;
+import dailyplanr.models.Category;
+import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
 
@@ -23,9 +29,17 @@ import dailyplanr.models.UserRepository;
 public class UserService {
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private CategoryRepository categoryRepository;
 	
 	@Inject
 	private LoggedUser loggedUser;
+	
+	private final PasswordEncoder encoder;
+	
+	public UserService(PasswordEncoder encoder) {
+		this.encoder = encoder;
+	}
 	
 	public int decryptHash(String hashu) throws Exception {
 		
@@ -84,22 +98,57 @@ public class UserService {
 	}
 	
 	public byte[] getUserImg(){
-		    int userId = loggedUser.getUserId();
+		int userId = loggedUser.getUserId();
 
-		    return userRepository.findById(userId)
-		            .map(User::getImage)
-		            .filter(image -> image != null && image.length > 0)
-		            .orElseGet(this::getDefaultUserImage);
+		return userRepository.findById(userId)
+		       .map(User::getImage)
+		       .filter(image -> image != null && image.length > 0)
+		       .orElseGet(this::getDefaultUserImage);
 	}
 
 	private byte[] getDefaultUserImage() {
-		    try (InputStream inputStream = getClass()
-		            .getResourceAsStream("/static/images/perfil.png")) {
-		    	return inputStream.readAllBytes();
+		try (InputStream inputStream = getClass()
+		      .getResourceAsStream("/static/images/perfil.png")) {
+		    return inputStream.readAllBytes();
 
-		    } catch (IOException e) {
-		        throw new IllegalStateException("A technical error occurred.", e);
-		    }
+		} catch (IOException e) {
+		    throw new IllegalStateException("A technical error occurred.", e);
 		}
+	}
+	
+	public Matcher createUserPass(User user) {
+		String salt = KeyGenerators.string().generateKey();
+		user.setSalt(salt);
+		String tempId = KeyGenerators.string().generateKey();
+		user.setTempId(tempId);
+		user.setPassword(encoder.encode(user.getPassword().concat(salt)));
+		String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
+		Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
+		Matcher matcher = pattern.matcher(user.getLogin());
+		
+		return matcher;
+
+	}
+	
+	public Optional<String> verifyUserLogin(User user) {
+		return userRepository.findByLogin(user.getLogin()).map(User::getLogin);
+	}
+	
+	public int saveNewUser(User user) {
+		user.setTime_block(null);
+		user.setLogin_attempts(0);
+		userRepository.save(user);
+		Optional<User> u = userRepository.findByLogin(user.getLogin());
+		int id = u.get().getId();
+		return id;
+	}
+	
+	public Category createDefaultCategory(User user){
+		Category category = new Category();
+		category.setCategoryName("Default");
+		category.addUsersCategory(user);
+		categoryRepository.save(category);
+		return category;
+	}
 	
 }
