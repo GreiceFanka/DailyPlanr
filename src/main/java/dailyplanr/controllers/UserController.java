@@ -2,11 +2,10 @@ package dailyplanr.controllers;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.io.IOException;
 import java.time.Duration;
-import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +23,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import dailyplanr.models.Category;
-import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
 import dailyplanr.service.CategoryService;
+import dailyplanr.service.Mail;
 import dailyplanr.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -38,9 +37,6 @@ public class UserController {
 
 	@Autowired
 	private UserRepository userRepository;
-
-	@Autowired
-	private CategoryRepository categoryRepository;
 
 	private final PasswordEncoder encoder;
 	
@@ -163,41 +159,20 @@ public class UserController {
 
 	@PostMapping("/new")
 	public ResponseEntity<String> newUser(@Valid User user, RedirectAttributes redirAttrs){
-		String salt = KeyGenerators.string().generateKey();
-		user.setSalt(salt);
-		String tempId = KeyGenerators.string().generateKey();
-		user.setTempId(tempId);
-		user.setPassword(encoder.encode(user.getPassword().concat(salt)));
 		boolean isEmail = false;
-		String expression = "^[\\w\\.-]+@([\\w\\-]+\\.)+[A-Z]{2,4}$";
-		Pattern pattern = Pattern.compile(expression, Pattern.CASE_INSENSITIVE);
-		Matcher matcher = pattern.matcher(user.getLogin());
-
+		Matcher matcher = userService.createUserPass(user);
 		if (matcher.matches()) {
 			isEmail = true;
 		}
-
-		Optional<User> opUser = userRepository.findByLogin(user.getLogin());
-
+		Optional<String> opUser = userService.verifyUserLogin(user);
 		if (opUser.isEmpty() && isEmail) {
-			user.setTime_block(null);
-			user.setLogin_attempts(0);
-			userRepository.save(user);
-			
-			Optional<User> u = userRepository.findByLogin(user.getLogin());
-			int uId = u.get().getId();
-			List<Category> listCat = categoryRepository.findCategoryByUser(uId);
-			if (listCat.isEmpty()) {
-				Category category = new Category();
-				category.setCategoryName("Default");
-				category.addUsersCategory(user);
-				categoryRepository.save(category);
-				try {
-					categoryService.createKey(user, category);
-					userService.createKeys(uId);
-				} catch (Exception e) {
+			int id = userService.saveNewUser(user);
+			Category category = userService.createDefaultCategory(user);
+			try {
+				userService.createKeys(id);
+				categoryService.createKey(user, category);
+			} catch (Exception e) {
 					return ResponseEntity.status(HttpStatus.FORBIDDEN).body("A technical error occurred. Please try again later.");
-				}
 			}
 			return ResponseEntity.status(HttpStatus.OK).body("Account created successfully!");
 		} else if (!isEmail) {
@@ -373,7 +348,7 @@ public class UserController {
 			try {
 				userService.saveImg(file);
 				redirAttrs.addFlashAttribute("success", "Image saved with success!");
-			} catch (Exception e) {
+			} catch (IOException e) {
 				redirAttrs.addFlashAttribute("error", "A technical error occurred. Please try again later.");
 			}
 				return "redirect:/uploadimage";
