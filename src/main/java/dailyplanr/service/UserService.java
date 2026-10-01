@@ -3,6 +3,7 @@ package dailyplanr.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -24,6 +25,8 @@ import dailyplanr.models.Category;
 import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Service
 public class UserService {
@@ -150,5 +153,28 @@ public class UserService {
 		categoryRepository.save(category);
 		return category;
 	}
+	
+	public void setNewSession(User user,int login_attempts,LocalDateTime time_block, int id,HttpSession session, HttpServletRequest request){
+		session.invalidate();
+		HttpSession newSession = request.getSession(true);
+		newSession.setAttribute("user", user.getLogin());
+		newSession.setMaxInactiveInterval(30 * 60);
+		this.loggedUser.setUserLogged(user);
+		userRepository.userTimeBlock(login_attempts, time_block, id);
+	}
+	
+	public boolean validateOldPassword(String oldPass) {
+		User user = userRepository.findByLogin(loggedUser.getLoginUser()).orElseThrow();
+		String lastPass = oldPass.concat(user.getSalt());
+		boolean valid = encoder.matches(lastPass, user.getPassword());		
+		return valid;
+	}
+	
+	public void updatePassword(String newPass) {
+		String salt = KeyGenerators.string().generateKey();
+		String password = encoder.encode(newPass.concat(salt));
+		userRepository.updatePassword(password, salt, loggedUser.getUserId());
+	}
+	
 	
 }
