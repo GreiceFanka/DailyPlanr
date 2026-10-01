@@ -103,12 +103,11 @@ public class UserController {
 		}else {
 			if(user.getTemporary_salt().isAfter(time)) {
 					String salt = KeyGenerators.string().generateKey();
-					user.setSalt(salt);
 					String password = (encoder.encode(newPassword.concat(salt)));
 					user.setTemporary_salt(null);
 					user.setToken("");
 					int id = user.getId();
-					userRepository.updatePassword(password, id);
+					userRepository.updatePassword(password, salt, id);
 					return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
 					
 			}else {
@@ -194,14 +193,13 @@ public class UserController {
 		if (opUser.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
 		}
-
+		
 		User user = opUser.get();
 		int id = user.getId();
 		LocalDateTime time_now = LocalDateTime.now();
 		LocalDateTime unblockTime = user.getTime_block();
 		
 		if(unblockTime != null && time_now.isBefore(unblockTime)) {
-			time_block = user.getTime_block();
 			Duration duration = Duration.between(time_now, unblockTime);
 			duration = duration.plusMinutes(1);
 			min_block = duration.toMinutesPart();
@@ -209,17 +207,11 @@ public class UserController {
 			
 		}else {
 			if(user.getSalt() != null) {
-				String encodedPass = password.concat(user.getSalt());
-				
+				String encodedPass = password.concat(user.getSalt());				
 				boolean valid = encoder.matches(encodedPass, user.getPassword());
 				
 				if (valid) {
-					session.invalidate();
-					HttpSession newSession = request.getSession(true);
-					newSession.setAttribute("user", user.getLogin());
-					newSession.setMaxInactiveInterval(30 * 60);
-					this.loggedUser.setUserLogged(user);
-					userRepository.userTimeBlock(login_attempts, time_block, id);
+					userService.setNewSession(user, login_attempts, time_block, id, session, request);
 					return ResponseEntity.status(HttpStatus.OK).body("Success");
 						
 				}else {
@@ -256,23 +248,13 @@ public class UserController {
 		boolean logged = loggedUser.isLogged();
 
 		if (logged) {
-			String login = loggedUser.getLoginUser();
-			Optional<User> opUser = userRepository.findByLogin(login);
-			User user = opUser.get();
-			String lastPass = oldPass.concat(user.getSalt());
-			boolean valid = encoder.matches(lastPass, user.getPassword());		
+			boolean valid = userService.validateOldPassword(oldPass);
 
 			if (valid) {
-				int id = loggedUser.getUserId();
-				String salt = KeyGenerators.string().generateKey();
-				user.setSalt(salt);
-				String password = (encoder.encode(newPass.concat(salt)));
-				userRepository.updatePassword(password, id);
+				userService.updatePassword(newPass);
 				return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
-				
 			} else {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Your current password doesn´t match.");
-				
 			}
 		} else {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("An error occurred!Please try again later.");
