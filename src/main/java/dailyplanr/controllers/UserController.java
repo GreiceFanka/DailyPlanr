@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -80,12 +79,11 @@ public class UserController {
 	public String userpass(@PathVariable String token) {
 		Optional<User> userToken = userRepository.findByToken(token);
 		LocalDateTime dateTime = LocalDateTime.now();
-		
 		if(userToken.isEmpty()) {
 			return "redirect:/index";
 		}else if(userToken.get().getTemporary_salt().isBefore(dateTime)) {
 			int id = userToken.get().getId();
-			userRepository.userDestroyToken("", null, id);
+			userService.destroyToken(id);
 			return "redirect:/index";
 		}else if(userToken.isPresent() && token.length() >= 16) {
 			return "userpass";
@@ -95,24 +93,19 @@ public class UserController {
 	
 	@PostMapping("/tokenpasschange")
 	public ResponseEntity<String> tokenPassChange(String newPassword, String token){
-		Optional<User> findUser = userRepository.findByToken(token);
-		User user = findUser.get();
-		LocalDateTime time = LocalDateTime.now();
-		if(findUser.isEmpty()) {
+		User user = userService.findUserByToken(token);
+		int id = user.getId();
+		if(user.getName().isEmpty()) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
 		}else {
+			LocalDateTime time = LocalDateTime.now();
 			if(user.getTemporary_salt().isAfter(time)) {
-					String salt = KeyGenerators.string().generateKey();
-					String password = (encoder.encode(newPassword.concat(salt)));
-					user.setTemporary_salt(null);
-					user.setToken("");
-					int id = user.getId();
-					userRepository.updatePassword(password, salt, id);
-					return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
+				userService.updatePassword(newPassword, id);
+				userService.destroyToken(id);
+				return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
 					
 			}else {
-				int id = user.getId();
-				userRepository.userDestroyToken("", null, id);
+				userService.destroyToken(id);
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Expired token. Please request the reset password again.");
 		}
 			
@@ -251,7 +244,8 @@ public class UserController {
 			boolean valid = userService.validateOldPassword(oldPass);
 
 			if (valid) {
-				userService.updatePassword(newPass);
+				int id = loggedUser.getUserId();
+				userService.updatePassword(newPass, id);
 				return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
 			} else {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Your current password doesn´t match.");
