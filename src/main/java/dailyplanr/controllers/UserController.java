@@ -77,15 +77,15 @@ public class UserController {
 	
 	@GetMapping("/userpass/{token}")
 	public String userpass(@PathVariable String token) {
-		Optional<User> userToken = userRepository.findByToken(token);
+		Optional<User> user = userService.findUserByToken(token);
 		LocalDateTime dateTime = LocalDateTime.now();
-		if(userToken.isEmpty()) {
+		if(user.isEmpty()) {
 			return "redirect:/index";
-		}else if(userToken.get().getTemporary_salt().isBefore(dateTime)) {
-			int id = userToken.get().getId();
+		}else if(user.get().getTemporary_salt().isBefore(dateTime)) {
+			int id = user.get().getId();
 			userService.destroyToken(id);
 			return "redirect:/index";
-		}else if(userToken.isPresent() && token.length() >= 16) {
+		}else if(user.isPresent() && token.length() >= 16) {
 			return "userpass";
 		}
 		return "redirect:/index";
@@ -93,13 +93,13 @@ public class UserController {
 	
 	@PostMapping("/tokenpasschange")
 	public ResponseEntity<String> tokenPassChange(String newPassword, String token){
-		User user = userService.findUserByToken(token);
-		int id = user.getId();
-		if(user.getName().isEmpty()) {
+		Optional<User> user = userService.findUserByToken(token);
+		int id = user.get().getId();
+		if(user.isEmpty()){
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
 		}else {
 			LocalDateTime time = LocalDateTime.now();
-			if(user.getTemporary_salt().isAfter(time)) {
+			if(user.get().getTemporary_salt().isAfter(time)) {
 				userService.updatePassword(newPassword, id);
 				userService.destroyToken(id);
 				return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
