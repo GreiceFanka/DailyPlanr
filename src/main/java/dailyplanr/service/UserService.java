@@ -182,8 +182,8 @@ public class UserService {
 		userRepository.userDestroyToken(token, temporary_salt, id);
 	}
 	
-	public User findUserByToken(String token) {
-		return userRepository.findByToken(token).get();
+	public Optional<User> findUserByToken(String token) {
+		return userRepository.findByToken(token);
 	}
 	
 	
