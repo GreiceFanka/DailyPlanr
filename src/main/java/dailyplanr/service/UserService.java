@@ -170,10 +170,20 @@ public class UserService {
 		return valid;
 	}
 	
-	public void updatePassword(String newPass) {
+	public void updatePassword(String newPass, int id) {
 		String salt = KeyGenerators.string().generateKey();
 		String password = encoder.encode(newPass.concat(salt));
-		userRepository.updatePassword(password, salt, loggedUser.getUserId());
+		userRepository.updatePassword(password, salt, id);
+	}
+	
+	public void destroyToken(int id) {
+		LocalDateTime temporary_salt = null;
+		String token = "";
+		userRepository.userDestroyToken(token, temporary_salt, id);
+	}
+	
+	public User findUserByToken(String token) {
+		return userRepository.findByToken(token).get();
 	}
 	
 	
