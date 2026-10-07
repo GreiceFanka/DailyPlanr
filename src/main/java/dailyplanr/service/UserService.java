@@ -4,6 +4,7 @@ package dailyplanr.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -14,6 +15,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 
+import org.apache.commons.mail.EmailException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +39,9 @@ public class UserService {
 	
 	@Inject
 	private LoggedUser loggedUser;
+	
+	@Inject
+	private Mail mail;
 	
 	private final PasswordEncoder encoder;
 	
@@ -186,5 +191,32 @@ public class UserService {
 		return userRepository.findByToken(token);
 	}
 	
+	public String sendEmailToResetPassword(User user){
+		try {
+			String email = user.getLogin();
+			String name = user.getName();
+			String passwordEmail = mail.getPasswordMail();
+			String salt = user.getSalt();
+			String token = encoder.encode(email.concat(salt));
+			token = token.replaceAll("/", "");
+			token = token.replace(".", "");
+			int id = user.getId();
+			String sender = mail.sendResetPassword(email, name, token, passwordEmail);
+			if(sender.equalsIgnoreCase("success")) {
+				saveEmailData(token,id);
+				return sender;
+			}else {
+				throw new EmailException();
+			}
+		} catch (EmailException e) {
+			return "A technical error occurred. Please try again later.";
+		}
+	}
 	
+	private void saveEmailData(String token, int id) {
+		LocalDateTime time = LocalDateTime.now().plusMinutes(5);
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
+		time.format(dateTimeFormatter);
+		userRepository.saveTemporary(time, token, id);
+	}
 }
