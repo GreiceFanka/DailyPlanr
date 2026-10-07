@@ -1,7 +1,6 @@
 package dailyplanr.controllers;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Optional;
@@ -115,37 +114,19 @@ public class UserController {
 	@PostMapping("/resetpass")
 	public String resetPass(@RequestParam String email, RedirectAttributes redirAttrs){
 		Optional<User> findUser = userRepository.findByLogin(email);
-		
 		if(findUser.isEmpty()) {
 			redirAttrs.addFlashAttribute("error", "User not found!");
 			return "redirect:/forgotpass";
 		}else {
 			User user = findUser.get();
-			String name = user.getName();
-			String passwordEmail = mail.getPasswordMail();
-			String salt = user.getSalt();
-			String token = encoder.encode(email.concat(salt));
-			token = token.replaceAll("/", "");
-			token = token.replace(".", "");
-			int id = user.getId();
-			try {
-				String sender = mail.sendResetPassword(email, name, token, passwordEmail);
+			String sender = userService.sendEmailToResetPassword(user);
 				if(sender.equalsIgnoreCase("success")) {
-					LocalDateTime time = LocalDateTime.now().plusMinutes(5);
-					DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-					time.format(dateTimeFormatter);
-					userRepository.saveTemporary(time, token, id);
 					redirAttrs.addFlashAttribute("success", "An email was sent, you have 5 minutes to change your password.");
 					return "redirect:/forgotpass";
 				}else {
 					redirAttrs.addFlashAttribute("error", sender);
 					return "redirect:/forgotpass";
 				}
-			} catch (Exception e) {
-				String error = e.getMessage();
-				redirAttrs.addFlashAttribute("error", error);
-				return "redirect:/forgotpass";
-			}
 		}
 	}
 
