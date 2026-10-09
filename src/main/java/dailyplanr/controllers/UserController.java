@@ -157,10 +157,7 @@ public class UserController {
 
 	@PostMapping("/passwordcheck")
 	public ResponseEntity<String> validatePassword(@RequestParam String login, @RequestParam String password, HttpSession session, HttpServletRequest request) {
-		LocalDateTime time_block = null;
-		int login_attempts = 0;
 		Optional<User> opUser = userService.findLogin(login);
-
 		if (opUser.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
 		}
@@ -176,17 +173,17 @@ public class UserController {
 				String encodedPass = password.concat(opUser.get().getSalt());				
 				boolean valid = encoder.matches(encodedPass, opUser.get().getPassword());
 				if (valid) {
-					userService.setNewSession(opUser.get(), login_attempts, time_block, opUser.get().getId(), session, request);
+					userService.setNewSession(opUser.get(), session, request);
 					return ResponseEntity.status(HttpStatus.OK).body("Success");
 				}else {
-					login_attempts = userService.configLoginAttempts(opUser.get());
-					userService.saveTimeBlock(login_attempts, time_block, opUser.get().getId());
+					int login_attempts = userService.configLoginAttempts(opUser.get());
+					userService.saveTimeBlock(login_attempts, opUser.get().getTime_block(), opUser.get().getId());
 					if(login_attempts >= 5) {
 						userService.setUserTimeBlock(opUser.get());
 					}
 				}
 			}
-				return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
 		}
 	}
 
