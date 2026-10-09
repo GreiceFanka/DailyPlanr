@@ -160,13 +160,16 @@ public class UserService {
 		return category;
 	}
 	
-	public void setNewSession(User user,int login_attempts,LocalDateTime time_block, int id,HttpSession session, HttpServletRequest request){
+	public void setNewSession(User user,HttpSession session, HttpServletRequest request){
 		session.invalidate();
 		HttpSession newSession = request.getSession(true);
 		newSession.setAttribute("user", user.getLogin());
 		newSession.setMaxInactiveInterval(30 * 60);
 		this.loggedUser.setUserLogged(user);
-		userRepository.userTimeBlock(login_attempts, time_block, id);
+		int login_attempts = 0;
+		LocalDateTime time_block = null;
+		int id = user.getId();
+		saveTimeBlock(login_attempts, time_block, id);
 	}
 	
 	public boolean validateOldPassword(String oldPass) {
