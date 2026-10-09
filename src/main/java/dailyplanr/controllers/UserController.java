@@ -2,7 +2,6 @@ package dailyplanr.controllers;
 
 import java.time.LocalDateTime;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import javax.inject.Inject;
@@ -160,52 +159,36 @@ public class UserController {
 	public ResponseEntity<String> validatePassword(@RequestParam String login, @RequestParam String password, HttpSession session, HttpServletRequest request) {
 		LocalDateTime time_block = null;
 		int login_attempts = 0;
-		int min_block = 0;
-		
-		Optional<User> opUser = userRepository.findByLogin(login);
+		Optional<User> opUser = userService.findLogin(login);
 
 		if (opUser.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
 		}
-		
-		User user = opUser.get();
-		int id = user.getId();
 		LocalDateTime time_now = LocalDateTime.now();
-		LocalDateTime unblockTime = user.getTime_block();
+		LocalDateTime unblockTime = opUser.get().getTime_block();
 		
 		if(unblockTime != null && time_now.isBefore(unblockTime)) {
-			Duration duration = Duration.between(time_now, unblockTime);
-			duration = duration.plusMinutes(1);
-			min_block = duration.toMinutesPart();
+			int min_block = userService.configMinutesUserBlock(time_now, unblockTime);
 			return ResponseEntity.status(HttpStatus.LOCKED).body("Blocked for " + min_block + " minutes due to multiple tentatives!Try again later.");
 			
 		}else {
-			if(user.getSalt() != null) {
-				String encodedPass = password.concat(user.getSalt());				
-				boolean valid = encoder.matches(encodedPass, user.getPassword());
-				
+			if(opUser.get().getSalt() != null) {
+				String encodedPass = password.concat(opUser.get().getSalt());				
+				boolean valid = encoder.matches(encodedPass, opUser.get().getPassword());
 				if (valid) {
-					userService.setNewSession(user, login_attempts, time_block, id, session, request);
+					userService.setNewSession(opUser.get(), login_attempts, time_block, opUser.get().getId(), session, request);
 					return ResponseEntity.status(HttpStatus.OK).body("Success");
-						
 				}else {
-					login_attempts = user.getLogin_attempts();
-					user.setLogin_attempts(login_attempts++);
+					login_attempts = userService.configLoginAttempts(opUser.get());
+					userService.saveTimeBlock(login_attempts, time_block, opUser.get().getId());
 					if(login_attempts >= 5) {
-						LocalDateTime newTime = LocalDateTime.now().plusMinutes(10);
-						user.setTime_block(newTime);
-						time_block = user.getTime_block();
-						login_attempts = 0;
+						userService.setUserTimeBlock(opUser.get());
 					}
-			
 				}
-				
 			}
-			
-			userRepository.userTimeBlock(login_attempts, time_block, id);
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
-			}
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
 		}
+	}
 
 	@GetMapping("/changepassword")
 	public String changePassword(ModelMap model) {
