@@ -3,6 +3,7 @@ package dailyplanr.service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -218,5 +219,34 @@ public class UserService {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 		time.format(dateTimeFormatter);
 		userRepository.saveTemporary(time, token, id);
+	}
+	
+	public Optional<User> findLogin(String login){
+		return userRepository.findByLogin(login);
+	}
+	
+	public int configMinutesUserBlock(LocalDateTime time_now,LocalDateTime unblockTime) {
+		Duration duration = Duration.between(time_now, unblockTime);
+		duration = duration.plusMinutes(1);
+		int min_block = duration.toMinutesPart();
+		return min_block;
+	}
+	
+	public int configLoginAttempts(User user) {
+		int login_attempts = user.getLogin_attempts();
+		user.setLogin_attempts(login_attempts++);
+		return login_attempts;
+	}
+	
+	public void setUserTimeBlock(User user) {
+		LocalDateTime newTime = LocalDateTime.now().plusMinutes(10);
+		user.setTime_block(newTime);
+		LocalDateTime time_block = user.getTime_block(); 
+		int login_attempts = 0;
+		saveTimeBlock(login_attempts,time_block,user.getId());
+	}
+	
+	public void saveTimeBlock(int login_attempts, LocalDateTime time_block, int id) {
+		userRepository.userTimeBlock(login_attempts, time_block, id);
 	}
 }
