@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import dailyplanr.controllers.LoggedUser;
@@ -85,7 +86,7 @@ public class UserService {
 		}
 	
 	}
-	
+	@Transactional
 	public void createKeys(int uId) throws Exception {
 		
 		String userId = Integer.toString(uId);
@@ -99,7 +100,7 @@ public class UserService {
 		String base64Iv = Base64.getEncoder().encodeToString(uIv);
 		userRepository.saveKeys(userEncryptId, base64Iv, uKey, uId);
 	}
-	
+	@Transactional
 	public void saveImg(MultipartFile file) throws IOException{
 		byte[] image = file.getBytes();
 		int user_id = loggedUser.getUserId();
@@ -142,7 +143,7 @@ public class UserService {
 	public Optional<String> verifyUserLogin(User user) {
 		return userRepository.findByLogin(user.getLogin()).map(User::getLogin);
 	}
-	
+	@Transactional
 	public int saveNewUser(User user) {
 		user.setTime_block(null);
 		user.setLogin_attempts(0);
@@ -151,7 +152,7 @@ public class UserService {
 		int id = u.get().getId();
 		return id;
 	}
-	
+	@Transactional
 	public Category createDefaultCategory(User user){
 		Category category = new Category();
 		category.setCategoryName("Default");
@@ -159,7 +160,7 @@ public class UserService {
 		categoryRepository.save(category);
 		return category;
 	}
-	
+	@Transactional
 	public void setNewSession(User user,HttpSession session, HttpServletRequest request){
 		session.invalidate();
 		HttpSession newSession = request.getSession(true);
@@ -178,23 +179,23 @@ public class UserService {
 		boolean valid = encoder.matches(lastPass, user.getPassword());		
 		return valid;
 	}
-	
+	@Transactional
 	public void updatePassword(String newPass, int id) {
 		String salt = KeyGenerators.string().generateKey();
 		String password = encoder.encode(newPass.concat(salt));
 		userRepository.updatePassword(password, salt, id);
 	}
-	
+	@Transactional
 	public void destroyToken(int id) {
 		LocalDateTime temporary_salt = null;
 		String token = "";
 		userRepository.userDestroyToken(token, temporary_salt, id);
 	}
-	
+
 	public Optional<User> findUserByToken(String token) {
 		return userRepository.findByToken(token);
 	}
-	
+	@Transactional
 	public String sendEmailToResetPassword(User user){
 		try {
 			String email = user.getLogin();
@@ -216,14 +217,14 @@ public class UserService {
 			return "A technical error occurred. Please try again later.";
 		}
 	}
-	
+	@Transactional
 	private void saveEmailData(String token, int id) {
 		LocalDateTime time = LocalDateTime.now().plusMinutes(5);
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 		time.format(dateTimeFormatter);
 		userRepository.saveTemporary(time, token, id);
 	}
-	
+
 	public Optional<User> findLogin(String login){
 		return userRepository.findByLogin(login);
 	}
@@ -240,7 +241,7 @@ public class UserService {
 		user.setLogin_attempts(login_attempts++);
 		return login_attempts;
 	}
-	
+	@Transactional
 	public void setUserTimeBlock(User user) {
 		LocalDateTime newTime = LocalDateTime.now().plusMinutes(10);
 		user.setTime_block(newTime);
@@ -249,6 +250,7 @@ public class UserService {
 		saveTimeBlock(login_attempts,time_block,user.getId());
 	}
 	
+	@Transactional
 	public void saveTimeBlock(int login_attempts, LocalDateTime time_block, int id) {
 		userRepository.userTimeBlock(login_attempts, time_block, id);
 	}
