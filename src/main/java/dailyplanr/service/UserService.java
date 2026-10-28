@@ -186,8 +186,13 @@ public class UserService {
 		userRepository.updatePassword(password, salt, id);
 	}
 	@Transactional
-	public void destroyToken(LocalDateTime dateTime) {
-		userRepository.userDestroyToken(dateTime);
+	public void destroyExpiredToken(LocalDateTime dateTime) {
+		userRepository.userDestroyExpiredToken(dateTime);
+	}
+	
+	@Transactional
+	public void destroyToken(int id) {
+		userRepository.userDestroyToken(id);
 	}
 
 	public Optional<User> findUserByToken(String token) {

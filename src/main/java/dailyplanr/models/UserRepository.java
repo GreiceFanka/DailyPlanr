@@ -36,7 +36,11 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	
 	@Modifying
 	@Query(value=" UPDATE User SET token = '',temporary_salt = null WHERE temporary_salt < :now AND token IS NOT NULL", nativeQuery = true)
-	public void userDestroyToken(@Param("now") LocalDateTime now);
+	public void userDestroyExpiredToken(@Param("now") LocalDateTime now);
+	
+	@Modifying
+	@Query(value=" UPDATE User SET token = '', temporary_salt = null WHERE id = ?",nativeQuery = true)
+	public void userDestroyToken(int id);
 	
 	@Modifying
 	@Query(value="UPDATE User SET login_attempts = ?, time_block = ? WHERE id = ? ", nativeQuery = true)

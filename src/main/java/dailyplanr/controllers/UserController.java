@@ -80,7 +80,7 @@ public class UserController {
 		if(user.isEmpty()) {
 			return "redirect:/index";
 		}else if(user.get().getTemporary_salt().isBefore(dateTime)) {
-			userService.destroyToken(dateTime);
+			userService.destroyExpiredToken(dateTime);
 			return "redirect:/index";
 		}else if(user.isPresent() && token.length() >= 16) {
 			return "userpass";
@@ -98,10 +98,11 @@ public class UserController {
 			LocalDateTime time = LocalDateTime.now();
 			if(user.get().getTemporary_salt().isAfter(time)) {
 				userService.updatePassword(newPassword, id);
+				userService.destroyToken(id);
 				return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
 					
 			}else {
-				userService.destroyToken(time);
+				userService.destroyExpiredToken(time);
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Expired token. Please request the reset password again.");
 		}
 			
