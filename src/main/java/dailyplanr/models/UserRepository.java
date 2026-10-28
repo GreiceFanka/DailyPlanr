@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends CrudRepository<User, Integer>{
 	@Query(value="SELECT * FROM User WHERE company = ? ", nativeQuery = true)
@@ -34,8 +35,8 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	public void updatePassword(String password, String salt, int id);
 	
 	@Modifying
-	@Query(value="UPDATE User SET token = ?, temporary_salt = ? WHERE id = ? ", nativeQuery = true)
-	public void userDestroyToken(String token, LocalDateTime temporary_salt, int id);
+	@Query(value=" UPDATE User SET token = '',temporary_salt = null WHERE temporary_salt < :now AND token IS NOT NULL", nativeQuery = true)
+	public void userDestroyToken(@Param("now") LocalDateTime now);
 	
 	@Modifying
 	@Query(value="UPDATE User SET login_attempts = ?, time_block = ? WHERE id = ? ", nativeQuery = true)
