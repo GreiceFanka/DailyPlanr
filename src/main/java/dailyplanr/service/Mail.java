@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import dailyplanr.models.TaskRepository;
-import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
 
 @EnableScheduling
@@ -34,20 +34,9 @@ public class Mail {
 	}
 	
 	@Scheduled(cron="0 0 0 * * *")
+	@Transactional
 	public void destroyToken() {
-		LocalDateTime time = LocalDateTime.now();
-		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
-		time.format(dateTimeFormatter);
-		
-		Iterable<User> users = userRepository.findUsersWithToken();
-		
-		for (User user : users) {
-			if(user.getTemporary_salt().isBefore(time)) {
-				int id = user.getId();
-				userRepository.userDestroyToken("", null, id);
-			}
-		}
-		
+		 userRepository.userDestroyToken(LocalDateTime.now());
 	}
 	
 	@Scheduled(cron="0 0 23 * * *")
