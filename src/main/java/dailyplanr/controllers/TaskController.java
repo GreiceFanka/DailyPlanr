@@ -27,6 +27,7 @@ import dailyplanr.models.Priority;
 import dailyplanr.models.Status;
 import dailyplanr.models.Task;
 import dailyplanr.models.TaskRepository;
+import dailyplanr.service.CategoryService;
 import dailyplanr.service.TaskService;
 import dailyplanr.service.UserService;
 import jakarta.validation.Valid;
@@ -45,6 +46,9 @@ public class TaskController {
 	@Autowired
 	private UserService userService;
 	
+	@Autowired
+	private CategoryService categoryService;
+	
 	@Inject
 	private LoggedUser loggedUser;
 
@@ -53,8 +57,7 @@ public class TaskController {
 		boolean session = loggedUser.isLogged();
 
 		if (session) {
-			int id = loggedUser.getUserId();
-			List<Category> listCategories = categoryRepository.findCategoryByUser(id);
+			List<Category> listCategories = categoryService.findCategoryByUser();
 			List<String> allPriorities = Priority.getAllPriorities();
 
 			model.addAttribute("name", loggedUser.getName());
@@ -129,11 +132,9 @@ public class TaskController {
 		
 		if (session) {
 			try {
-				int idDecrypt = taskService.decryptId(encryptId);
-				int user_id = loggedUser.getUserId();
-	
+				int idDecrypt = taskService.decryptId(encryptId);	
 				List<Task> tasks = taskRepository.findTaskById(idDecrypt);
-				List<Category> listCategories = categoryRepository.findCategoryByUser(user_id);
+				List<Category> listCategories = categoryService.findCategoryByUser();
 				List<String> allStatus = Status.getAllStatus();
 				List<String> allPriorities = Priority.getAllPriorities();
 						
@@ -307,8 +308,7 @@ public class TaskController {
 	public String showTasksByCategory(ModelMap model) {
 		boolean session = loggedUser.isLogged();
 		if (session) {
-			int id = loggedUser.getUserId();
-			List<Category> categories = categoryRepository.findCategoryByUser(id);
+			List<Category> categories = categoryService.findCategoryByUser();
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("categories", categories);
 			return "tasksbycategory";
@@ -320,12 +320,11 @@ public class TaskController {
 	public String showTasksCategory(@RequestParam String category, ModelMap model) {
 		boolean session = loggedUser.isLogged();
 		if (session) {
-			int id = loggedUser.getUserId();
 			try {
 				int catId = categoryRepository.findCategory(category);
 				if (catId > 0) {
-					List<Task> tasks = taskRepository.findTaskByUserAndCategory(id, catId);
-					List<Category> categories = categoryRepository.findCategoryByUser(id);
+					List<Task> tasks = taskRepository.findTaskByUserAndCategory(loggedUser.getUserId(), catId);
+					List<Category> categories = categoryService.findCategoryByUser();
 					model.addAttribute("name", loggedUser.getName());
 					model.addAttribute("tasks", tasks);
 					model.addAttribute("categories", categories);
