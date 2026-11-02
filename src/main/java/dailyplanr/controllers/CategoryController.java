@@ -36,8 +36,7 @@ public class CategoryController {
 	public String getAllCategories(ModelMap model){
 		boolean session = loggedUser.isLogged();
 		if (session) {
-			int id = loggedUser.getUserId();
-			List<Category> categories = categoryRepository.findCategoryByUser(id);			
+			List<Category> categories = categoryService.findCategoryByUser();			
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("categories", categories);
 			return "allcategories";
@@ -48,21 +47,14 @@ public class CategoryController {
 	@PostMapping("/create/categories")
 	public String createCategory(@Valid Category category, RedirectAttributes redirAttrs){
 		boolean session = loggedUser.isLogged();
-		int user = loggedUser.getUserId();
-		boolean exists = false;
-		String catName = category.getCategoryName();
-		
 		if (session) {
-			List<Category> catExists = categoryRepository.findCategoryByUser(user);
-			exists = catExists.stream()
-			        .anyMatch(cat -> cat.getCategoryName().equalsIgnoreCase(catName));
-
+			boolean exists = categoryService.categoryExists(category);
 				if (exists) {
 					redirAttrs.addFlashAttribute("error", "This category already exists.");
 					return "redirect:/newcategory";
-				}else {
+				}else if(!category.getCategoryName().isEmpty()){
 						User u = new User();
-						u.setId(user);
+						u.setId(loggedUser.getUserId());
 						category.addUsersCategory(u);
 						categoryRepository.save(category);
 						
@@ -73,8 +65,10 @@ public class CategoryController {
 							redirAttrs.addFlashAttribute("error", "A technical error ocurred. Please try again later.");
 							return "redirect:/newcategory";
 						}
-					
-						return "redirect:/allcategories";
+					return "redirect:/allcategories";
+				}else {
+					redirAttrs.addFlashAttribute("error", "Category name must not be empty.");
+					return "redirect:/newcategory";
 				}
 		}
 		return "redirect:/login";
@@ -83,9 +77,8 @@ public class CategoryController {
 	@GetMapping("/edit/category/{id}")
 	public String editCategory(@PathVariable String id, ModelMap model) {
 		boolean session = loggedUser.isLogged();
-		int categoryId = categoryRepository.findCategory(id);
 		if (session) {
-			List<Category> categories = categoryRepository.findCategoryById(categoryId);
+			List<Category> categories = categoryService.findCategory(id);
 			model.addAttribute("name", loggedUser.getName());
 			model.addAttribute("categories", categories);
 			return "editcategory";
@@ -96,13 +89,11 @@ public class CategoryController {
 	@PostMapping("/update/category")
 	public String updateCategory(@RequestParam String categoryName, String id, ModelMap model,RedirectAttributes redirAttrs) {
 		boolean session = loggedUser.isLogged();
-		int categoryId = categoryRepository.findCategory(id);
 		if (session) {
 			if(!categoryName.isEmpty()) {
-			categoryRepository.updateCategory(categoryName, categoryId);
+			categoryService.updateCategory(categoryName, id);
 			model.addAttribute("name", loggedUser.getName());
 			return "redirect:/allcategories";
-			
 			}else {
 				redirAttrs.addFlashAttribute("error", "Category name must not be empty.");
 				return "redirect:/edit/category/"+ id;
