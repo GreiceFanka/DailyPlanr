@@ -5,10 +5,13 @@ import java.util.List;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import dailyplanr.controllers.LoggedUser;
 import dailyplanr.models.Category;
 import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
@@ -19,6 +22,10 @@ public class CategoryService {
 	@Autowired
 	private CategoryRepository categoryRepository;
 	
+	@Inject
+	private LoggedUser loggedUser;
+	
+	@Transactional
 	public void createKey(User user,Category category) throws Exception {
 		int u = user.getId();
 		List<Category> categories = categoryRepository.findCategoryByUser(u);
@@ -36,6 +43,32 @@ public class CategoryService {
 				String base64Iv = Base64.getEncoder().encodeToString(cIv);
 				categoryRepository.saveKeys(categoryEncId, base64Iv, cKey, catId);
 			}
+	}
+	
+	@Transactional
+	public void updateCategory (String categoryName,String id) {
+		int categoryId = categoryRepository.findCategory(id);
+		categoryRepository.updateCategory(categoryName, categoryId);
+	}
+	
+	public boolean categoryExists(Category category) {
+		String catName = category.getCategoryName();
+		List<Category> categories = findCategoryByUser();
+		boolean exists = categories.stream()
+		        .anyMatch(cat -> cat.getCategoryName().equalsIgnoreCase(catName));
+		return exists;
+	}
+	
+	public List<Category> findCategoryByUser(){
+		int user = loggedUser.getUserId();
+		List<Category> categories = categoryRepository.findCategoryByUser(user);
+		return categories;
+	}
+	
+	public List<Category> findCategory(String id) {
+		int categoryId = categoryRepository.findCategory(id);
+		List<Category> categories = categoryRepository.findCategoryById(categoryId);
+		return categories;
 	}
 
 }
