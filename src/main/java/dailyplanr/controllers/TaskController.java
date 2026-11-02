@@ -161,7 +161,7 @@ public class TaskController {
 			if (data != null && !data.isEmpty()) {
 				try {
 					int idDecrypt = taskService.decryptId(task_id);
-					taskRepository.updateTask(data, title, description, priority, idDecrypt);
+					taskService.updateTask(data, title, description, priority, idDecrypt);
 				} catch (Exception e) {
 					redirectAttributes.addFlashAttribute("error", "Failed to edit task.Please try again later.");
 					return "redirect:/edit/task/{id}";
@@ -184,11 +184,8 @@ public class TaskController {
 		if (session) {
 			try {
 				int idDecrypt = taskService.decryptId(task_id);
-				LocalDate updatedStatus = LocalDate.now();
-				DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-				updatedStatus.format(dateTimeFormatter);
-
-				taskRepository.editStatus(taskStatus, updatedStatus, idDecrypt);
+				LocalDate updatedStatus = taskService.getDate();
+				taskService.editStatus(taskStatus, updatedStatus, idDecrypt);
 				return "redirect:/alltasks";
 			} catch (Exception e) {
 				redirectAttributes.addFlashAttribute("error", "Failed to edit status.Please try again later.");
@@ -205,9 +202,8 @@ public class TaskController {
 			try {
 				int cId = categoryRepository.findCategory(cat_id);
 				int idDecrypt = taskService.decryptId(task_id);
-				taskRepository.editTaskCategory(cId, idDecrypt);
+				taskService.editTaskCategory(cId, idDecrypt);
 				return "redirect:/alltasks";
-				
 			} catch (Exception e) {
 				redirectAttributes.addFlashAttribute("error", "Failed to edit category.Please try again later.");
 				return "redirect:/alltasks";
@@ -225,7 +221,7 @@ public class TaskController {
 				int decryptUserId = userService.decryptHash(hashu);	
 				boolean user = taskService.userInTask(idDecrypt, decryptUserId);
 				if (!user) {
-					taskRepository.insertUserTask(idDecrypt, decryptUserId);
+					taskService.insertUserTask(idDecrypt, decryptUserId);
 					redirectAttributes.addFlashAttribute("success", "Everything went just fine.");
 				} else {
 					redirectAttributes.addFlashAttribute("error", "This user is already signed to this task!");
@@ -392,7 +388,7 @@ public class TaskController {
 			try {
 				int idDecrypt = taskService.decryptId(taskId);
 				int decryptUserId = userService.decryptHash(hashu);				
-				taskRepository.deleteUserTask(idDecrypt, decryptUserId);
+				taskService.deleteUserTask(idDecrypt, decryptUserId);
 				redirectAttributes.addFlashAttribute("success", "Person deleted from task with success!");
 			} catch (Exception e) {
 				redirectAttributes.addFlashAttribute("error", "Something went wrog, please try later.");
