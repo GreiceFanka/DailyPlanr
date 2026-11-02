@@ -1,5 +1,6 @@
 package dailyplanr.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import dailyplanr.controllers.LoggedUser;
 import dailyplanr.models.Category;
@@ -39,7 +41,7 @@ public class TaskService {
 	
 	private byte[] cipherText;
 	
-	
+	@Transactional
 	public void createTask(String title,LocalDateTime data,String description,String categories,String priority) throws Exception {
 		User user = new User();
 	    user.setId(loggedUser.getUserId());
@@ -90,6 +92,7 @@ public class TaskService {
 			return alert;
 	}
 	
+	
 	public void createKey() throws Exception {
 		int id = loggedUser.getUserId();
 		Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
@@ -139,6 +142,38 @@ public class TaskService {
 				}
 			}
 		return user;
+	}
+	
+	public LocalDate getDate() {
+		LocalDate today = LocalDate.now();
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		today.format(dateTimeFormatter);
+		return today;
+	}
+	
+	@Transactional
+	public void updateTask(String data,String title, String description, String priority, int idDecrypt) {
+		taskRepository.updateTask(data, title, description, priority, idDecrypt);
+	}
+	
+	@Transactional
+	public void editStatus(String taskStatus,LocalDate updatedStatus, int idDecrypt) {
+		taskRepository.editStatus(taskStatus, updatedStatus, idDecrypt);
+	}
+	
+	@Transactional
+	public void editTaskCategory(int cId, int idDecrypt) {
+		taskRepository.editTaskCategory(cId, idDecrypt);
+	}
+	
+	@Transactional
+	public void insertUserTask(int idDecrypt, int decryptUserId) {
+		taskRepository.insertUserTask(idDecrypt, decryptUserId);
+	}
+	
+	@Transactional
+	public void deleteUserTask(int idDecrypt,int decryptUserId) {
+		taskRepository.deleteUserTask(idDecrypt, decryptUserId);
 	}
 
 }
