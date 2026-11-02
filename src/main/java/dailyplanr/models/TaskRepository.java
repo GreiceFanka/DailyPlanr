@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface TaskRepository extends PagingAndSortingRepository<Task, Integer>, CrudRepository<Task, Integer>{
 	
@@ -49,36 +48,30 @@ public interface TaskRepository extends PagingAndSortingRepository<Task, Integer
 			+ "where user_id = ? AND taskStatus IN ('In progress', 'To do') AND category_id = ? ", nativeQuery = true)
 	public List<Task> findTaskByUserAndCategory(int id, int category);
 	
-	@Transactional
 	@Modifying
 	@Query(value="UPDATE Task SET data = ? , title = ? , description = ? , priority = ? "
 			+ "WHERE id = ? ", nativeQuery = true)
 	public void updateTask(String data, String title, String description, String priority, int task_id);
 	
-	@Transactional
 	@Modifying
 	@Query(value="UPDATE Task SET taskStatus = ?, updatedStatus = ? WHERE id = ? ", nativeQuery = true)
 	public void editStatus(String taskStatus, LocalDate updatedStatus, int id);
 	
-	@Transactional
 	@Modifying
 	@Query(value="UPDATE Task SET category_id = ? WHERE id = ? ", nativeQuery = true)
 	public void editTaskCategory(int cat_id, int id);
 	
-	@Transactional
 	@Modifying
 	@Query(value="INSERT INTO task_user (task_id, user_id) "
 			+ "VALUES (?, ?) ", nativeQuery = true)
 	public void insertUserTask(int taskId, int userId);
 	
-	@Transactional
 	@Modifying
 	@Query(value="DELETE FROM task_user WHERE task_id = ? AND user_id = ? ", nativeQuery = true)
 	public void deleteUserTask(int taskId, int userId);
 	
 	public List<Task> findTaskById(int id);
 	
-	@Transactional
 	@Modifying
 	@Query(value="UPDATE Task SET encryptId = ?, iv = ?, symmetricKey = ? WHERE id = ? ", nativeQuery = true)
 	public void encryptKeyCreation(String encryptId,String taskIv, byte[] taskKey, int id);
