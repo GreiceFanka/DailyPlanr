@@ -27,11 +27,11 @@ public class CategoryService {
 	
 	@Transactional
 	public void createKey(User user,Category category) throws Exception {
-		int u = user.getId();
+		long u = user.getId();
 		List<Category> categories = categoryRepository.findCategoryByUser(u);
 		for (Category cat : categories) {
-				int catId = cat.getId();
-				String cId = Integer.toString(catId);
+				long catId = cat.getId();
+				String cId = Long.toString(catId);
 				IvParameterSpec iv = Security.iv();
 				SecretKey symmetricKey = Security.secretKey();
 				byte[] cipherText = Security.encrypt(cId, symmetricKey, iv);
@@ -47,7 +47,7 @@ public class CategoryService {
 	
 	@Transactional
 	public void updateCategory (String categoryName,String id) {
-		int categoryId = categoryRepository.findCategory(id);
+		long categoryId = categoryRepository.findCategory(id);
 		categoryRepository.updateCategory(categoryName, categoryId);
 	}
 	
@@ -60,13 +60,13 @@ public class CategoryService {
 	}
 	
 	public List<Category> findCategoryByUser(){
-		int user = loggedUser.getUserId();
+		long user = loggedUser.getUserId();
 		List<Category> categories = categoryRepository.findCategoryByUser(user);
 		return categories;
 	}
 	
 	public List<Category> findCategory(String id) {
-		int categoryId = categoryRepository.findCategory(id);
+		long categoryId = categoryRepository.findCategory(id);
 		List<Category> categories = categoryRepository.findCategoryById(categoryId);
 		return categories;
 	}

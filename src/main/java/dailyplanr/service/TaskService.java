@@ -46,7 +46,7 @@ public class TaskService {
 		User user = new User();
 	    user.setId(loggedUser.getUserId());
 
-	    int categoryId = categoryRepository.findCategory(categories);
+	    long categoryId = categoryRepository.findCategory(categories);
 	    Category category = categoryRepository.findById(categoryId)
 	        .orElseThrow(() -> new IllegalArgumentException("Category not found"));
 
@@ -72,7 +72,7 @@ public class TaskService {
 	
 	public String findLateTasks() {
 		String alert = "null";
-		int id = loggedUser.getUserId();
+		long id = loggedUser.getUserId();
 		Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
 		LocalDateTime now = LocalDateTime.now();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
@@ -94,12 +94,12 @@ public class TaskService {
 	
 	
 	public void createKey() throws Exception {
-		int id = loggedUser.getUserId();
+		long id = loggedUser.getUserId();
 		Iterable<Task> allTasks = taskRepository.findTaskByUser(id);
 		for (Task task : allTasks) {
 			if(!task.getTaskStatus().equalsIgnoreCase("Archive")) {
-				String taskId = Integer.toString(task.getId());
-				int tid = task.getId();
+				String taskId = Long.toString(task.getId());
+				long tid = task.getId();
 				iv = Security.iv();
 				symmetricKey = Security.secretKey();
 				cipherText = Security.encrypt(taskId, symmetricKey, iv);
@@ -114,7 +114,7 @@ public class TaskService {
 		}
 	}
 	
-	public int decryptId(String encryptId)throws Exception {
+	public long decryptId(String encryptId)throws Exception {
 		Optional<Task> taskInf = taskRepository.findTaskInf(encryptId);
 		Task task = taskInf.get();
 		
@@ -128,12 +128,12 @@ public class TaskService {
 		
 		String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
 		
-		int idDecrypt = Integer.parseInt(decryptedText);
+		long idDecrypt = Integer.parseInt(decryptedText);
 		
 		return idDecrypt;
 	}
 	
-	public boolean userInTask(int idDecrypt, int decryptUserId) {
+	public boolean userInTask(long idDecrypt, long decryptUserId) {
 		List<Task> tasks = taskRepository.findTaskById(idDecrypt);
 		boolean user = false;
 		for (User users : tasks.get(0).getUsers()) {
@@ -152,27 +152,27 @@ public class TaskService {
 	}
 	
 	@Transactional
-	public void updateTask(String data,String title, String description, String priority, int idDecrypt) {
+	public void updateTask(String data,String title, String description, String priority, long idDecrypt) {
 		taskRepository.updateTask(data, title, description, priority, idDecrypt);
 	}
 	
 	@Transactional
-	public void editStatus(String taskStatus,LocalDate updatedStatus, int idDecrypt) {
+	public void editStatus(String taskStatus,LocalDate updatedStatus, long idDecrypt) {
 		taskRepository.editStatus(taskStatus, updatedStatus, idDecrypt);
 	}
 	
 	@Transactional
-	public void editTaskCategory(int cId, int idDecrypt) {
+	public void editTaskCategory(long cId, long idDecrypt) {
 		taskRepository.editTaskCategory(cId, idDecrypt);
 	}
 	
 	@Transactional
-	public void insertUserTask(int idDecrypt, int decryptUserId) {
+	public void insertUserTask(long idDecrypt, long decryptUserId) {
 		taskRepository.insertUserTask(idDecrypt, decryptUserId);
 	}
 	
 	@Transactional
-	public void deleteUserTask(int idDecrypt,int decryptUserId) {
+	public void deleteUserTask(long idDecrypt,long decryptUserId) {
 		taskRepository.deleteUserTask(idDecrypt, decryptUserId);
 	}
 

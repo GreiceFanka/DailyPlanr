@@ -51,7 +51,7 @@ public class UserService {
 		this.encoder = encoder;
 	}
 	
-	public int decryptHash(String hashu) throws Exception {
+	public long decryptHash(String hashu) throws Exception {
 		
 		Optional<User> userInf = userRepository.findUsrInf(hashu);
 		
@@ -63,13 +63,13 @@ public class UserService {
 		
 		byte[] uCipherText = Base64.getUrlDecoder().decode(hashu);
 		String decryptHashu = Security.decrypt(uCipherText, oKey, uIvSpec);
-		int decryptUserId = Integer.parseInt(decryptHashu);		
+		long decryptUserId = Integer.parseInt(decryptHashu);		
 		return decryptUserId;
 	}
 	
 	public byte[] getUserTaskImg(String tempId) {
 		Optional<User> userInf = userRepository.findTempId(tempId);
-		int id = userInf.get().getId();
+		long id = userInf.get().getId();
 		
 		return userRepository.findById(id)
 	            .map(User::getImage)
@@ -87,9 +87,9 @@ public class UserService {
 	
 	}
 	@Transactional
-	public void createKeys(int uId) throws Exception {
+	public void createKeys(long uId) throws Exception {
 		
-		String userId = Integer.toString(uId);
+		String userId = Long.toString(uId);
 		IvParameterSpec iv = Security.iv();
 		SecretKey symmetricKey = Security.secretKey();
 		byte[] cipherText = Security.encrypt(userId, symmetricKey, iv);
@@ -103,12 +103,12 @@ public class UserService {
 	@Transactional
 	public void saveImg(MultipartFile file) throws IOException{
 		byte[] image = file.getBytes();
-		int user_id = loggedUser.getUserId();
+		long user_id = loggedUser.getUserId();
 		userRepository.saveImageById(image, user_id);
 	}
 	
 	public byte[] getUserImg(){
-		int userId = loggedUser.getUserId();
+		long userId = loggedUser.getUserId();
 
 		return userRepository.findById(userId)
 		       .map(User::getImage)
@@ -144,12 +144,12 @@ public class UserService {
 		return userRepository.findByLogin(user.getLogin()).map(User::getLogin);
 	}
 	@Transactional
-	public int saveNewUser(User user) {
+	public long saveNewUser(User user) {
 		user.setTime_block(null);
 		user.setLogin_attempts(0);
 		userRepository.save(user);
 		Optional<User> u = userRepository.findByLogin(user.getLogin());
-		int id = u.get().getId();
+		long id = u.get().getId();
 		return id;
 	}
 	@Transactional
@@ -169,7 +169,7 @@ public class UserService {
 		this.loggedUser.setUserLogged(user);
 		int login_attempts = 0;
 		LocalDateTime time_block = null;
-		int id = user.getId();
+		long id = user.getId();
 		saveTimeBlock(login_attempts, time_block, id);
 	}
 	
@@ -180,7 +180,7 @@ public class UserService {
 		return valid;
 	}
 	@Transactional
-	public void updatePassword(String newPass, int id) {
+	public void updatePassword(String newPass, long id) {
 		String salt = KeyGenerators.string().generateKey();
 		String password = encoder.encode(newPass.concat(salt));
 		userRepository.updatePassword(password, salt, id);
@@ -191,7 +191,7 @@ public class UserService {
 	}
 	
 	@Transactional
-	public void destroyToken(int id) {
+	public void destroyToken(long id) {
 		userRepository.userDestroyToken(id);
 	}
 
@@ -208,7 +208,7 @@ public class UserService {
 			String token = encoder.encode(email.concat(salt));
 			token = token.replaceAll("/", "");
 			token = token.replace(".", "");
-			int id = user.getId();
+			long id = user.getId();
 			String sender = mail.sendResetPassword(email, name, token, passwordEmail);
 			if(sender.equalsIgnoreCase("success")) {
 				saveEmailData(token,id);
@@ -221,7 +221,7 @@ public class UserService {
 		}
 	}
 	@Transactional
-	private void saveEmailData(String token, int id) {
+	private void saveEmailData(String token, long id) {
 		LocalDateTime time = LocalDateTime.now().plusMinutes(5);
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 		time.format(dateTimeFormatter);
@@ -254,7 +254,7 @@ public class UserService {
 	}
 	
 	@Transactional
-	public void saveTimeBlock(int login_attempts, LocalDateTime time_block, int id) {
+	public void saveTimeBlock(int login_attempts, LocalDateTime time_block, long id) {
 		userRepository.userTimeBlock(login_attempts, time_block, id);
 	}
 }
