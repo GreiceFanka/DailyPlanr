@@ -36,7 +36,7 @@ public class Mail {
 	@Scheduled(cron="0 0 0 * * *")
 	@Transactional
 	public void destroyToken() {
-		 userRepository.userDestroyToken(LocalDateTime.now());
+		 userRepository.userDestroyExpiredToken(LocalDateTime.now());
 	}
 	
 	@Scheduled(cron="0 0 23 * * *")
@@ -57,7 +57,7 @@ public class Mail {
 
 				email.setHostName("smtp.zoho.eu");
 				email.setSmtpPort(465);
-				email.setFrom("greicefcardoso@zohomail.eu","DailyPlanr");
+				email.setFrom("appdailyplanr@zohomail.eu","DailyPlanr");
 
 				email.addTo(user);
 				email.setSubject("DailyPlanr task reminder");
@@ -66,7 +66,7 @@ public class Mail {
 						+ "\n" + "Greetings from DailyPlanr team!");
 
 				email.setSSLOnConnect(true);
-				email.setAuthentication("greicefcardoso@zohomail.eu", passwordMail);
+				email.setAuthentication("appdailyplanr@zohomail.eu", passwordMail);
 				System.out.println("Sending...");
 				email.send();
 				System.out.println("Email sent!");
@@ -83,13 +83,13 @@ public class Mail {
 			contactEmail.setHostName("smtp.zoho.eu");
 			contactEmail.setSmtpPort(465);
 			
-			contactEmail.setFrom("greicefcardoso@zohomail.eu", userEmail);
+			contactEmail.setFrom("appdailyplanr@zohomail.eu", userEmail);
 			contactEmail.addTo("greicefcardoso@gmail.com");
 			contactEmail.setSubject(subject);
 			contactEmail.setMsg(message);
 			
 			contactEmail.setSSLOnConnect(true);
-			contactEmail.setAuthentication("greicefcardoso@zohomail.eu", passwordEmail);
+			contactEmail.setAuthentication("appdailyplanr@zohomail.eu", passwordEmail);
 			System.out.println("Sending...");
 			contactEmail.send();
 			return "success";
@@ -122,12 +122,12 @@ public class Mail {
 			contactEmail.setHostName("smtp.zoho.eu");
 			contactEmail.setSmtpPort(465);
 			
-			contactEmail.setFrom("greicefcardoso@zohomail.eu");
+			contactEmail.setFrom("appdailyplanr@zohomail.eu");
 			contactEmail.addTo(userEmail);
 			contactEmail.setSubject(subject);
 			contactEmail.setMsg(message);
 			contactEmail.setSSLOnConnect(true);
-			contactEmail.setAuthentication("greicefcardoso@zohomail.eu", passwordEmail);
+			contactEmail.setAuthentication("appdailyplanr@zohomail.eu", passwordEmail);
 			System.out.println("Sending...");
 			contactEmail.send();
 			return "success";
