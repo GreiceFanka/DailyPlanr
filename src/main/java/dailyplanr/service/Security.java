@@ -7,6 +7,7 @@ import java.security.SecureRandom;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 
 public class Security{
@@ -27,16 +28,18 @@ public class Security{
 	
 	public static byte[] encrypt(String input, SecretKey key, IvParameterSpec iv)
 	        throws Exception {
-	    Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding");
-	    cipher.init(Cipher.ENCRYPT_MODE, key, iv);
+	    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+	    GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv.getIV());
+	    cipher.init(Cipher.ENCRYPT_MODE, key, parameterSpec);
 	    return cipher.doFinal(input.getBytes(StandardCharsets.UTF_8));
 	}
 	
 	public static String decrypt(byte[] cipherText, SecretKey key, IvParameterSpec iv) throws Exception {
-	    Cipher cipher = Cipher.getInstance("AES/CFB8/NoPadding");
-	    cipher.init(Cipher.DECRYPT_MODE, key, iv); 
+	    Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+	    GCMParameterSpec parameterSpec = new GCMParameterSpec(128, iv.getIV());
+	    cipher.init(Cipher.DECRYPT_MODE, key, parameterSpec); 
 	    byte[] plainText = cipher.doFinal(cipherText);
-	    return new String(plainText);
+	    return new String(plainText, StandardCharsets.UTF_8);
 	}
 	
 	public static SecretKey secretKey() throws Exception {
