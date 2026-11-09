@@ -102,7 +102,7 @@ public class Mail {
 	
 	public String sendResetPassword(String userEmail,String name, String token, String passwordEmail) throws EmailException {
 		String subject = "DailyPlanr reset password";
-		String urlToken = "http://localhost:8080/userpass/"+token;
+		String urlToken = "http://dailyplanr.site/userpass/"+token;
 	
 		String message = "Hello "+name+", \n"
 				
