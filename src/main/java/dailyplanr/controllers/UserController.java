@@ -91,7 +91,7 @@ public class UserController {
 	@PostMapping("/tokenpasschange")
 	public ResponseEntity<String> tokenPassChange(String newPassword, String token){
 		Optional<User> user = userService.findUserByToken(token);
-		int id = user.get().getId();
+		long id = user.get().getId();
 		if(user.isEmpty()){
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Forbidden");
 		}else {
@@ -137,7 +137,7 @@ public class UserController {
 		}
 		Optional<String> opUser = userService.verifyUserLogin(user);
 		if (opUser.isEmpty() && isEmail) {
-			int id = userService.saveNewUser(user);
+			long id = userService.saveNewUser(user);
 			Category category = userService.createDefaultCategory(user);
 			try {
 				userService.createKeys(id);
@@ -204,7 +204,7 @@ public class UserController {
 			boolean valid = userService.validateOldPassword(oldPass);
 
 			if (valid) {
-				int id = loggedUser.getUserId();
+				long id = loggedUser.getUserId();
 				userService.updatePassword(newPass, id);
 				return ResponseEntity.status(HttpStatus.OK).body("Password changed successfully!");
 			} else {

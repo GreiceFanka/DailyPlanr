@@ -115,7 +115,7 @@ public class TaskController {
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			try {
-				int idDecrypt = taskService.decryptId(encryptId);
+				long idDecrypt = taskService.decryptId(encryptId);
 				taskRepository.deleteById(idDecrypt);
 				return "redirect:/alltasks";
 			} catch (Exception e) {
@@ -132,7 +132,7 @@ public class TaskController {
 		
 		if (session) {
 			try {
-				int idDecrypt = taskService.decryptId(encryptId);	
+				long idDecrypt = taskService.decryptId(encryptId);	
 				List<Task> tasks = taskRepository.findTaskById(idDecrypt);
 				List<Category> listCategories = categoryService.findCategoryByUser();
 				List<String> allStatus = Status.getAllStatus();
@@ -161,7 +161,7 @@ public class TaskController {
 		if (session) {
 			if (data != null && !data.isEmpty()) {
 				try {
-					int idDecrypt = taskService.decryptId(task_id);
+					long idDecrypt = taskService.decryptId(task_id);
 					taskService.updateTask(data, title, description, priority, idDecrypt);
 				} catch (Exception e) {
 					redirectAttributes.addFlashAttribute("error", "Failed to edit task.Please try again later.");
@@ -184,7 +184,7 @@ public class TaskController {
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			try {
-				int idDecrypt = taskService.decryptId(task_id);
+				long idDecrypt = taskService.decryptId(task_id);
 				LocalDate updatedStatus = taskService.getDate();
 				taskService.editStatus(taskStatus, updatedStatus, idDecrypt);
 				return "redirect:/alltasks";
@@ -201,8 +201,8 @@ public class TaskController {
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			try {
-				int cId = categoryRepository.findCategory(cat_id);
-				int idDecrypt = taskService.decryptId(task_id);
+				long cId = categoryRepository.findCategory(cat_id);
+				long idDecrypt = taskService.decryptId(task_id);
 				taskService.editTaskCategory(cId, idDecrypt);
 				return "redirect:/alltasks";
 			} catch (Exception e) {
@@ -218,8 +218,8 @@ public class TaskController {
 		boolean session = loggedUser.isLogged();	
 		if (session) {
 			try {
-				int idDecrypt = taskService.decryptId(taskId);
-				int decryptUserId = userService.decryptHash(hashu);	
+				long idDecrypt = taskService.decryptId(taskId);
+				long decryptUserId = userService.decryptHash(hashu);	
 				boolean user = taskService.userInTask(idDecrypt, decryptUserId);
 				if (!user) {
 					taskService.insertUserTask(idDecrypt, decryptUserId);
@@ -240,7 +240,7 @@ public class TaskController {
 
 	@GetMapping("/late/tasks")
 	public String lateTasks(ModelMap model) {
-		int id = loggedUser.getUserId();
+		long id = loggedUser.getUserId();
 		LocalDateTime date = LocalDateTime.now();
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 		date.format(dateTimeFormatter);
@@ -256,7 +256,7 @@ public class TaskController {
 			@RequestParam(value = "size", defaultValue = "8") int size) {
 		boolean session = loggedUser.isLogged();
 		if (session) {
-			int id = loggedUser.getUserId();
+			long id = loggedUser.getUserId();
 			int currentPage = page;
 			int pageSize = size;
 			Page<Task> allTasks = taskRepository.findTaskByUserAndStatus(id,
@@ -288,7 +288,7 @@ public class TaskController {
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			try {
-				int idDecrypt = taskService.decryptId(id);
+				long idDecrypt = taskService.decryptId(id);
 				List<Task> tasks = taskRepository.findTaskById(idDecrypt);
 				List<String> allStatus = Status.getAllStatus();
 				model.addAttribute("name", loggedUser.getName());
@@ -321,7 +321,7 @@ public class TaskController {
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			try {
-				int catId = categoryRepository.findCategory(category);
+				long catId = categoryRepository.findCategory(category);
 				if (catId > 0) {
 					List<Task> tasks = taskRepository.findTaskByUserAndCategory(loggedUser.getUserId(), catId);
 					List<Category> categories = categoryService.findCategoryByUser();
@@ -345,7 +345,7 @@ public class TaskController {
 		
 		if (session) {
 			if (finalDate != null && initialDate != null) {
-				int id = loggedUser.getUserId();
+				long id = loggedUser.getUserId();
 				Iterable<Task> completedTasks = taskRepository.findCompletedTasks(id, initialDate, finalDate);
 				if (completedTasks.iterator().hasNext()) {
 					model.addAttribute("completedTasks", completedTasks);
@@ -366,7 +366,7 @@ public class TaskController {
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			try {
-				int idDecrypt = taskService.decryptId(id);
+				long idDecrypt = taskService.decryptId(id);
 				List<Task> tasks = taskRepository.findTaskById(idDecrypt);
 				model.addAttribute("tasks", tasks);
 				model.addAttribute("name", loggedUser.getName());
@@ -385,8 +385,8 @@ public class TaskController {
 		boolean session = loggedUser.isLogged();
 		if (session) {
 			try {
-				int idDecrypt = taskService.decryptId(taskId);
-				int decryptUserId = userService.decryptHash(hashu);				
+				long idDecrypt = taskService.decryptId(taskId);
+				long decryptUserId = userService.decryptHash(hashu);				
 				taskService.deleteUserTask(idDecrypt, decryptUserId);
 				redirectAttributes.addFlashAttribute("success", "Person deleted from task with success!");
 			} catch (Exception e) {

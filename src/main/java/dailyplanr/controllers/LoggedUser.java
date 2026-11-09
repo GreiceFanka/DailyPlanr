@@ -34,7 +34,7 @@ public class LoggedUser {
 		return this.user.getLogin();
 	}
 
-	public Integer getUserId() {
+	public Long getUserId() {
 		return this.user.getId();
 	}
 
