@@ -22,7 +22,7 @@ import jakarta.persistence.ManyToOne;
 public class Task {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private long id;
 
 	@Column(nullable = false)
 	private String title;
@@ -77,7 +77,7 @@ public class Task {
 		this.priority = priority;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 

@@ -18,7 +18,7 @@ import jakarta.persistence.ManyToMany;
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private long id;
 	
 	@Column(unique = true, nullable = false)
 	private String login;
@@ -82,7 +82,7 @@ public class User {
 		this.time_block = time_block;
 		this.token = token;
 	}
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 	public void setId(int id) {
