@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface UserRepository extends CrudRepository<User, Integer>{
+public interface UserRepository extends CrudRepository<User, Long>{
 	@Query(value="SELECT * FROM User WHERE company = ? ", nativeQuery = true)
 	public Iterable<User> findUserWithSameCompany(String company);
 	
@@ -28,11 +28,11 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	@Modifying
 	@Query(value="UPDATE User SET image = ? "
 			+ "WHERE id = ? ",nativeQuery = true)
-	public void saveImageById(byte[] image, int user_id);
+	public void saveImageById(byte[] image, long user_id);
 	
 	@Modifying
 	@Query(value="UPDATE User SET password = ?, salt = ? WHERE id = ? ", nativeQuery = true)
-	public void updatePassword(String password, String salt, int id);
+	public void updatePassword(String password, String salt, long id);
 	
 	@Modifying
 	@Query(value=" UPDATE User SET token = '',temporary_salt = null WHERE temporary_salt < :now AND token IS NOT NULL", nativeQuery = true)
@@ -40,17 +40,17 @@ public interface UserRepository extends CrudRepository<User, Integer>{
 	
 	@Modifying
 	@Query(value=" UPDATE User SET token = '', temporary_salt = null WHERE id = ?",nativeQuery = true)
-	public void userDestroyToken(int id);
+	public void userDestroyToken(long id);
 	
 	@Modifying
 	@Query(value="UPDATE User SET login_attempts = ?, time_block = ? WHERE id = ? ", nativeQuery = true)
-	public void userTimeBlock (int login_attempts, LocalDateTime time_block, int id);
+	public void userTimeBlock (int login_attempts, LocalDateTime time_block, long id);
 	
 	@Modifying
 	@Query(value="UPDATE User SET temporary_salt = ?, token = ? WHERE id = ? ", nativeQuery = true)
-	public void saveTemporary(LocalDateTime temporary_salt, String token, int id);
+	public void saveTemporary(LocalDateTime temporary_salt, String token, long id);
 	
 	@Modifying
 	@Query(value="UPDATE User SET hashu = ?, iv = ?, symmetricKey = ?  WHERE id = ? ", nativeQuery = true)
-	public void saveKeys(String hashu, String iv, byte[] uKey, int uid);
+	public void saveKeys(String hashu, String iv, byte[] uKey, long uid);
 }
