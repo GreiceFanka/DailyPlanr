@@ -63,7 +63,7 @@ public class UserService {
 		
 		byte[] uCipherText = Base64.getUrlDecoder().decode(hashu);
 		String decryptHashu = Security.decrypt(uCipherText, oKey, uIvSpec);
-		long decryptUserId = Integer.parseInt(decryptHashu);		
+		long decryptUserId = Long.parseLong(decryptHashu);		
 		return decryptUserId;
 	}
 	

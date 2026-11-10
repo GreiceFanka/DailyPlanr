@@ -128,7 +128,7 @@ public class TaskService {
 		
 		String decryptedText = Security.decrypt(cipherText, originalKey, ivSpec);
 		
-		long idDecrypt = Integer.parseInt(decryptedText);
+		long idDecrypt = Long.parseLong(decryptedText);
 		
 		return idDecrypt;
 	}
