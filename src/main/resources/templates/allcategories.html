@@ -65,18 +65,18 @@
 			<div class="container">
 				<div class="alert alert-danger" role="alert" th:text="${error}"
 						th:if="${error}" style="max-width:25%;"></div>
-				<div class="alert alert-success" role="alert" th:text="${success}"
+				<div class="alert alert-success col-4" role="alert" th:text="${success}"
 						th:if="${success}"></div>
 					<div class="row">
-						<div class="card col-4 border-white" style="margin: 30px; padding: 10px;"
+						<div class="card col-4 border-white" style="margin: 2%; padding:2%;"
 							th:each="category:${categories}">
 							<div class="card-body row">
 							<i class="bi bi-tag-fill"></i>
 								<p class="card-text col-4" th:text="${category.categoryName}"></p>
 								<a th:href="@{/edit/category/{id}(id=${category.catId})}"><button
-										type="button" class="btn btn-primary align-self-end">Edit</button></a>
-								<button type="button" class="btn btn-danger"
-							        style="margin-left: 5%;"
+										type="button" class="btn btn-primary align-baseline">Edit</button></a>
+								<button type="button" class="btn btn-danger align-baseline"
+							        style="margin-left:2%; height: 39px;"
 							        data-toggle="modal"
 							        data-target="#deleteModalCategory"
 							        th:attr="data-category-id=${category.catId}, data-category-name=${category.categoryName}"
