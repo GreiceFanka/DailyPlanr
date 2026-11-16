@@ -138,7 +138,7 @@ public class UserController {
 		Optional<String> opUser = userService.verifyUserLogin(user);
 		if (opUser.isEmpty() && isEmail) {
 			long id = userService.saveNewUser(user);
-			Category category = userService.createDefaultCategory(user);
+			Category category = categoryService.createDefaultCategory(user);
 			try {
 				userService.createKeys(id);
 				categoryService.createKey(user, category);
