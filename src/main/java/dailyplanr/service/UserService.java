@@ -25,8 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import dailyplanr.controllers.LoggedUser;
-import dailyplanr.models.Category;
-import dailyplanr.models.CategoryRepository;
 import dailyplanr.models.User;
 import dailyplanr.models.UserRepository;
 import jakarta.servlet.http.HttpSession;
@@ -36,8 +34,6 @@ import jakarta.servlet.http.HttpServletRequest;
 public class UserService {
 	@Autowired
 	private UserRepository userRepository;
-	@Autowired
-	private CategoryRepository categoryRepository;
 	
 	@Inject
 	private LoggedUser loggedUser;
@@ -151,14 +147,6 @@ public class UserService {
 		Optional<User> u = userRepository.findByLogin(user.getLogin());
 		long id = u.get().getId();
 		return id;
-	}
-	@Transactional
-	public Category createDefaultCategory(User user){
-		Category category = new Category();
-		category.setCategoryName("Default");
-		category.addUsersCategory(user);
-		categoryRepository.save(category);
-		return category;
 	}
 	@Transactional
 	public void setNewSession(User user,HttpSession session, HttpServletRequest request){
