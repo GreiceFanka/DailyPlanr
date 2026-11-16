@@ -27,4 +27,12 @@ public interface CategoryRepository extends CrudRepository<Category, Long>{
 	
 	@Query(value="SELECT id FROM Category WHERE catId = ? ", nativeQuery = true)
 	public long findCategory(String catId);
+	
+	@Modifying
+	@Query(value="UPDATE Task SET category_id = ? WHERE category_id = ?", nativeQuery = true)
+	public void changeTaskCategory(long newCategoryid, long oldId);
+	
+	@Modifying
+	@Query(value="DELETE FROM categories_user WHERE category_id = ? AND user_id = ?", nativeQuery = true)
+	public void deleteCategory(long category_id, long user_id);
 }

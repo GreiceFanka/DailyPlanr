@@ -111,4 +111,24 @@ public class CategoryController {
 		}
 		return "redirect:/login";
 	}
+	
+	@PostMapping("/delete/category")
+	public String deleteCategory(@RequestParam String catId,@RequestParam String categoryName, RedirectAttributes redirAttrs) {
+		boolean session = loggedUser.isLogged();
+		if(session) {
+			if(categoryName.equalsIgnoreCase("Default")) {
+				redirAttrs.addFlashAttribute("error", "The default category cannot be deleted!");
+				return "redirect:/allcategories";
+			}
+			try {
+				categoryService.changeTaskCategory(catId);
+				redirAttrs.addFlashAttribute("success", "Everything went just fine.");
+				return "redirect:/allcategories";
+			} catch (Exception e) {
+				redirAttrs.addFlashAttribute("error", "A technical error ocurred. Please try again later.");
+				return "redirect:/allcategories";
+			}
+		}
+		return "redirect:/login";
+	}
 }

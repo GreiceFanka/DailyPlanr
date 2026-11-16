@@ -3,7 +3,6 @@ if ($('#alert').text() != 'null') {
 	$('#alertModal').modal('show');
 }
 
-
 (function($) {
 
 	"use strict";
@@ -180,3 +179,13 @@ $(".close").click(function() {
       }
     });
   });
+  
+ $('#deleteModalCategory').on('show.bs.modal', function (event) {
+
+    var button = $(event.relatedTarget);
+    var categoryId = button.data('category-id');
+    var categoryName = button.data('category-name');
+    $(this).find('#catId').val(categoryId);
+    $(this).find('#categoryName').val(categoryName);
+
+});
